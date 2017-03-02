@@ -94,11 +94,18 @@ namespace RappiSharp.Compiler.Lexer
 
         private IntegerToken ReadInteger()
         {
-            int value = 0;
+            uint value = 0;
+            uint old_value = 0;
             while (!_endOfText && IsDigit(_current))
             {
-                int digit = _current - '0';
+                old_value = value;
+                uint digit = (uint)_current - '0';
                 value = value * 10 + digit;
+                if(value < old_value)
+                {
+                    //TODO: return error token or throw exception
+                    return null;
+                }
                 ReadNext();
             }
             return new IntegerToken(CurrentLocation(), value);
