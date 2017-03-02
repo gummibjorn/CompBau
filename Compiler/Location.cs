@@ -2,8 +2,8 @@
 
 namespace RappiSharp.Compiler {
   internal struct Location : IEquatable<Location> {
-    public int Row { get; }
-    public int Col { get; }
+    public int Row { get; set; }
+    public int Col { get; set; }
 
     public Location(int row, int col) {
       Row = row;

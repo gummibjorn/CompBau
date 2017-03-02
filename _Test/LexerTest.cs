@@ -11,6 +11,7 @@ namespace _Test
     {
 
         RappiLexer _lexer;
+        private Location ZEROLOCATION = new Location(1, 1);
 
         public TestContext TestContext { get; set; }
 
@@ -32,7 +33,7 @@ namespace _Test
 
             Assert.IsInstanceOfType(token, typeof(ErrorToken));
 
-            Assert.AreEqual(new Location(0,0), token.Location);
+            Assert.AreEqual(ZEROLOCATION, token.Location);
 
             Assert.IsTrue(Diagnosis.HasErrors);
         }
@@ -41,7 +42,7 @@ namespace _Test
         public void ReadInteger_Test() {
             initializeLexer("2147483647");
 
-            AssertNext(new IntegerToken(new Location(0,0), 2147483647));
+            AssertNext(new IntegerToken(ZEROLOCATION, 2147483647));
         }
 
         [TestMethod]
@@ -49,7 +50,116 @@ namespace _Test
         {
             initializeLexer();
 
-            AssertEnd();
+            AssertNext(new FixToken(new Location(1,0), Tag.End));
+        }
+
+        [TestMethod]
+        public void NameKeywordClass()
+        {
+            initializeLexer("class");
+            AssertNextFixToken(Tag.Class);
+        }
+
+        [TestMethod]
+        public void NameKeywordElse()
+        {
+            initializeLexer("else");
+            AssertNextFixToken(Tag.Else);
+        }
+
+        [TestMethod]
+        public void NameKeywordIf()
+        {
+            initializeLexer("if");
+            AssertNextFixToken(Tag.If);
+        }
+
+        [TestMethod]
+        public void NameKeywordIs()
+        {
+            initializeLexer("is");
+            AssertNextFixToken(Tag.Is);
+        }
+
+        [TestMethod]
+        public void NameKeywordNew()
+        {
+            initializeLexer("new");
+            AssertNextFixToken(Tag.New);
+        }
+
+        [TestMethod]
+        public void NameKeywordReturn()
+        {
+            initializeLexer("return");
+            AssertNextFixToken(Tag.Return);
+        }
+
+        [TestMethod]
+        public void NameKeywordWhile()
+        {
+            initializeLexer("while");
+            AssertNextFixToken(Tag.While);
+        }
+
+        [TestMethod]
+        public void NameSingleLetter()
+        {
+            initializeLexer("x");
+            AssertNextIdentifier("x");
+        }
+
+        [TestMethod]
+        public void NameWithNumbers()
+        {
+            initializeLexer("variable1");
+            AssertNextIdentifier("variable1");
+        }
+
+        [TestMethod]
+        public void NameNormal()
+        {
+            initializeLexer("prettyHans");
+            AssertNextIdentifier("prettyHans");
+        }
+
+        [TestMethod]
+        public void StringUnterminated()
+        {
+            initializeLexer("\"look ma, no end");
+            AssertNextError();
+        }
+
+        [TestMethod]
+        public void StringEmpty()
+        {
+            initializeLexer("\"\"");
+            AssertNextString("");
+        }
+
+        [TestMethod]
+        public void String()
+        {
+            initializeLexer("\"prettyHans\"");
+            AssertNextString("prettyHans");
+        }
+
+        private void AssertNextError()
+        {
+            Assert.IsInstanceOfType(_lexer.Next(), typeof(ErrorToken));
+        }
+
+        private void AssertNextString(string content) {
+            AssertNext(new StringToken(ZEROLOCATION, content));
+        }
+
+        private void AssertNextIdentifier(string name) {
+            AssertNext(new IdentifierToken(ZEROLOCATION, name));
+        }
+
+        private void AssertNextFixToken(Tag t)
+        {
+            AssertNext(new FixToken(ZEROLOCATION, t));
         }
 
         private void AssertNext(Token t)
@@ -58,12 +168,5 @@ namespace _Test
             Assert.AreEqual(t.Location, token.Location);
             Assert.AreEqual(t.ToString(), token.ToString());
         }
-
-        private void AssertEnd()
-        {
-            AssertNext(new FixToken(new Location(0,0), Tag.End));
-        }
-
-
     }
 }

@@ -11,7 +11,18 @@ namespace RappiSharp.Compiler.Lexer
         private char _current;
         private bool _endOfText;
 
-        private int _col = 0, _row = 0;
+        private int _col = 0, _row = 1;
+
+        private Dictionary<String, Tag> _keywords = new Dictionary<string, Tag>()
+        {
+            { "class", Tag.Class },
+            { "else", Tag.Else },
+            { "if", Tag.If },
+            { "is", Tag.Is },
+            { "new", Tag.New },
+            { "return", Tag.Return },
+            { "while", Tag.While }
+        };
 
         public RappiLexer(TextReader reader)
         {
@@ -87,20 +98,21 @@ namespace RappiSharp.Compiler.Lexer
                 case '"': return ReadString();
                 case '+': ReadNext();  return new FixToken(CurrentLocation(), Tag.Plus);
                 //...
-                default: return reportError("Char is not allowed");
+                default: return reportError(CurrentLocation(), $"Char '{_current}' is not allowed");
             }
         }
 
-        private ErrorToken reportError(string message)
+        private ErrorToken reportError(Location location, string message)
         {
             Diagnosis.ReportError(message);
-            return new ErrorToken(CurrentLocation(), message);
+            return new ErrorToken(location, message);
         }
 
         private Token ReadInteger()
         {
             int value = 0;
             int old_value = 0;
+            var location = CurrentLocation();
             while (!_endOfText && IsDigit(_current))
             {
                 old_value = value;
@@ -108,16 +120,16 @@ namespace RappiSharp.Compiler.Lexer
                 value = value * 10 + digit;
                 if(value < old_value)
                 {
-                    return reportError("32bit int overflow");
+                    return reportError(location, "32bit int overflow");
                 }
                 ReadNext();
             }
-            return new IntegerToken(CurrentLocation(), value);
+            return new IntegerToken(location, value);
         }
 
-        private Dictionary<String, Tag> _keywords;
         Token ReadName()
         {
+            var location = CurrentLocation();
             string name = _current.ToString();
             ReadNext();
             while (!_endOfText &&
@@ -128,14 +140,15 @@ namespace RappiSharp.Compiler.Lexer
             }
             if (_keywords.ContainsKey(name))
             {
-                return new FixToken(CurrentLocation(), _keywords[name]);
+                return new FixToken(location, _keywords[name]);
             }
-            return new IdentifierToken(CurrentLocation(), name);
+            return new IdentifierToken(location, name);
         }
 
 
-        StringToken ReadString()
+        Token ReadString()
         {
+            var location = CurrentLocation();
             ReadNext(); // skip beginning double quote 
             string value = "";
             while (!_endOfText && _current != '"')
@@ -145,10 +158,10 @@ namespace RappiSharp.Compiler.Lexer
             }
             if (_endOfText)
             {
-                // Error: String not closed
+                return reportError(location, "Unterminated String");
             }
             ReadNext(); // skip ending double quote return new StringToken(value);
-            return null; //REMOVE THIS
+            return new StringToken(location, value);
         }
     }
 }
