@@ -48,11 +48,11 @@ namespace RappiSharp.Compiler.Lexer
             {
                 return new FixToken(LOCATION, Tag.End);
             }
-            if (isDigit(_current))
+            if (IsDigit(_current))
             {
                 return ReadInteger();
             }
-            if (isLetter(_current))
+            if (IsLetter(_current))
             {
                 return ReadName();
             }
@@ -61,6 +61,7 @@ namespace RappiSharp.Compiler.Lexer
                 case '"': return ReadString();
                 case '+': ReadNext();  return new FixToken(LOCATION, Tag.Plus);
                 //...
+                default: return null;
             }
         }
 
