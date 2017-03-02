@@ -13,6 +13,17 @@ namespace RappiSharp.Compiler.Lexer
 
         private int _col = 0, _row = 0;
 
+        private Dictionary<String, Tag> _keywords = new Dictionary<string, Tag>()
+        {
+            { "class", Tag.Class },
+            { "else", Tag.Else },
+            { "if", Tag.If },
+            { "is", Tag.Is },
+            { "new", Tag.New },
+            { "return", Tag.Return },
+            { "while", Tag.While }
+        };
+
         public RappiLexer(TextReader reader)
         {
             _reader = reader;
@@ -115,7 +126,6 @@ namespace RappiSharp.Compiler.Lexer
             return new IntegerToken(CurrentLocation(), value);
         }
 
-        private Dictionary<String, Tag> _keywords;
         Token ReadName()
         {
             string name = _current.ToString();

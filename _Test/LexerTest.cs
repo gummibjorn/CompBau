@@ -11,6 +11,7 @@ namespace _Test
     {
 
         RappiLexer _lexer;
+        private Location LOCATION = new Location(0, 0);
 
         public TestContext TestContext { get; set; }
 
@@ -46,6 +47,95 @@ namespace _Test
             initializeLexer();
 
             AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameKeywordClass()
+        {
+            initializeLexer("class");
+            AssertNextFixToken(Tag.Class);
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameKeywordElse()
+        {
+            initializeLexer("else");
+            AssertNextFixToken(Tag.Else);
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameKeywordIf()
+        {
+            initializeLexer("if");
+            AssertNextFixToken(Tag.If);
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameKeywordIs()
+        {
+            initializeLexer("is");
+            AssertNextFixToken(Tag.Is);
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameKeywordNew()
+        {
+            initializeLexer("new");
+            AssertNextFixToken(Tag.New);
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameKeywordReturn()
+        {
+            initializeLexer("return");
+            AssertNextFixToken(Tag.Return);
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameKeywordWhile()
+        {
+            initializeLexer("while");
+            AssertNextFixToken(Tag.While);
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameSingleLetter()
+        {
+            initializeLexer("x");
+            AssertNextIdentifier("x");
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameWithNumbers()
+        {
+            initializeLexer("variable1");
+            AssertNextIdentifier("variable1");
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void NameNormal()
+        {
+            initializeLexer("prettyHans");
+            AssertNextIdentifier("prettyHans");
+            AssertEnd();
+        }
+
+        private void AssertNextIdentifier(string name) {
+            AssertNext(new IdentifierToken(LOCATION, name));
+        }
+
+        private void AssertNextFixToken(Tag t)
+        {
+            AssertNext(new FixToken(LOCATION, t));
         }
 
         private void AssertNext(Token t)
