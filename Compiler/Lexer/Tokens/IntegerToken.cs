@@ -1,8 +1,8 @@
 ﻿namespace RappiSharp.Compiler.Lexer.Tokens {
   internal class IntegerToken : Token {
-    public uint Value { get; }
+    public int Value { get; }
 
-    public IntegerToken(Location location, uint value) : 
+    public IntegerToken(Location location, int value) : 
       base(location) {
       Value = value;
     }

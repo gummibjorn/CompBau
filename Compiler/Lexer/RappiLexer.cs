@@ -99,16 +99,16 @@ namespace RappiSharp.Compiler.Lexer
 
         private Token ReadInteger()
         {
-            uint value = 0;
-            uint old_value = 0;
+            int value = 0;
+            int old_value = 0;
             while (!_endOfText && IsDigit(_current))
             {
                 old_value = value;
-                uint digit = (uint)_current - '0';
+                int digit = _current - '0';
                 value = value * 10 + digit;
                 if(value < old_value)
                 {
-                    return reportError("32bit unsigned int overflow");
+                    return reportError("32bit int overflow");
                 }
                 ReadNext();
             }

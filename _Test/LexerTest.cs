@@ -26,18 +26,22 @@ namespace _Test
 
         [TestMethod]
         public void ReadInteger_Overflow_Test() {
-            initializeLexer("4294967296");
+            initializeLexer("2147483648");
 
-            Assert.IsInstanceOfType(_lexer.Next(), typeof(ErrorToken));
+            var token = _lexer.Next();
+
+            Assert.IsInstanceOfType(token, typeof(ErrorToken));
+
+            Assert.AreEqual(new Location(0,0), token.Location);
 
             Assert.IsTrue(Diagnosis.HasErrors);
         }
 
         [TestMethod]
         public void ReadInteger_Test() {
-            initializeLexer("4294967295");
+            initializeLexer("2147483647");
 
-            AssertNext(new IntegerToken(new Location(0,0), 4294967295));
+            AssertNext(new IntegerToken(new Location(0,0), 2147483647));
         }
 
         [TestMethod]
@@ -50,7 +54,9 @@ namespace _Test
 
         private void AssertNext(Token t)
         {
-            Assert.AreEqual(t.ToString(), _lexer.Next().ToString());
+            var token = _lexer.Next();
+            Assert.AreEqual(t.Location, token.Location);
+            Assert.AreEqual(t.ToString(), token.ToString());
         }
 
         private void AssertEnd()
