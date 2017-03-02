@@ -146,10 +146,11 @@ namespace RappiSharp.Compiler.Lexer
         }
 
 
-        StringToken ReadString()
+        Token ReadString()
         {
             ReadNext(); // skip beginning double quote 
             string value = "";
+            var location = CurrentLocation();
             while (!_endOfText && _current != '"')
             {
                 value += _current;
@@ -157,10 +158,10 @@ namespace RappiSharp.Compiler.Lexer
             }
             if (_endOfText)
             {
-                // Error: String not closed
+                return reportError(location, "Unterminated String");
             }
             ReadNext(); // skip ending double quote return new StringToken(value);
-            return null; //REMOVE THIS
+            return new StringToken(location, value);
         }
     }
 }

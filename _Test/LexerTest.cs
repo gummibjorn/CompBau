@@ -129,6 +129,39 @@ namespace _Test
             AssertEnd();
         }
 
+        [TestMethod]
+        public void StringUnterminated()
+        {
+            initializeLexer("\"look ma, no end");
+            AssertNextError();
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void StringEmpty()
+        {
+            initializeLexer("\"\"");
+            AssertNextString("");
+            AssertEnd();
+        }
+
+        [TestMethod]
+        public void String()
+        {
+            initializeLexer("\"prettyHans\"");
+            AssertNextString("prettyHans");
+            AssertEnd();
+        }
+
+        private void AssertNextError()
+        {
+            Assert.IsInstanceOfType(_lexer.Next(), typeof(ErrorToken));
+        }
+
+        private void AssertNextString(string content) {
+            AssertNext(new StringToken(LOCATION, content));
+        }
+
         private void AssertNextIdentifier(string name) {
             AssertNext(new IdentifierToken(LOCATION, name));
         }
