@@ -20,7 +20,15 @@ namespace RappiSharp.Compiler.Lexer
 
         private void ReadNext()
         {
-
+            var tmp = _reader.Read();
+            if (tmp == -1)
+            {
+                _endOfText = true;
+            }
+            else
+            {
+                _current = (char)tmp;
+            }
         }
 
         private bool IsDigit(char c)
