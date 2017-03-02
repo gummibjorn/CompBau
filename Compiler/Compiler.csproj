@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Lexer\RappiLexer.cs" />
     <Compile Include="Lexer\Tokens\CharacterToken.cs" />
+    <Compile Include="Lexer\Tokens\ErrorToken.cs" />
     <Compile Include="Lexer\Tokens\IdentifierToken.cs" />
     <Compile Include="Lexer\Tokens\IntegerToken.cs" />
     <Compile Include="Lexer\Tokens\StringToken.cs" />

@@ -26,18 +26,19 @@ namespace _Test
 
         [TestMethod]
         public void ReadInteger_Overflow_Test() {
-                initializeLexer("4294967296");
+            initializeLexer("4294967296");
 
-                Assert.IsNull(_lexer.Next());
+            Assert.IsInstanceOfType(_lexer.Next(), typeof(ErrorToken));
+
+            Assert.IsTrue(Diagnosis.HasErrors);
         }
 
         [TestMethod]
         public void ReadInteger_Test() {
-                initializeLexer("4294967295");
+            initializeLexer("4294967295");
 
-                AssertNext(new IntegerToken(new Location(0,0), 4294967295));
+            AssertNext(new IntegerToken(new Location(0,0), 4294967295));
         }
-
 
         [TestMethod]
         public void EmptyFile()

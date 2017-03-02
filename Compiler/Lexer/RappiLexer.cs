@@ -87,12 +87,17 @@ namespace RappiSharp.Compiler.Lexer
                 case '"': return ReadString();
                 case '+': ReadNext();  return new FixToken(CurrentLocation(), Tag.Plus);
                 //...
-                default: return null;
+                default: return reportError("Char is not allowed");
             }
         }
 
+        private ErrorToken reportError(string message)
+        {
+            Diagnosis.ReportError(message);
+            return new ErrorToken(CurrentLocation(), message);
+        }
 
-        private IntegerToken ReadInteger()
+        private Token ReadInteger()
         {
             uint value = 0;
             uint old_value = 0;
@@ -103,13 +108,11 @@ namespace RappiSharp.Compiler.Lexer
                 value = value * 10 + digit;
                 if(value < old_value)
                 {
-                    //TODO: return error token or throw exception
-                    return null;
+                    return reportError("32bit unsigned int overflow");
                 }
                 ReadNext();
             }
             return new IntegerToken(CurrentLocation(), value);
-            //TODO: handle overflows
         }
 
         private Dictionary<String, Tag> _keywords;
