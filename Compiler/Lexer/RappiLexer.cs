@@ -11,7 +11,7 @@ namespace RappiSharp.Compiler.Lexer
         private char _current;
         private bool _endOfText;
 
-        private Location LOCATION = new Location(0, 0);
+        private int _col = 0, _row = 0;
 
         public RappiLexer(TextReader reader)
         {
@@ -28,7 +28,25 @@ namespace RappiSharp.Compiler.Lexer
             else
             {
                 _current = (char)tmp;
+                UpdateLocation(_current);
             }
+        }
+
+        private void UpdateLocation(char current)
+        {
+            if(current == '\n')
+            {
+                _row += 1;
+                _col = 0;
+            } else
+            {
+                _col += 1;
+            }
+        }
+
+        private Location CurrentLocation()
+        {
+            return new Location(_row, _col);
         }
 
         private bool IsDigit(char c)
@@ -54,7 +72,7 @@ namespace RappiSharp.Compiler.Lexer
             SkipBlanks();
             if (_endOfText)
             {
-                return new FixToken(LOCATION, Tag.End);
+                return new FixToken(CurrentLocation(), Tag.End);
             }
             if (IsDigit(_current))
             {
@@ -67,7 +85,7 @@ namespace RappiSharp.Compiler.Lexer
             switch (_current)
             {
                 case '"': return ReadString();
-                case '+': ReadNext();  return new FixToken(LOCATION, Tag.Plus);
+                case '+': ReadNext();  return new FixToken(CurrentLocation(), Tag.Plus);
                 //...
                 default: return null;
             }
@@ -83,7 +101,7 @@ namespace RappiSharp.Compiler.Lexer
                 value = value * 10 + digit;
                 ReadNext();
             }
-            return new IntegerToken(LOCATION, value);
+            return new IntegerToken(CurrentLocation(), value);
             //TODO: handle overflows
         }
 
@@ -100,9 +118,9 @@ namespace RappiSharp.Compiler.Lexer
             }
             if (_keywords.ContainsKey(name))
             {
-                return new FixToken(LOCATION, _keywords[name]);
+                return new FixToken(CurrentLocation(), _keywords[name]);
             }
-            return new IdentifierToken(LOCATION, name);
+            return new IdentifierToken(CurrentLocation(), name);
         }
 
 

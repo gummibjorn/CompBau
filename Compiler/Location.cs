@@ -2,16 +2,16 @@
 
 namespace RappiSharp.Compiler {
   internal struct Location : IEquatable<Location> {
-    public int Start { get; }
-    public int End { get; }
+    public int Row { get; }
+    public int Col { get; }
 
-    public Location(int start, int end) {
-      Start = start;
-      End = end;
+    public Location(int row, int col) {
+      Row = row;
+      Col = col;
     }
 
     public bool Equals(Location other) {
-      return Start == other.Start && End == other.End;
+      return Row == other.Row && Col == other.Col;
     }
 
     public override bool Equals(object obj) {
@@ -19,11 +19,11 @@ namespace RappiSharp.Compiler {
     }
 
     public override int GetHashCode() {
-      return Start * 31 + End;
+      return Row * 31 + Col;
     }
 
     public override string ToString() {
-      return $"({Start}, {End})";
+      return $"({Row}, {Col})";
     }
   }
 }
