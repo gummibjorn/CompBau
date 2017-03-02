@@ -98,20 +98,21 @@ namespace RappiSharp.Compiler.Lexer
                 case '"': return ReadString();
                 case '+': ReadNext();  return new FixToken(CurrentLocation(), Tag.Plus);
                 //...
-                default: return reportError("Char is not allowed");
+                default: return reportError(CurrentLocation(), $"Char '{_current}' is not allowed");
             }
         }
 
-        private ErrorToken reportError(string message)
+        private ErrorToken reportError(Location location, string message)
         {
             Diagnosis.ReportError(message);
-            return new ErrorToken(CurrentLocation(), message);
+            return new ErrorToken(location, message);
         }
 
         private Token ReadInteger()
         {
             uint value = 0;
             uint old_value = 0;
+            var location = CurrentLocation();
             while (!_endOfText && IsDigit(_current))
             {
                 old_value = value;
@@ -119,15 +120,16 @@ namespace RappiSharp.Compiler.Lexer
                 value = value * 10 + digit;
                 if(value < old_value)
                 {
-                    return reportError("32bit unsigned int overflow");
+                    return reportError(location, "32bit unsigned int overflow");
                 }
                 ReadNext();
             }
-            return new IntegerToken(CurrentLocation(), value);
+            return new IntegerToken(location, value);
         }
 
         Token ReadName()
         {
+            var location = CurrentLocation();
             string name = _current.ToString();
             ReadNext();
             while (!_endOfText &&
@@ -138,9 +140,9 @@ namespace RappiSharp.Compiler.Lexer
             }
             if (_keywords.ContainsKey(name))
             {
-                return new FixToken(CurrentLocation(), _keywords[name]);
+                return new FixToken(location, _keywords[name]);
             }
-            return new IdentifierToken(CurrentLocation(), name);
+            return new IdentifierToken(location, name);
         }
 
 
