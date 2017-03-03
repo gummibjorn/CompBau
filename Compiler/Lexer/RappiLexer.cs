@@ -143,24 +143,25 @@ namespace RappiSharp.Compiler.Lexer
         {
             var location = CurrentLocation();
             ReadNext();
+
+            Func<Token, Token> makeTokenChecked = (Token output) =>
+            {
+                ReadNext();
+                if (_current != '\'') { return reportError(location, "Invalid length of char"); }
+                ReadNext();
+                return output;
+            };
+
             if (_current == '\\')
             {
                 ReadNext();
                 if (_validEscapes.ContainsKey(_current))
                 {
-                    var tmp = _current;
-                    ReadNext();
-                    if (_current != '\'') { return reportError(location, "Invalid length of char"); }
-                    ReadNext();
-                    return new CharacterToken(location, _validEscapes[tmp]);
+                    return makeTokenChecked(new CharacterToken(location, _validEscapes[_current]));
                 }
                 else
                 {
-                    var tmp = _current;
-                    ReadNext();
-                    if (_current != '\'') { return reportError(location, "Invalid length of char"); }
-                    ReadNext();
-                    return reportError(location, $"Invalid escape code: {_current}");
+                    return makeTokenChecked(reportError(location, $"Invalid escape code: {_current}"));
                 }
             }
             if (_endOfText)
@@ -173,11 +174,7 @@ namespace RappiSharp.Compiler.Lexer
             }
             else
             {
-                var tmp = _current;
-                ReadNext();
-                if (_current != '\'') { return reportError(location, "Invalid length of char"); }
-                ReadNext();
-                return new CharacterToken(location, tmp);
+                return makeTokenChecked(new CharacterToken(location, _current));
             }
         }
 
