@@ -98,6 +98,7 @@ namespace RappiSharp.Compiler.Lexer
             switch (_current)
             {
                 case '"': return ReadString();
+                case '\'': return ReadChar();
                 case '/': return ReadSlash();
                 case '+': ReadNext();  return new FixToken(location, Tag.Plus);
                 case '-': ReadNext();  return new FixToken(location, Tag.Minus);
@@ -138,9 +139,41 @@ namespace RappiSharp.Compiler.Lexer
                 case ',': ReadNext(); return new FixToken(location, Tag.Comma);
                 case '.': ReadNext(); return new FixToken(location, Tag.Period);
                 case ';': ReadNext(); return new FixToken(location, Tag.Semicolon);
-                //...
                 default: return reportError(CurrentLocation(), $"Char '{_current}' is not allowed");
             }
+        }
+
+        private Token ReadChar()
+        {
+            var location = CurrentLocation();
+            ReadNext();
+            if (_current == '\\')
+            {
+                ReadNext();
+                switch (_current)
+                {
+                    case '\\':
+                        ReadNext(); 
+                        if (_current != '\'') { return reportError(location, "Invalid length of char"); }
+                        return new CharacterToken(location, '\\');
+                    case '\n':
+                        ReadNext();
+                        if (_current != '\'') { return reportError(location, "Invalid length of char"); }
+                        return new CharacterToken(location, '\n');
+                    case '\0':
+                        ReadNext(); 
+                        if (_current != '\'') { return reportError(location, "Invalid length of char"); }
+                        return new CharacterToken(location, '\0');
+                    default:
+                        return reportError(location, $"Invalid escape code: {_current}");
+                }
+            }
+            ReadNext(); 
+            if (_current != '\'')
+            {
+                return reportError(location, "Invalid length of char");
+            }
+            return new CharacterToken(location, _current);
         }
 
         private Token ReadSlash()
@@ -218,14 +251,31 @@ namespace RappiSharp.Compiler.Lexer
             return new IdentifierToken(location, name);
         }
 
+        private void jumpToEndOfString()
+        {
+            while (!_endOfText && _current != '"')
+            {
+                ReadNext();
+            }
+            ReadNext(); // skip ending double quote 
+        }
 
-        Token ReadString()
+        private Token ReadString()
         {
             var location = CurrentLocation();
             ReadNext(); // skip beginning double quote 
             string value = "";
             while (!_endOfText && _current != '"')
             {
+                if (_current == '\\'){
+                    ReadNext();
+                    if(_current != '\\' || _current != '"' || _current != 'n')
+                    {
+                        var invalidEscape = _current;
+                        jumpToEndOfString();
+                        return reportError(location, $"Invalid escape code: {invalidEscape}");
+                    }
+                }
                 value += _current;
                 ReadNext();
             }

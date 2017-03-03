@@ -56,6 +56,7 @@ namespace _Test
             AssertNext(new FixToken(new Location(1, 15), Tag.End));
         }
 
+
         [TestMethod]
         public void MultilineComment_Test()
         {
