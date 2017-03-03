@@ -71,7 +71,7 @@ namespace _Test
         {
             initializeLexer();
 
-            AssertNext(new FixToken(new Location(1,0), Tag.End));
+            AssertNext(new FixToken(new Location(1,1), Tag.End));
         }
 
         [TestMethod]
@@ -163,6 +163,193 @@ namespace _Test
         {
             initializeLexer("\"prettyHans\"");
             AssertNextString("prettyHans");
+        }
+
+        [TestMethod]
+        public void FixPlus()
+        {
+            initializeLexer("+");
+            AssertNextFixToken(Tag.Plus);
+        }
+
+        [TestMethod]
+        public void FixMinus()
+        {
+            initializeLexer("-");
+            AssertNextFixToken(Tag.Minus);
+        }
+
+        [TestMethod]
+        public void FixTimes()
+        {
+            initializeLexer("*");
+            AssertNextFixToken(Tag.Times);
+        }
+
+        [TestMethod]
+        public void FixModulo()
+        {
+            initializeLexer("%");
+            AssertNextFixToken(Tag.Modulo);
+        }
+
+        [TestMethod]
+        public void FixEquals()
+        {
+            initializeLexer("==");
+            AssertNextFixToken(Tag.Equals);
+        }
+
+        [TestMethod]
+        public void FixAssign()
+        {
+            initializeLexer("=");
+            AssertNextFixToken(Tag.Assign);
+        }
+
+        [TestMethod]
+        public void FixUnequal()
+        {
+            initializeLexer("!=");
+            AssertNextFixToken(Tag.Unequal);
+        }
+
+        [TestMethod]
+        public void FixNot()
+        {
+            initializeLexer("!");
+            AssertNextFixToken(Tag.Not);
+        }
+
+        [TestMethod]
+        public void FixLessEqual()
+        {
+            initializeLexer("<=");
+            AssertNextFixToken(Tag.LessEqual);
+        }
+
+        [TestMethod]
+        public void FixLess()
+        {
+            initializeLexer("<");
+            AssertNextFixToken(Tag.Less);
+        }
+
+        [TestMethod]
+        public void FixGreaterEqual()
+        {
+            initializeLexer(">=");
+            AssertNextFixToken(Tag.GreaterEqual);
+        }
+
+        [TestMethod]
+        public void FixGreater()
+        {
+            initializeLexer(">");
+            AssertNextFixToken(Tag.Greater);
+        }
+
+        [TestMethod]
+        public void FixAnd()
+        {
+            initializeLexer("&&");
+            AssertNextFixToken(Tag.And);
+        }
+
+        [TestMethod]
+        public void FixAndIncomplete()
+        {
+            initializeLexer("&hans");
+            AssertNextError(new Location(1, 2));
+        }
+
+        [TestMethod]
+        public void FixOr()
+        {
+            initializeLexer("||");
+            AssertNextFixToken(Tag.Or);
+        }
+
+        [TestMethod]
+        public void FixOrIncomplete()
+        {
+            initializeLexer("|hans");
+            AssertNextError(new Location(1, 2));
+        }
+
+        [TestMethod]
+        public void FixOpenBrace()
+        {
+            initializeLexer("{");
+            AssertNextFixToken(Tag.OpenBrace);
+        }
+
+        [TestMethod]
+        public void FixCloseBrace()
+        {
+            initializeLexer("}");
+            AssertNextFixToken(Tag.CloseBrace);
+        }
+
+        [TestMethod]
+        public void FixOpenBracket()
+        {
+            initializeLexer("[");
+            AssertNextFixToken(Tag.OpenBracket);
+        }
+
+        [TestMethod]
+        public void FixCloseBracket()
+        {
+            initializeLexer("]");
+            AssertNextFixToken(Tag.CloseBracket);
+        }
+
+        [TestMethod]
+        public void FixOpenParenthesis()
+        {
+            initializeLexer("(");
+            AssertNextFixToken(Tag.OpenParenthesis);
+        }
+
+        [TestMethod]
+        public void FixCloseParenthesis()
+        {
+            initializeLexer(")");
+            AssertNextFixToken(Tag.CloseParenthesis);
+        }
+
+        [TestMethod]
+        public void FixColon()
+        {
+            initializeLexer(":");
+            AssertNextFixToken(Tag.Colon);
+        }
+
+        [TestMethod]
+        public void FixComma()
+        {
+            initializeLexer(",");
+            AssertNextFixToken(Tag.Comma);
+        }
+
+        [TestMethod]
+        public void FixPeriod()
+        {
+            initializeLexer(".");
+            AssertNextFixToken(Tag.Period);
+        }
+
+        [TestMethod]
+        public void FixSemicolon()
+        {
+            initializeLexer(";");
+            AssertNextFixToken(Tag.Semicolon );
+        }
+
+        private void AssertEnd(int col)
+        {
+            AssertNext(new FixToken(new Location(1, col), Tag.End));
         }
 
         private void AssertNextError(Location expected)

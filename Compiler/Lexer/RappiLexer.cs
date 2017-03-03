@@ -35,6 +35,7 @@ namespace RappiSharp.Compiler.Lexer
             if (tmp == -1)
             {
                 _endOfText = true;
+                UpdateLocation('1');
             }
             else
             {
@@ -67,7 +68,7 @@ namespace RappiSharp.Compiler.Lexer
 
         private bool IsLetter(char c)
         {
-            return c >= 'A' && c <= 'z';
+            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
         }
 
         private void SkipBlanks()
@@ -81,6 +82,7 @@ namespace RappiSharp.Compiler.Lexer
         public Token Next()
         {
             SkipBlanks();
+            var location = CurrentLocation();
             if (_endOfText)
             {
                 return new FixToken(CurrentLocation(), Tag.End);
@@ -96,7 +98,45 @@ namespace RappiSharp.Compiler.Lexer
             switch (_current)
             {
                 case '"': return ReadString();
-                case '+': ReadNext();  return new FixToken(CurrentLocation(), Tag.Plus);
+                case '+': ReadNext();  return new FixToken(location, Tag.Plus);
+                case '-': ReadNext();  return new FixToken(location, Tag.Minus);
+                case '*': ReadNext();  return new FixToken(location, Tag.Times);
+                case '%': ReadNext();  return new FixToken(location, Tag.Modulo);
+                case '=':
+                    ReadNext();
+                    if (!_endOfText && _current == '=') { ReadNext();  return new FixToken(location, Tag.Equals); }
+                    else { return new FixToken(location, Tag.Assign); }
+                case '!':
+                    ReadNext();
+                    if(!_endOfText && _current == '=') { ReadNext(); return new FixToken(location, Tag.Unequal); }
+                    else { ReadNext(); return new FixToken(location, Tag.Not); }
+                case '<':
+                    ReadNext();
+                    if(!_endOfText && _current == '=') { ReadNext(); return new FixToken(location, Tag.LessEqual); }
+                    else { ReadNext(); return new FixToken(location, Tag.Less); }
+                case '>':
+                    ReadNext();
+                    if(!_endOfText && _current == '=') { ReadNext(); return new FixToken(location, Tag.GreaterEqual); }
+                    else { ReadNext(); return new FixToken(location, Tag.Greater); }
+                case '&':
+                    ReadNext();
+                    if (!_endOfText && _current == '&') { ReadNext();  return new FixToken(location, Tag.And); }
+                    else { return reportError(CurrentLocation(), $"Invalid sequence ${_current}"); }
+                case '|':
+                    ReadNext();
+                    if (!_endOfText && _current == '|') { ReadNext();  return new FixToken(location, Tag.Or); }
+                    else { return reportError(CurrentLocation(), $"Invalid sequence |{_current}"); }
+                // interpunction
+                case '{': ReadNext(); return new FixToken(location, Tag.OpenBrace);
+                case '}': ReadNext(); return new FixToken(location, Tag.CloseBrace);
+                case '[': ReadNext(); return new FixToken(location, Tag.OpenBracket);
+                case ']': ReadNext(); return new FixToken(location, Tag.CloseBracket);
+                case '(': ReadNext(); return new FixToken(location, Tag.OpenParenthesis);
+                case ')': ReadNext(); return new FixToken(location, Tag.CloseParenthesis);
+                case ':': ReadNext(); return new FixToken(location, Tag.Colon);
+                case ',': ReadNext(); return new FixToken(location, Tag.Comma);
+                case '.': ReadNext(); return new FixToken(location, Tag.Period);
+                case ';': ReadNext(); return new FixToken(location, Tag.Semicolon);
                 //...
                 default: return reportError(CurrentLocation(), $"Char '{_current}' is not allowed");
             }
