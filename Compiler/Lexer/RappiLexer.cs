@@ -146,10 +146,17 @@ namespace RappiSharp.Compiler.Lexer
         private Token ReadSlash()
         {
             ReadNext();
-            if(_current != '/' && _current != '*')
+            if (_current != '/' && _current != '*')
             {
                 return new FixToken(CurrentLocation(), Tag.Divide);
-            }else if(_current == '/')
+            }
+            SkipComment();
+            return Next();
+        }
+
+        private void SkipComment()
+        {
+            if(_current == '/')
             {
                 while (_current != '\n' && !_endOfText)
                     ReadNext();
@@ -158,20 +165,14 @@ namespace RappiSharp.Compiler.Lexer
             {
                 while (_current != '/')
                 {
-                    ReadCommentBlock();
+                    do
+                    {
+                        ReadNext();
+                    } while (_current != '*');
+                    ReadNext();
                 }
                 ReadNext();
             }
-            return Next();
-        }
-
-        private void ReadCommentBlock()
-        {
-                do
-                {
-                    ReadNext();
-                } while (_current != '*');
-                ReadNext();
         }
 
         private ErrorToken reportError(Location location, string message)
