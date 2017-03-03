@@ -16,7 +16,7 @@ namespace RappiSharp.Compiler.Lexer.Tokens
         }
 
         public override string ToString() {
-          return $"INTEGER {Message}";
+          return $"ERROR {Message}";
         }
     }
 }

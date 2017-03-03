@@ -159,6 +159,16 @@ namespace _Test
         }
 
         [TestMethod]
+        public void StringEscapes()
+        {
+            initializeLexer();
+            AssertNext(new StringToken(null, "\n"));
+            AssertNext(new StringToken(null, "\\"));
+            AssertNext(new StringToken(null, "\""));
+            AssertNext(new StringToken(null, "\0"));
+        }
+
+        [TestMethod]
         public void String()
         {
             initializeLexer("\"prettyHans\"");
@@ -372,9 +382,18 @@ namespace _Test
         }
 
         [TestMethod]
-        public void CharInvalid()
+        public void CharTooMany()
         {
             initializeLexer("'zz';");
+            AssertNextError(new Location(1, 1));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
+        [TestMethod]
+        public void CharTooFew()
+        {
+            initializeLexer("'';");
             AssertNextError(new Location(1, 1));
             AssertNext(new FixToken(null, Tag.Semicolon));
             AssertNext(new FixToken(null, Tag.End));

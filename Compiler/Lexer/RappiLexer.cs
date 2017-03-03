@@ -260,6 +260,14 @@ namespace RappiSharp.Compiler.Lexer
             ReadNext(); // skip ending double quote 
         }
 
+        private Dictionary<char, char> _validEscapes = new Dictionary<char, char>() {
+            { 'n', '\n' },
+            { '\'', '\'' },
+            { '"', '"' },
+            { '\\', '\\' },
+            { '0', '\0' }
+        };
+
         private Token ReadString()
         {
             var location = CurrentLocation();
@@ -269,14 +277,16 @@ namespace RappiSharp.Compiler.Lexer
             {
                 if (_current == '\\'){
                     ReadNext();
-                    if(_current != '\\' || _current != '"' || _current != 'n')
-                    {
+                    if (_validEscapes.ContainsKey(_current)){
+                        value += _validEscapes[_current];
+                    } else { 
                         var invalidEscape = _current;
                         jumpToEndOfString();
                         return reportError(location, $"Invalid escape code: {invalidEscape}");
                     }
+                } else {
+                    value += _current;
                 }
-                value += _current;
                 ReadNext();
             }
             if (_endOfText)
