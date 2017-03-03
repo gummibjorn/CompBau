@@ -3,4 +3,4 @@
 	multiline
 */
 
-int a = 10;
+10
