@@ -7,3 +7,6 @@ s[12] = "Hello";
 
 string w;
 w = s[i];
+
+char c;
+c = 'c';

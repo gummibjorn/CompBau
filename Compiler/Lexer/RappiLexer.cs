@@ -156,24 +156,37 @@ namespace RappiSharp.Compiler.Lexer
                         ReadNext(); 
                         if (_current != '\'') { return reportError(location, "Invalid length of char"); }
                         return new CharacterToken(location, '\\');
-                    case '\n':
+                    case 'n':
                         ReadNext();
                         if (_current != '\'') { return reportError(location, "Invalid length of char"); }
                         return new CharacterToken(location, '\n');
-                    case '\0':
+                    case '0':
                         ReadNext(); 
                         if (_current != '\'') { return reportError(location, "Invalid length of char"); }
                         return new CharacterToken(location, '\0');
                     default:
+                        var tmp = _current;
+                        ReadNext();
                         return reportError(location, $"Invalid escape code: {_current}");
                 }
             }
-            ReadNext(); 
-            if (_current != '\'')
+            if (_endOfText)
+            {
+                return new FixToken(location, Tag.End);
+            }
+            if(_current == '\'')
             {
                 return reportError(location, "Invalid length of char");
+            }else{
+                var tmp = _current;
+                ReadNext(); 
+                if (_current != '\'')
+                {
+                    return reportError(location, "Invalid length of char");
+                }
+                ReadNext();
+                return new CharacterToken(location, tmp);
             }
-            return new CharacterToken(location, _current);
         }
 
         private Token ReadSlash()

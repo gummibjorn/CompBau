@@ -374,9 +374,9 @@ namespace _Test
         }
 
         [TestMethod]
-        public void CharUnterminated()
+        public void CharInvalidEscape()
         {
-            initializeLexer("'hans + franz");
+            initializeLexer(@"'\p'");
             AssertNextError(new Location(1, 1));
             AssertNext(new FixToken(null, Tag.End));
         }
@@ -386,8 +386,24 @@ namespace _Test
         {
             initializeLexer("'zz';");
             AssertNextError(new Location(1, 1));
-            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNext(new IdentifierToken(null, "z"));
+            AssertNextError(new Location(1, 4));
             AssertNext(new FixToken(null, Tag.End));
+        }
+
+        public void CharBackslash()
+        {
+            initializeLexer(@"'\\'");
+            AssertNext(new CharacterToken(null, '\\'));
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
+        [TestMethod]
+        public void CharUnterminated()
+        {
+            initializeLexer("'h;");
+            AssertNextError(new Location(1, 1));
+            AssertNext(new FixToken(null, Tag.Semicolon));
         }
 
         [TestMethod]
@@ -395,7 +411,7 @@ namespace _Test
         {
             initializeLexer("'';");
             AssertNextError(new Location(1, 1));
-            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNextError(new Location(1, 2));
             AssertNext(new FixToken(null, Tag.End));
         }
 
@@ -444,6 +460,15 @@ namespace _Test
             AssertNext(new FixToken(null, Tag.OpenBracket));
             AssertNext(new IdentifierToken(null, "i"));
             AssertNext(new FixToken(null, Tag.CloseBracket));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "char"));
+            AssertNext(new IdentifierToken(null, "c"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "c"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new CharacterToken(null, 'c'));
             AssertNext(new FixToken(null, Tag.Semicolon));
 
             AssertNext(new FixToken(null, Tag.End));
