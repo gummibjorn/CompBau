@@ -1,0 +1,9 @@
+﻿int i;
+i = 12;
+
+string s[];
+s = new string[17];
+s[12] = "Hello";
+
+string w;
+w = s[i];

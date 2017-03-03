@@ -10,7 +10,7 @@ namespace RappiSharp.Compiler.Lexer.Tokens
     {
         public string Message { get; }
 
-        public ErrorToken(Location location, string message) : base(location)
+        public ErrorToken(Location? location, string message) : base(location)
         {
             Message = message;            
         }

@@ -45,7 +45,7 @@ namespace _Test
         {
             initializeLexer("/* testcomment */");
 
-            AssertNext(new FixToken(new Location(1,18), Tag.End));
+            AssertNext(new FixToken(new Location(1, 18), Tag.End));
         }
 
         [TestMethod]
@@ -53,7 +53,7 @@ namespace _Test
         {
             initializeLexer("// testcomment");
 
-            AssertNext(new FixToken(new Location(1,15), Tag.End));
+            AssertNext(new FixToken(new Location(1, 15), Tag.End));
         }
 
         [TestMethod]
@@ -61,8 +61,8 @@ namespace _Test
         {
             initializeLexer();
 
-            AssertNext(new IntegerToken(new Location(6,1), 10));
-            AssertNext(new FixToken(new Location(6,3), Tag.End));
+            AssertNext(new IntegerToken(new Location(6, 1), 10));
+            AssertNext(new FixToken(new Location(6, 3), Tag.End));
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace _Test
         {
             initializeLexer();
 
-            AssertNext(new FixToken(new Location(1,1), Tag.End));
+            AssertNext(new FixToken(new Location(1, 1), Tag.End));
         }
 
         [TestMethod]
@@ -343,8 +343,173 @@ namespace _Test
         public void FixSemicolon()
         {
             initializeLexer(";");
-            AssertNextFixToken(Tag.Semicolon );
+            AssertNextFixToken(Tag.Semicolon);
         }
+
+        [TestMethod]
+        public void CombinedAssignment()
+        {
+            initializeLexer();
+            AssertNext(new IdentifierToken(null, "int"));
+            AssertNext(new IdentifierToken(null, "i"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNext(new IdentifierToken(null, "i"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new IntegerToken(null, 12));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "string"));
+            AssertNext(new IdentifierToken(null, "s"));
+            AssertNext(new FixToken(null, Tag.OpenBracket));
+            AssertNext(new FixToken(null, Tag.CloseBracket));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "s"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new FixToken(null, Tag.New));
+            AssertNext(new IdentifierToken(null, "string"));
+            AssertNext(new FixToken(null, Tag.OpenBracket));
+            AssertNext(new IntegerToken(null, 17));
+            AssertNext(new FixToken(null, Tag.CloseBracket));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "s"));
+            AssertNext(new FixToken(null, Tag.OpenBracket));
+            AssertNext(new IntegerToken(null, 12));
+            AssertNext(new FixToken(null, Tag.CloseBracket));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new StringToken(null, "Hello"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "string"));
+            AssertNext(new IdentifierToken(null, "w"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "w"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new IdentifierToken(null, "s"));
+            AssertNext(new FixToken(null, Tag.OpenBracket));
+            AssertNext(new IdentifierToken(null, "i"));
+            AssertNext(new FixToken(null, Tag.CloseBracket));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
+        [TestMethod]
+        public void CombinedHelloWorld()
+        {
+            initializeLexer();
+            AssertNext(new FixToken(null, Tag.Class));
+            AssertNext(new IdentifierToken(null, "Hello"));
+            AssertNext(new FixToken(null, Tag.OpenBrace));
+            AssertNext(new IdentifierToken(null, "void"));
+            AssertNext(new IdentifierToken(null, "Main"));
+            AssertNext(new FixToken(null, Tag.OpenParenthesis));
+            AssertNext(new FixToken(null, Tag.CloseParenthesis));
+            AssertNext(new FixToken(null, Tag.OpenBrace));
+            AssertNext(new IdentifierToken(null, "Outputter"));
+            AssertNext(new FixToken(new Location(9,12), Tag.Period));
+            AssertNext(new IdentifierToken(null, "inscribe"));
+            AssertNext(new FixToken(null, Tag.OpenParenthesis));
+            AssertNext(new StringToken(null, "Hello World"));
+            AssertNext(new FixToken(null, Tag.CloseParenthesis));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNext(new FixToken(null, Tag.CloseBrace));
+            AssertNext(new FixToken(null, Tag.CloseBrace));
+        }
+
+        [TestMethod]
+        public void CombinedEverything()
+        {
+            //gonna write that sometime.
+        }
+
+        public void CombinedOperators()
+        {
+            initializeLexer();
+            AssertNext(new FixToken(null, Tag.Class));
+            AssertNext(new IdentifierToken(null, "Ops"));
+            AssertNext(new FixToken(null, Tag.OpenBrace));
+            AssertNext(new IdentifierToken(null, "void"));
+            AssertNext(new IdentifierToken(null, "Main"));
+            AssertNext(new FixToken(null, Tag.OpenParenthesis));
+            AssertNext(new FixToken(null, Tag.CloseParenthesis));
+            AssertNext(new FixToken(null, Tag.OpenBrace));
+            AssertNext(new IdentifierToken(null, "int"));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNext(new IdentifierToken(null, "int"));
+            AssertNext(new IdentifierToken(null, "b"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNext(new IdentifierToken(null, "bool"));
+            AssertNext(new IdentifierToken(null, "x"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new IntegerToken(null, 1));
+            AssertNext(new FixToken(null, Tag.Plus));
+            AssertNext(new IntegerToken(null, 2));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "b"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new IntegerToken(null, 2));
+            AssertNext(new FixToken(null, Tag.Divide));
+            AssertNext(new IntegerToken(null, 3));
+            AssertNext(new FixToken(null, Tag.Times));
+            AssertNext(new IntegerToken(null, 4));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.Modulo));
+            AssertNext(new FixToken(null, Tag.OpenParenthesis));
+            AssertNext(new IdentifierToken(null, "b"));
+            AssertNext(new FixToken(null, Tag.Minus));
+            AssertNext(new IntegerToken(null, 9));
+            AssertNext(new FixToken(null, Tag.CloseParenthesis));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "x"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.Less));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.And));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.LessEqual));
+            AssertNext(new IdentifierToken(null, "b"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "x"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new FixToken(null, Tag.OpenParenthesis));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.Greater));
+            AssertNext(new IdentifierToken(null, "b"));
+            AssertNext(new FixToken(null, Tag.Or));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.GreaterEqual));
+            AssertNext(new IdentifierToken(null, "b"));
+            AssertNext(new FixToken(null, Tag.CloseParenthesis));
+            AssertNext(new FixToken(null, Tag.And));
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.Equals));
+            AssertNext(new IdentifierToken(null, "b"));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+
+            AssertNext(new IdentifierToken(null, "x"));
+            AssertNext(new FixToken(null, Tag.Assign));
+            AssertNext(new IdentifierToken(null, "x"));
+            AssertNext(new FixToken(null, Tag.Unequal));
+            AssertNext(new FixToken(null, Tag.Not));
+            AssertNext(new IdentifierToken(null, "x"));
+
+        }
+
 
         private void AssertEnd(int col)
         {
@@ -378,7 +543,10 @@ namespace _Test
         private void AssertNext(Token expected)
         {
             var actual = _lexer.Next();
-            Assert.AreEqual(expected.Location, actual.Location);
+            if(expected.Location != null)
+            {
+                Assert.AreEqual(expected.Location, actual.Location);
+            }
             Assert.AreEqual(expected.ToString(), actual.ToString());
         }
     }

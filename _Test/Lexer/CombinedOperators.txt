@@ -1,0 +1,16 @@
+﻿class Ops{
+	void Main(){
+		int a;
+		int b;
+		bool x;
+
+		a = 1+2;
+		b = 2/3*4;
+
+		a = a % (b-9);
+
+		x = a < b && a <= b;
+		x = (a > b || a >= b) && a == b;
+		x = x != !x;
+	}
+}

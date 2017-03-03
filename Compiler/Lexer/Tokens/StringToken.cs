@@ -2,7 +2,7 @@
   internal class StringToken : Token {
     public string Value { get; }
 
-    public StringToken(Location location, string value) :
+    public StringToken(Location? location, string value) :
       base(location) {
       Value = value;
     }

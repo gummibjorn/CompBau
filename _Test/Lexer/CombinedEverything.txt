@@ -1,0 +1,22 @@
+﻿class Everything{
+	int[] calculateDistance(string weather, boolean gender){
+		int[] output;
+		if(!gender){
+			output = new int[10];
+		}else{
+			output = new int[2];
+		}
+
+		int i;
+		i = 0;
+		while(i < output.length){
+			i = i+1;
+			int result;
+			result = magic(weather) + 4 * 2 / 9 % 12 - 9001;
+
+			output[i] = result;
+		}
+
+		return output;
+	}
+}

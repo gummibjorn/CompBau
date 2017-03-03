@@ -1,0 +1,11 @@
+﻿/*
+ * @author: Hans
+ */
+
+ class Hello{
+
+	//This is the main function
+	void Main(){
+		Outputter.inscribe("Hello World");
+	}
+ }

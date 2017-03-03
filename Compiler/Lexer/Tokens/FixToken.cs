@@ -2,7 +2,7 @@
   internal class FixToken : Token {
     public Tag Tag { get; }
 
-    public FixToken(Location location, Tag tag)
+    public FixToken(Location? location, Tag tag)
       : base(location) {
       Tag = tag;
     }
