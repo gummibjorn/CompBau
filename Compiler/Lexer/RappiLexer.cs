@@ -13,7 +13,7 @@ namespace RappiSharp.Compiler.Lexer
 
         private int _col = 0, _row = 1;
 
-        private Dictionary<String, Tag> _keywords = new Dictionary<string, Tag>()
+        private readonly Dictionary<String, Tag> _keywords = new Dictionary<string, Tag>()
         {
             { "class", Tag.Class },
             { "else", Tag.Else },
@@ -22,6 +22,14 @@ namespace RappiSharp.Compiler.Lexer
             { "new", Tag.New },
             { "return", Tag.Return },
             { "while", Tag.While }
+        };
+        
+        private readonly Dictionary<char, char> _validEscapes = new Dictionary<char, char>() {
+            { 'n', '\n' },
+            { '\'', '\'' },
+            { '"', '"' },
+            { '\\', '\\' },
+            { '0', '\0' }
         };
 
         public RappiLexer(TextReader reader)
@@ -150,22 +158,17 @@ namespace RappiSharp.Compiler.Lexer
             if (_current == '\\')
             {
                 ReadNext();
-                switch (_current)
+                if (_validEscapes.ContainsKey(_current))
                 {
-                    case '\\':
-                        ReadNext(); 
-                        if (_current != '\'') { return reportError(location, "Invalid length of char"); }
-                        return new CharacterToken(location, '\\');
-                    case 'n':
+                        var tmp = _current;
                         ReadNext();
                         if (_current != '\'') { return reportError(location, "Invalid length of char"); }
-                        return new CharacterToken(location, '\n');
-                    case '0':
-                        ReadNext(); 
-                        if (_current != '\'') { return reportError(location, "Invalid length of char"); }
-                        return new CharacterToken(location, '\0');
-                    default:
+                        ReadNext();
+                        return new CharacterToken(location, _validEscapes[tmp]);
+                }else{
                         var tmp = _current;
+                        ReadNext();
+                        if (_current != '\'') { return reportError(location, "Invalid length of char"); }
                         ReadNext();
                         return reportError(location, $"Invalid escape code: {_current}");
                 }
@@ -180,10 +183,7 @@ namespace RappiSharp.Compiler.Lexer
             }else{
                 var tmp = _current;
                 ReadNext(); 
-                if (_current != '\'')
-                {
-                    return reportError(location, "Invalid length of char");
-                }
+                if (_current != '\'') { return reportError(location, "Invalid length of char"); }
                 ReadNext();
                 return new CharacterToken(location, tmp);
             }
@@ -273,13 +273,6 @@ namespace RappiSharp.Compiler.Lexer
             ReadNext(); // skip ending double quote 
         }
 
-        private Dictionary<char, char> _validEscapes = new Dictionary<char, char>() {
-            { 'n', '\n' },
-            { '\'', '\'' },
-            { '"', '"' },
-            { '\\', '\\' },
-            { '0', '\0' }
-        };
 
         private Token ReadString()
         {
