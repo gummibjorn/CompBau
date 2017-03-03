@@ -98,6 +98,7 @@ namespace RappiSharp.Compiler.Lexer
             switch (_current)
             {
                 case '"': return ReadString();
+                case '/': return ReadSlash();
                 case '+': ReadNext();  return new FixToken(location, Tag.Plus);
                 case '-': ReadNext();  return new FixToken(location, Tag.Minus);
                 case '*': ReadNext();  return new FixToken(location, Tag.Times);
@@ -140,6 +141,37 @@ namespace RappiSharp.Compiler.Lexer
                 //...
                 default: return reportError(CurrentLocation(), $"Char '{_current}' is not allowed");
             }
+        }
+
+        private Token ReadSlash()
+        {
+            ReadNext();
+            if(_current != '/' && _current != '*')
+            {
+                return new FixToken(CurrentLocation(), Tag.Divide);
+            }else if(_current == '/')
+            {
+                while (_current != '\n' && !_endOfText)
+                    ReadNext();
+                    
+            }else if (_current == '*')
+            {
+                while (_current != '/')
+                {
+                    ReadCommentBlock();
+                }
+                ReadNext();
+            }
+            return Next();
+        }
+
+        private void ReadCommentBlock()
+        {
+                do
+                {
+                    ReadNext();
+                } while (_current != '*');
+                ReadNext();
         }
 
         private ErrorToken reportError(Location location, string message)

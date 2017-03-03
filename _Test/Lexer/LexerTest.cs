@@ -40,8 +40,6 @@ namespace _Test
             AssertNext(new IntegerToken(ZEROLOCATION, 2147483647));
         }
 
-
-
         [TestMethod]
         public void CommentBlock_Test()
         {
@@ -63,7 +61,8 @@ namespace _Test
         {
             initializeLexer();
 
-            AssertNext(new FixToken(new Location(1,15), Tag.End));
+            AssertNext(new IntegerToken(new Location(6,1), 10));
+            AssertNext(new FixToken(new Location(6,3), Tag.End));
         }
 
         [TestMethod]
