@@ -2,7 +2,7 @@
   internal class CharacterToken : Token {
     public char Value { get; }
 
-    public CharacterToken(Location location, char value) : 
+    public CharacterToken(Location? location, char value) : 
       base(location) {
       Value = value;
     }

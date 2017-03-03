@@ -347,6 +347,39 @@ namespace _Test
         }
 
         [TestMethod]
+        public void CharA()
+        {
+            initializeLexer("'a'");
+            AssertNext(new CharacterToken(null, 'a'));
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
+        [TestMethod]
+        public void CharNewline()
+        {
+            initializeLexer(@"'\n'");
+            AssertNext(new CharacterToken(null, '\n'));
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
+        [TestMethod]
+        public void CharUnterminated()
+        {
+            initializeLexer("'hans + franz");
+            AssertNextError(new Location(1, 1));
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
+        [TestMethod]
+        public void CharInvalid()
+        {
+            initializeLexer("'zz';");
+            AssertNextError(new Location(1, 1));
+            AssertNext(new FixToken(null, Tag.Semicolon));
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
+        [TestMethod]
         public void CombinedAssignment()
         {
             initializeLexer();
