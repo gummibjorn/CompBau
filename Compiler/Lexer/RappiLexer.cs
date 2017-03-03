@@ -96,13 +96,13 @@ namespace RappiSharp.Compiler.Lexer
             if (IsLetter(_current)) { return ReadName(); }
 
             Func<Tag, Token> fixToken = (Tag t) => { ReadNext(); return new FixToken(location, t); };
-            Func<char, Tag, Tag, Token> fixSequence = (char next, Tag tag1, Tag tag2) =>
+            Func<char, Tag, Tag, Token> fixToken_1or2Sequence = (char next, Tag tag1, Tag tag2) =>
             {
                     ReadNext();
                     if (!_endOfText && _current == next) { ReadNext();  return new FixToken(location, tag2); }
                     else { return new FixToken(location, tag1); }
             };
-            Func<char, Tag, Token> fixIf = (char next, Tag t) =>
+            Func<char, Tag, Token> fixToken_2Sequence = (char next, Tag t) =>
             {
                 ReadNext();
                 if (!_endOfText && _current == next) { ReadNext(); return new FixToken(location, t); }
@@ -119,12 +119,12 @@ namespace RappiSharp.Compiler.Lexer
                 case '-': return fixToken(Tag.Minus);
                 case '*': return fixToken(Tag.Times);
                 case '%': return fixToken(Tag.Modulo);
-                case '=': return fixSequence('=', Tag.Assign, Tag.Equals);
-                case '!': return fixSequence('=', Tag.Not, Tag.Unequal);
-                case '<': return fixSequence('=', Tag.Less, Tag.LessEqual);
-                case '>': return fixSequence('=', Tag.Greater, Tag.GreaterEqual);
-                case '&': return fixIf('&', Tag.And);
-                case '|': return fixIf('|', Tag.Or);
+                case '=': return fixToken_1or2Sequence('=', Tag.Assign, Tag.Equals);
+                case '!': return fixToken_1or2Sequence('=', Tag.Not, Tag.Unequal);
+                case '<': return fixToken_1or2Sequence('=', Tag.Less, Tag.LessEqual);
+                case '>': return fixToken_1or2Sequence('=', Tag.Greater, Tag.GreaterEqual);
+                case '&': return fixToken_2Sequence('&', Tag.And);
+                case '|': return fixToken_2Sequence('|', Tag.Or);
                 case '{': return fixToken(Tag.OpenBrace);
                 case '}': return fixToken(Tag.CloseBrace);
                 case '[': return fixToken(Tag.OpenBracket);
@@ -147,7 +147,7 @@ namespace RappiSharp.Compiler.Lexer
             Func<Token, Token> makeTokenChecked = (Token output) =>
             {
                 ReadNext();
-                if (_current != '\'') { return reportError(location, "Invalid length of char"); }
+                if (_current != '\'') { return reportError(location, "Char literal too long"); }
                 ReadNext();
                 return output;
             };
@@ -161,21 +161,12 @@ namespace RappiSharp.Compiler.Lexer
                 }
                 else
                 {
-                    return makeTokenChecked(reportError(location, $"Invalid escape code: {_current}"));
+                    return makeTokenChecked(reportError(location, $"Invalid escape code: \\{_current}"));
                 }
             }
-            if (_endOfText)
-            {
-                return new FixToken(location, Tag.End);
-            }
-            if (_current == '\'')
-            {
-                return reportError(location, "Invalid length of char");
-            }
-            else
-            {
-                return makeTokenChecked(new CharacterToken(location, _current));
-            }
+            if (_endOfText) { return new FixToken(location, Tag.End); }
+            if (_current == '\'') { return reportError(location, "Char literal cannot be empty"); }
+            else { return makeTokenChecked(new CharacterToken(location, _current)); }
         }
 
         private Token ReadSlash()
