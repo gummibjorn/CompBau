@@ -1,0 +1,6 @@
+﻿/*
+	testcomment
+	multiline
+*/
+
+int a = 10;
