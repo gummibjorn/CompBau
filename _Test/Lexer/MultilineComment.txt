@@ -1,0 +1,6 @@
+﻿/*
+	testcomment
+	multiline
+*/
+
+10

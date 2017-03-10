@@ -73,7 +73,7 @@
     <Content Include="Lexer\CombinedHelloWorld.txt" />
     <Content Include="Lexer\CombinedOperators.txt" />
     <Content Include="Lexer\EmptyFile.txt" />
-    <Content Include="Lexer\MultilineComment_Test.txt" />
+    <Content Include="Lexer\MultilineComment.txt" />
     <Content Include="Lexer\StringEscapes.txt" />
   </ItemGroup>
   <Choose>

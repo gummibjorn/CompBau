@@ -40,14 +40,35 @@ namespace _Test
         }
 
         [TestMethod]
-        public void ReadInteger_Positive_MAX_Test() {
+        public void ReadInteger_Huge_Overflow_Test() {
+            initializeLexer("2147483649234123412341213412345565464561234123841789236478912364078126381723089471230847120893741089243456345634563456345634564");
+
+            AssertNextError(ZEROLOCATION);
+        }
+
+        [TestMethod]
+        public void ReadInteger_Integer() {
+            initializeLexer("2147483649");
+
+            AssertNextError(ZEROLOCATION);
+        }
+
+        [TestMethod]
+        public void ReadInteger() {
+            initializeLexer("21474");
+
+            AssertNext(new IntegerToken(ZEROLOCATION, 21474));
+        }
+
+        [TestMethod]
+        public void ReadInteger_Positive_MAX() {
             initializeLexer("2147483647");
 
             AssertNext(new IntegerToken(ZEROLOCATION, 2147483647));
         }
 
         [TestMethod]
-        public void CommentBlock_Test()
+        public void CommentBlock()
         {
             initializeLexer("/* testcomment */");
 
@@ -55,16 +76,15 @@ namespace _Test
         }
 
         [TestMethod]
-        public void SinglelineComment_Test()
+        public void SinglelineComment()
         {
             initializeLexer("// testcomment");
 
             AssertNext(new FixToken(new Location(1, 15), Tag.End));
         }
 
-
         [TestMethod]
-        public void MultilineComment_Test()
+        public void MultilineComment()
         {
             initializeLexer();
 
