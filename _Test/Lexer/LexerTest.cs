@@ -26,15 +26,21 @@ namespace _Test
         }
 
         [TestMethod]
-        public void ReadInteger_Overflow_Test() {
+        public void ReadInteger_Negative_MAX_Test() {
             initializeLexer("2147483648");
 
+            AssertNext(new IntegerToken(ZEROLOCATION, 2147483648));
+        }
+
+        [TestMethod]
+        public void ReadInteger_Overflow_Test() {
+            initializeLexer("2147483649");
 
             AssertNextError(ZEROLOCATION);
         }
 
         [TestMethod]
-        public void ReadInteger_Test() {
+        public void ReadInteger_Positive_MAX_Test() {
             initializeLexer("2147483647");
 
             AssertNext(new IntegerToken(ZEROLOCATION, 2147483647));

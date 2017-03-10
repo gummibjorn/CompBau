@@ -203,21 +203,20 @@ namespace RappiSharp.Compiler.Lexer
 
         private ErrorToken reportError(Location location, string message)
         {
-            Diagnosis.ReportError(message);
+            Diagnosis.ReportError(location, message);
             return new ErrorToken(location, message);
         }
 
         private Token ReadInteger()
         {
-            int value = 0;
-            int old_value = 0;
+            long value = 0;
+            long maxAllowedValue = int.MinValue;
             var location = CurrentLocation();
             while (!_endOfText && IsDigit(_current))
             {
-                old_value = value;
                 int digit = _current - '0';
                 value = value * 10 + digit;
-                if(value < old_value)
+                if(value > Math.Abs(maxAllowedValue))
                 {
                     return reportError(location, "32bit int overflow");
                 }
