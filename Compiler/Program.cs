@@ -1,5 +1,5 @@
 ﻿using RappiSharp.Compiler.Lexer;
-using RappiSharp.Compiler.Lexer.Tokens;
+using RappiSharp.Compiler.Parser;
 using System;
 using System.IO;
 
@@ -19,15 +19,17 @@ namespace RappiSharp.Compiler
             {
                 Diagnosis.Clear();
                 var lexer = new RappiLexer(reader);
-                Token tmp;
-                do
-                {
-                    tmp = lexer.Next();
-                    Console.WriteLine(tmp.ToString());
-                } while (!tmp.ToString().Equals("TOKEN End"));
                 if (Diagnosis.HasErrors)
                 {
                     Console.Write("Exit after lexical error(s)");
+                    return;
+                }
+                var parser = new RappiParser(lexer);
+                //var tree = parser.Parse();
+                parser.ParseProgram();
+                if (Diagnosis.HasErrors)
+                {
+                    Console.Write("Exit after syntactic error(s)");
                     return;
                 }
                 Console.WriteLine("Success");

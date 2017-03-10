@@ -50,15 +50,15 @@ namespace _Test
         public void ClassEmpty()
         {
             initializeParser("class Foo{}");
-            _parser.Parse();
+            _parser.ParseProgram();
         }
 
         [TestMethod]
         public void ClassNoname()
         {
             initializeParser("class{}");
-            _parser.Parse();
-            AssertDiagnosisContains("Expected identifier");
+            _parser.ParseProgram();
+            AssertDiagnosisContains("Identifier expected");
         }
     }
 
