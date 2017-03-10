@@ -4,8 +4,8 @@ namespace RappiSharp.Compiler {
   internal static class Diagnosis {
     public static bool HasErrors { get; private set; } = false;
 
-    public static void ReportError(string message) {
-      Console.WriteLine($"ERROR {message}");
+    public static void ReportError(Location location, string message) {
+      Console.WriteLine($"ERROR {message} at {location}");
       HasErrors = true;
     }
 
