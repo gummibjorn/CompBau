@@ -52,6 +52,7 @@
     <Compile Include="Lexer\Tokens\Token.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Diagnosis.cs" />
+    <Compile Include="Parser\RappiParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
