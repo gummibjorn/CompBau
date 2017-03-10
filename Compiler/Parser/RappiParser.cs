@@ -126,25 +126,96 @@ namespace RappiSharp.Compiler.Parser
 
         private void ParseIfStatement()
         {
-            // TODO: Implement
+            Check(Tag.If);
+            Check(Tag.OpenParenthesis);
+            ParseExpression();
+            Check(Tag.CloseParenthesis);
+            ParseStatementBlock();
+            if (Is(Tag.Else))
+            {
+                Next();
+                ParseStatementBlock();
+            }
         }
 
         private void ParseWhileStatement()
         {
-            // TODO: Implement
+            Check(Tag.While);
+            Check(Tag.OpenParenthesis);
+            ParseExpression();
+            Check(Tag.CloseParenthesis);
+            ParseStatementBlock();
         }
 
         private void ParseReturnStatement()
         {
-            // TODO: Implement
+            Check(Tag.Return);
+            if (Is(Tag.Semicolon))
+            {
+                //void return
+            } else {
+                ParseExpression();
+            }
         }
 
         private void ParseBasicStatement()
         {
+            var id = ReadIdentifier();
+            if (IsIdentifier()) //local variable declaration
+            {
+                ReadIdentifier();
+                Check(Tag.Semicolon);
+            } else if (Is(Tag.Equals)) //assignment
+            {
+                Check(Tag.Assign);
+                ParseExpression();
+            } else if (Is(Tag.OpenParenthesis)) //method call
+            {
+                ParseMethodCallRest(id);
+
+            } else
+            {
+                Error("Expected identifier, '=' or '('");
+            }
+
             // TODO: Parse local variable declaration, assignment, or method call (ambigious FIRST)
         }
 
-        // TODO: Continue parser implementation    
+        private void ParseDesignatorRest(string identifier)
+        {
+            while (Is(Tag.Period))
+            {
+                Next();
+                ReadIdentifier();
+            }
+            if (Is(Tag.OpenBracket))
+            {
+                Next();
+                ParseExpression();
+                Check(Tag.CloseBracket);
+            }
+        }
+
+        private void ParseMethodCallRest(string identifier)
+        {
+            ParseDesignatorRest(identifier);
+            ParseArgumentList();
+            Check(Tag.Semicolon);
+        }
+
+        private void ParseArgumentList()
+        {
+            Check(Tag.OpenParenthesis);
+            if (IsIdentifier())
+            {
+                ParseExpression();
+                while (Is(Tag.Comma))
+                {
+                    ParseExpression();
+                }
+            }
+        }
+
 
         private void Next()
         {
@@ -246,6 +317,10 @@ namespace RappiSharp.Compiler.Parser
         {
             Location location = (Location)(_current.Location.HasValue ? _current.Location : new Location(-1, -1));
           Diagnosis.ReportError(location, message);
+        }
+
+        private void ParseExpression() {
+            ReadInteger(false);
         }
     }
 }
