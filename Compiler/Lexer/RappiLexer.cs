@@ -135,7 +135,9 @@ namespace RappiSharp.Compiler.Lexer
                 case ',': return fixToken(Tag.Comma);
                 case '.': return fixToken(Tag.Period);
                 case ';': return fixToken(Tag.Semicolon);
-                default: return reportError(CurrentLocation(), $"Char '{_current}' is not allowed");
+                default:
+                    ReadNext();
+                    return reportError(location, $"Char '{_current}' is not allowed");
             }
         }
 

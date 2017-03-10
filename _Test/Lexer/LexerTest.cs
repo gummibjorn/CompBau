@@ -614,6 +614,15 @@ namespace _Test
 
         }
 
+        [TestMethod]
+        public void InvalidCharacters()
+        {
+            initializeLexer("$a");
+            AssertNextError(ZEROLOCATION);
+            AssertNext(new IdentifierToken(null, "a"));
+            AssertNext(new FixToken(null, Tag.End));
+        }
+
 
         private void AssertEnd(int col)
         {
