@@ -145,40 +145,60 @@ namespace _Test
         }
 
         [TestMethod, Timeout(1000)]
-        public void ExprTwoDimArrayCreation()
-        {
-            initializeParser(expression("new int[1234][]"));
-            _parser.ParseProgram();
-        }
-
-        [TestMethod, Timeout(1000)]
-        public void ExprTwoDimArrayCreationInvalid()
-        {
-            initializeParser(expression("new int[1234][14]"));
-            _parser.ParseProgram();
-            AssertDiagnosisContains("CloseBracket expected");
-        }
-
-        [TestMethod, Timeout(1000)]
-        public void ExprOneDimArrayCreation()
-        {
-            initializeParser(expression("new int[90]"));
-            _parser.ParseProgram();
-        }
-
-        [TestMethod, Timeout(1000)]
-        public void ExprObjectCreation()
-        {
-            initializeParser(expression("new Test()"));
-            _parser.ParseProgram();
-        }
-
-        [TestMethod, Timeout(1000)]
         public void ExprInvalidMult()
         {
             initializeParser(expression("1 ** 2"));
             _parser.ParseProgram();
             AssertDiagnosisContains("Invalid operand: TOKEN Times");
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprDesignatorSingle()
+        {
+            initializeParser(expression("i"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprDesignatorArrayContinued()
+        {
+            initializeParser(expression("test.i[1].peter"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprDesignatorArray()
+        {
+            initializeParser(expression("test.i[1]"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprDesignatorMulti()
+        {
+            initializeParser(expression("test.i"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprMethodCall()
+        {
+            initializeParser(expression("i()"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprMethodCallArrayDesignator()
+        {
+            initializeParser(expression("i[1].test()"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprMethodCallMultiDesignator()
+        {
+            initializeParser(expression("test.i()"));
+            _parser.ParseProgram();
         }
     }
 

@@ -156,9 +156,11 @@ namespace RappiSharp.Compiler.Parser
             Check(Tag.Return);
             if (Is(Tag.Semicolon))
             {
+                Next();
                 //void return
             } else {
                 ParseExpression();
+                Check(Tag.Semicolon);
             }
         }
 
@@ -245,8 +247,16 @@ namespace RappiSharp.Compiler.Parser
                 ReadString();
             }else if (IsIdentifier())
             {
-                //ParseMethodCall();
-                //ParseDesignator();
+                var identifier = ReadIdentifier();
+                ParseDesignatorRest(identifier);
+                if (Is(Tag.OpenParenthesis))
+                {
+                    ParseMethodCallRest(/*TODO: Designator Tag */);
+                    //return methodcall
+                } else
+                {
+                    //return designator
+                }
             }else if (Is(Tag.New)){
                 Next();
                 ReadIdentifier();
@@ -317,6 +327,7 @@ namespace RappiSharp.Compiler.Parser
             } else if (Is(Tag.OpenParenthesis)) //method call
             {
                 ParseMethodCallRest(id);
+                Check(Tag.Semicolon);
 
             } else
             {
@@ -339,13 +350,22 @@ namespace RappiSharp.Compiler.Parser
                 ParseExpression();
                 Check(Tag.CloseBracket);
             }
+            if (Is(Tag.Period)) // FIXME: laut EBNF scheint es so, als koennte hier nur nich ein identifier kommen und der Designator waere zuende.
+            {
+                Next();
+                ReadIdentifier();
+            }
+        }
+
+        private void ParseMethodCallRest(/*TODO: Designator Tag */)
+        {
+            ParseArgumentList();
         }
 
         private void ParseMethodCallRest(string identifier)
         {
             ParseDesignatorRest(identifier);
             ParseArgumentList();
-            Check(Tag.Semicolon);
         }
 
         private void ParseArgumentList()
