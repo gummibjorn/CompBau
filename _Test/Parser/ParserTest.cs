@@ -145,11 +145,40 @@ namespace _Test
         }
 
         [TestMethod, Timeout(1000)]
+        public void ExprTwoDimArrayCreation()
+        {
+            initializeParser(expression("new int[1234][]"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprTwoDimArrayCreationInvalid()
+        {
+            initializeParser(expression("new int[1234][14]"));
+            _parser.ParseProgram();
+            AssertDiagnosisContains("CloseBracket expected");
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprOneDimArrayCreation()
+        {
+            initializeParser(expression("new int[90]"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprObjectCreation()
+        {
+            initializeParser(expression("new Test()"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
         public void ExprInvalidMult()
         {
             initializeParser(expression("1 ** 2"));
             _parser.ParseProgram();
-            AssertDiagnosisContains("Invalid symbol in factor: TOKEN Times");
+            AssertDiagnosisContains("Invalid operand: TOKEN Times");
         }
     }
 

@@ -220,11 +220,7 @@ namespace RappiSharp.Compiler.Parser
                 //TODO: Implement and add ParseTypeCast here!
                 Next();
                 ParseExpression();
-                if (!Is(Tag.CloseParenthesis))
-                {
-                    Error($"Invalid Statement {_current}");
-                }
-                Next();
+                Check(Tag.CloseParenthesis);
             }else 
             {
                 ParseOperand();
@@ -256,15 +252,27 @@ namespace RappiSharp.Compiler.Parser
                 ReadIdentifier();
                 if (Is(Tag.OpenParenthesis))
                 {
-                    //TODO: ParseObjectCreation
+                    Check(Tag.OpenParenthesis);
+                    Check(Tag.CloseParenthesis);
                 }else if (Is(Tag.OpenBracket))
                 {
-                    //TODO: ParseArrayCreation
+                    ParseArrayCreation();
                 }
-                //TODO Implement Object and Array Creation
             }else
             {
                 Error("Invalid operand: " + _current);
+            }
+        }
+
+        private void ParseArrayCreation()
+        {
+            Check(Tag.OpenBracket);
+            ParseExpression();
+            Check(Tag.CloseBracket);
+            while (Is(Tag.OpenBracket))
+            {
+                Check(Tag.OpenBracket);
+                Check(Tag.CloseBracket);
             }
         }
 
