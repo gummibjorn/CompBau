@@ -2,6 +2,7 @@
 using RappiSharp.Compiler.Lexer;
 using RappiSharp.Compiler.Lexer.Tokens;
 using System.Collections.Generic;
+using RappiSharp.Compiler.Parser.Tree;
 
 namespace RappiSharp.Compiler.Parser
 {
@@ -16,37 +17,63 @@ namespace RappiSharp.Compiler.Parser
             Next();
         }
 
-        public void ParseProgram()
+        private Location CurrentLocation()
         {
-            while (!IsEnd())
-            {
-                ParseClass();
-            }
+            return (Location)(_current.Location.HasValue ? _current.Location : new Location(-1, -1));
         }
 
-        private void ParseClass()
+        public ProgramNode ParseProgram()
         {
+            var classes = new List<ClassNode>();
+            var currentLocation = CurrentLocation();
+            while (!IsEnd())
+            {
+                classes.Add(ParseClass());
+            }
+            return new ProgramNode(currentLocation, classes);
+        }
+
+        private ClassNode ParseClass()
+        {
+            var currentLocation = CurrentLocation();
             Check(Tag.Class);
-            ReadIdentifier();
+            var classIdentifier = ReadIdentifier();
+            var baseClass = new BasicTypeNode(currentLocation, "Object");
+            var variables = new List<VariableNode>();
+            var methods = new List<MethodNode>();
+
+            if (Is(Tag.Colon))
+            {
+                Next();
+                baseClass = new BasicTypeNode(CurrentLocation(), ReadIdentifier());
+            }
             Check(Tag.OpenBrace);
             while (!IsEnd() && !Is(Tag.CloseBrace))
             {
-                ParseClassMember();
+                var classMember = ParseClassMember();
+                if(classMember is VariableNode)
+                {
+                    variables.Add((VariableNode)classMember);
+                }
             }
             Check(Tag.CloseBrace);
+            return new ClassNode(currentLocation, classIdentifier, baseClass, variables, methods);
         }
 
-        private void ParseClassMember()
+        private Node ParseClassMember()
         {
-            ParseType();
+            var currentLocation = CurrentLocation();
+            var type = ParseType();
             var identifier = ReadIdentifier();
             if (Is(Tag.OpenParenthesis))
             {
                 ParseMethodRest(identifier);
+                return null;
             }
             else
             {
                 Check(Tag.Semicolon);
+                return new VariableNode(currentLocation, type, identifier);
             }
         }
 
@@ -77,14 +104,28 @@ namespace RappiSharp.Compiler.Parser
             ReadIdentifier();
         }
 
-        private void ParseType()
+        private TypeNode ArrayTypeBuilder(Location currentLocation, String identifier)
         {
-            ReadIdentifier();
-            while (Is(Tag.OpenBracket))
+            if (Is(Tag.OpenBracket))
             {
                 Next();
                 Check(Tag.CloseBracket);
+                return new ArrayTypeNode(currentLocation, ArrayTypeBuilder(currentLocation, identifier));
+            }else
+            {
+                return new BasicTypeNode(currentLocation, identifier);
             }
+        }
+
+        private TypeNode ParseType()
+        {
+            var currentLocation = CurrentLocation();
+            var identifier = ReadIdentifier();
+            if (!Is(Tag.OpenBracket))
+            {
+                return new BasicTypeNode(currentLocation, identifier);
+            }
+            return ArrayTypeBuilder(currentLocation, identifier);
         }
 
         private void ParseStatementBlock()
