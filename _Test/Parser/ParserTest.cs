@@ -33,6 +33,11 @@ namespace _Test
             return "class Proram{ void main(){" + content + "}}";
         }
 
+        private string expression(string expr)
+        {
+            return main("return " + expr + ";");
+        }
+
         private void AssertDiagnosisContains(string msg)
         {
             Assert.IsTrue(Diagnosis.Messages.Contains(msg), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
@@ -94,6 +99,20 @@ namespace _Test
         public void ReturnStatement()
         {
             initializeParser(main("return 0;"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod]
+        public void ExprIntLiteral()
+        {
+            initializeParser(expression("0"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprInvalidMult()
+        {
+            initializeParser(expression("1 ** 2"));
             _parser.ParseProgram();
         }
     }
