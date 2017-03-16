@@ -188,10 +188,7 @@ namespace RappiSharp.Compiler.Parser
 
         private void ParseFactor()
         {
-            if(IsInteger() || IsString() || IsCharacter())
-            {
-                ParseOperand();
-            }else if (Is(Tag.Not) || Is(Tag.Plus) || Is(Tag.Minus))
+            if (Is(Tag.Not) || Is(Tag.Plus) || Is(Tag.Minus))
             {
                 ParseUnaryExpression(); 
             }else if (Is(Tag.OpenParenthesis))
@@ -203,7 +200,11 @@ namespace RappiSharp.Compiler.Parser
                 {
                     Error($"Invalid Statement {_current}");
                 }
-                Next(); 
+                Next();
+            }else
+            {
+                ParseOperand();
+                //TODO: error handling if non of the above?
             }
         }
 
@@ -218,11 +219,25 @@ namespace RappiSharp.Compiler.Parser
             if (IsInteger())
             {
                 ReadInteger(true);
+            }else if (IsCharacter())
+            {
+                ReadCharacter();    
+            }else if (IsString()) {
+                ReadString();
             }else if (IsIdentifier())
             {
+                //ParseMethodCall();
                 //ParseDesignator();
             }else if (Is(Tag.New)){
                 Next();
+                ReadIdentifier();
+                if (Is(Tag.OpenParenthesis))
+                {
+                    //TODO: ParseObjectCreation
+                }else if (Is(Tag.OpenBracket))
+                {
+                    //TODO: ParseArrayCreation
+                }
                 //TODO Implement Object and Array Creation
             }
         }
