@@ -1,5 +1,7 @@
-﻿using RappiSharp.Compiler.Lexer;
+﻿using System;
+using RappiSharp.Compiler.Lexer;
 using RappiSharp.Compiler.Lexer.Tokens;
+using System.Collections.Generic;
 
 namespace RappiSharp.Compiler.Parser
 {
@@ -124,6 +126,7 @@ namespace RappiSharp.Compiler.Parser
             }
         }
 
+
         private void ParseIfStatement()
         {
             Check(Tag.If);
@@ -136,6 +139,7 @@ namespace RappiSharp.Compiler.Parser
                 Next();
                 ParseStatementBlock();
             }
+            
         }
 
         private void ParseWhileStatement()
@@ -156,6 +160,133 @@ namespace RappiSharp.Compiler.Parser
             } else {
                 ParseExpression();
             }
+        }
+
+        private void ParseExpression()
+        {
+            ParseLogicTerm();
+            while (Is(Tag.Or))
+            {
+                ParseLogicTerm();
+            }
+        }
+
+        private void ParseLogicTerm()
+        {
+            ParseLogicFactor();
+            while (Is(Tag.Or))
+            {
+                ParseLogicFactor();
+            }
+        }
+
+        private void ParseLogicFactor()
+        {
+            ParseSimpleExpression();
+            while (IsCompareOperator()){
+                ParseSimpleExpression();
+            }
+        }
+
+        private void ParseSimpleExpression()
+        {
+            ParseTerm();
+            while (Is(Tag.Plus) || Is(Tag.Minus))
+            {
+                ParseTerm();
+            }
+        }
+
+        private void ParseTerm()
+        {
+            ParseFactor();
+            while(Is(Tag.Times) || Is(Tag.Divide) || Is(Tag.Modulo))
+            {
+                ParseFactor();
+            }
+        }
+
+        private void ParseFactor()
+        {
+            if (Is(Tag.Not) || Is(Tag.Plus) || Is(Tag.Minus))
+            {
+                ParseUnaryExpression(); 
+            }else if (Is(Tag.OpenParenthesis))
+            {
+                //TODO: Implement and add ParseTypeCast here!
+                Next();
+                ParseExpression();
+                if (!Is(Tag.CloseParenthesis))
+                {
+                    Error($"Invalid Statement {_current}");
+                }
+                Next();
+            }else
+            {
+                ParseOperand();
+                //TODO: error handling if non of the above?
+            }
+        }
+
+        private void ParseUnaryExpression()
+        {
+            Next();
+            ParseFactor();
+        }
+
+        private void ParseOperand()
+        {
+            if (IsInteger())
+            {
+                ReadInteger(true);
+            }else if (IsCharacter())
+            {
+                ReadCharacter();    
+            }else if (IsString()) {
+                ReadString();
+            }else if (IsIdentifier())
+            {
+                //ParseMethodCall();
+                //ParseDesignator();
+            }else if (Is(Tag.New)){
+                Next();
+                ReadIdentifier();
+                if (Is(Tag.OpenParenthesis))
+                {
+                    //TODO: ParseObjectCreation
+                }else if (Is(Tag.OpenBracket))
+                {
+                    //TODO: ParseArrayCreation
+                }
+                //TODO Implement Object and Array Creation
+            }
+        }
+
+        private void ParseCompareOperator()
+        {
+            if (Is(Tag.Equals))
+            {
+
+            }else if (Is(Tag.Unequal))
+            {
+                
+            }else if (Is(Tag.Less))
+            {
+
+            }else if (Is(Tag.LessEqual))
+            {
+
+            }else if (Is(Tag.Greater))
+            {
+
+            }else if (Is(Tag.GreaterEqual))
+            {
+
+            }else if (Is(Tag.Is))
+            {
+
+            }
+            Next();
         }
 
         private void ParseBasicStatement()
@@ -300,6 +431,21 @@ namespace RappiSharp.Compiler.Parser
             return _current is StringToken;
         }
 
+        private bool IsCompareOperator()
+        {
+            var compareTags = new List<Tag>
+            {
+                Tag.Equals,
+                Tag.Not,
+                Tag.Less,
+                Tag.LessEqual,
+                Tag.Greater,
+                Tag.GreaterEqual,
+                Tag.Is
+            };
+            return _current is FixToken && compareTags.Contains(((FixToken)_current).Tag);
+        }
+
         private string ReadString()
         {
             if (!IsString())
@@ -317,10 +463,6 @@ namespace RappiSharp.Compiler.Parser
         {
             Location location = (Location)(_current.Location.HasValue ? _current.Location : new Location(-1, -1));
           Diagnosis.ReportError(location, message);
-        }
-
-        private void ParseExpression() {
-            ReadInteger(false);
         }
     }
 }
