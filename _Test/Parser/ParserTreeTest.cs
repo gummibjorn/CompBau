@@ -10,7 +10,8 @@ using System.Collections.Generic;
 namespace _Test
 {
     [TestClass]
-    public class ParserTreeTest {
+    public class ParserTreeTest
+    {
         const int TIMEOUT = 1000;
         private Location L = new Location(-1, -1);
         private RappiParser _parser;
@@ -84,7 +85,7 @@ namespace _Test
         {
             initializeParser("class Foo{}");
             var result = _parser.ParseProgram();
-            var node = new ProgramNode(L, 
+            var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
                     new BasicTypeNode(L, "Object"),
@@ -93,15 +94,99 @@ namespace _Test
                     )
                 }
             );
+            Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
         [TestMethod, Timeout(TIMEOUT)]
-        public void ClassNoname()
+        public void ClassWithMultipleVariables()
         {
-            initializeParser("class{}");
-            _parser.ParseProgram();
-            AssertDiagnosisContains("Identifier expected");
+            initializeParser("class Foo{ int[][] i; char c; }");
+            var result = _parser.ParseProgram();
+            var expected = new ProgramNode(L,
+                new List<ClassNode>(){
+                    new ClassNode(L, "Foo",
+                    new BasicTypeNode(L, "Object"),
+                    new List<VariableNode>() {
+                        new VariableNode(L,
+                            new ArrayTypeNode(L, new ArrayTypeNode(L, new BasicTypeNode(L, "int"))),
+                            "i"
+                        ),
+                        new VariableNode(L,
+                            new BasicTypeNode(L, "char"),
+                            "c"
+                        )
+                    },
+                    new List<MethodNode>()
+                    )
+                }
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ClassWithNestedArrayVariable()
+        {
+            initializeParser("class Foo{ int[][] i; }");
+            var result = _parser.ParseProgram();
+            var expected = new ProgramNode(L,
+                new List<ClassNode>(){
+                    new ClassNode(L, "Foo",
+                    new BasicTypeNode(L, "Object"),
+                    new List<VariableNode>() {
+                        new VariableNode(L,
+                            new ArrayTypeNode(L, new ArrayTypeNode(L, new BasicTypeNode(L, "int"))),
+                            "i"
+                        )
+                    },
+                    new List<MethodNode>()
+                    )
+                }
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
 
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ClassWithArrayVariable()
+        {
+            initializeParser("class Foo{ int[] i; }");
+            var result = _parser.ParseProgram();
+            var expected = new ProgramNode(L,
+                new List<ClassNode>(){
+                    new ClassNode(L, "Foo",
+                    new BasicTypeNode(L, "Object"),
+                    new List<VariableNode>() {
+                        new VariableNode(L,
+                            new ArrayTypeNode(L, new BasicTypeNode(L, "int")),
+                            "i"
+                        )
+                    },
+                    new List<MethodNode>()
+                    )
+                }
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ClassWithSimpleVariable()
+        {
+            initializeParser("class Foo{ int i; }");
+            var result = _parser.ParseProgram();
+            var expected = new ProgramNode(L,
+                new List<ClassNode>(){
+                    new ClassNode(L, "Foo",
+                    new BasicTypeNode(L, "Object"),
+                    new List<VariableNode>() {
+                        new VariableNode(L,
+                            new BasicTypeNode(L, "int"),
+                            "i"
+                        )
+                    },
+                    new List<MethodNode>()
+                    )
+                }
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+    }
 }
