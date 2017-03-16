@@ -110,10 +110,46 @@ namespace _Test
         }
 
         [TestMethod, Timeout(1000)]
+        public void ExprAddition()
+        {
+            initializeParser(expression("0+1"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprAdditionParenthesis()
+        {
+            initializeParser(expression("0+(1*5)"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprMulitplication()
+        {
+            initializeParser(expression("1*5"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprMulitplicationParenthesis()
+        {
+            initializeParser(expression("(1*5)"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
+        public void ExprMulitplicationCombined()
+        {
+            initializeParser(expression("(1*5)-5"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
         public void ExprInvalidMult()
         {
             initializeParser(expression("1 ** 2"));
             _parser.ParseProgram();
+            AssertDiagnosisContains("Invalid symbol in factor: TOKEN Times");
         }
     }
 

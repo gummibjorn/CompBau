@@ -167,6 +167,7 @@ namespace RappiSharp.Compiler.Parser
             ParseLogicTerm();
             while (Is(Tag.Or))
             {
+                Next();
                 ParseLogicTerm();
             }
         }
@@ -174,8 +175,9 @@ namespace RappiSharp.Compiler.Parser
         private void ParseLogicTerm()
         {
             ParseLogicFactor();
-            while (Is(Tag.Or))
+            while (Is(Tag.And))
             {
+                Next();
                 ParseLogicFactor();
             }
         }
@@ -184,6 +186,7 @@ namespace RappiSharp.Compiler.Parser
         {
             ParseSimpleExpression();
             while (IsCompareOperator()){
+                ParseCompareOperator();
                 ParseSimpleExpression();
             }
         }
@@ -202,6 +205,7 @@ namespace RappiSharp.Compiler.Parser
             ParseFactor();
             while(Is(Tag.Times) || Is(Tag.Divide) || Is(Tag.Modulo))
             {
+                Next();
                 ParseFactor();
             }
         }
@@ -221,10 +225,9 @@ namespace RappiSharp.Compiler.Parser
                     Error($"Invalid Statement {_current}");
                 }
                 Next();
-            }else
+            }else 
             {
                 ParseOperand();
-                //TODO: error handling if non of the above?
             }
         }
 
@@ -259,6 +262,9 @@ namespace RappiSharp.Compiler.Parser
                     //TODO: ParseArrayCreation
                 }
                 //TODO Implement Object and Array Creation
+            }else
+            {
+                Error("Invalid operand: " + _current);
             }
         }
 
@@ -345,6 +351,7 @@ namespace RappiSharp.Compiler.Parser
                     ParseExpression();
                 }
             }
+            Check(Tag.CloseParenthesis);
         }
 
 
