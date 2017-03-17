@@ -43,6 +43,25 @@ namespace _Test
             return main("return " + expr + ";");
         }
 
+        class StatementBlockExtractor : Visitor
+        {
+            public StatementBlockNode _node = null;
+            public override void Visit(StatementBlockNode node)
+            {
+                if(_node == null)
+                {
+                    _node = node;
+                }
+            }
+        }
+
+        private StatementBlockNode getStatementBlock(ProgramNode program)
+        {
+            var extractor = new StatementBlockExtractor();
+            extractor.Visit(program);
+            return extractor._node;
+        }
+
         class ExpressionExtractor : Visitor
         {
             public ExpressionNode _expression;
@@ -103,6 +122,57 @@ namespace _Test
             initializeParser(expression("0"));
             var result = getExpression(_parser.ParseProgram());
             var expected = new IntegerLiteralNode(L, 0);
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementIfElse()
+        {
+            initializeParser(main("if(0){}else{return;}"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            var expected = new IfStatementNode(L,
+                new IntegerLiteralNode(L, 0),
+                new StatementBlockNode(L, new List<StatementNode>()),
+                new StatementBlockNode(L, new List<StatementNode>()
+                {
+                    new ReturnStatementNode(L, null)
+                })
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementIf()
+        {
+            initializeParser(main("if(0){ return; }"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            var expected = new IfStatementNode(L,
+                new IntegerLiteralNode(L, 0),
+                new StatementBlockNode(L, new List<StatementNode>()
+                {
+                    new ReturnStatementNode(L, null)
+                }),
+                null
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementReturnExpr()
+        {
+            initializeParser(main("return 0;"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            var expected = new ReturnStatementNode(L, new IntegerLiteralNode(L, 0));
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementReturnVoid()
+        {
+            initializeParser(main("return;"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            var expected = new ReturnStatementNode(L, null);
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 

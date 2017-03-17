@@ -143,7 +143,11 @@ namespace RappiSharp.Compiler.Parser
             Check(Tag.OpenBrace);
             while (!IsEnd() && !Is(Tag.CloseBrace))
             {
-                list.Add(ParseStatement());
+                var statement = ParseStatement();
+                if(statement != null)
+                {
+                    list.Add(statement);
+                }
             }
             Check(Tag.CloseBrace);
             return new StatementBlockNode(location, list);
@@ -153,7 +157,7 @@ namespace RappiSharp.Compiler.Parser
         {
             if (Is(Tag.If))
             {
-                ParseIfStatement();
+                return ParseIfStatement();
             }
             else if (Is(Tag.While))
             {
@@ -175,23 +179,27 @@ namespace RappiSharp.Compiler.Parser
             {
                 Error($"Invalid statement {_current}");
                 Next();
+                return null;
             }
-            return null; //TODO implement
+            throw new NotImplementedException();
         }
 
 
-        private void ParseIfStatement()
+        private IfStatementNode ParseIfStatement()
         {
+            var location = CurrentLocation();
             Check(Tag.If);
             Check(Tag.OpenParenthesis);
-            ParseExpression();
+            var condition = ParseExpression();
             Check(Tag.CloseParenthesis);
-            ParseStatementBlock();
+            var thenBody = ParseStatementBlock();
+            StatementBlockNode elseBody = null;
             if (Is(Tag.Else))
             {
                 Next();
-                ParseStatementBlock();
+                elseBody = ParseStatementBlock();
             }
+            return new IfStatementNode(location, condition, thenBody, elseBody);
             
         }
 
