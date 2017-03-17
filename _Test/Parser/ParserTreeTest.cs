@@ -6,6 +6,7 @@ using RappiSharp.Compiler.Parser;
 using RappiSharp.Compiler.Parser.Tree;
 using System.IO;
 using System.Collections.Generic;
+using System;
 
 namespace _Test
 {
@@ -60,6 +61,20 @@ namespace _Test
             var extractor = new StatementBlockExtractor();
             extractor.Visit(program);
             return extractor._node;
+        }
+
+        private StatementNode getFirstStatement(ProgramNode program)
+        {
+            var extractor = new StatementBlockExtractor();
+            extractor.Visit(program);
+            if(extractor._node.Statements.Count > 0)
+            {
+                return extractor._node.Statements[0];
+            } else
+            {
+                Assert.Fail("First statement block contains no statements");
+                return null;
+            }
         }
 
         class ExpressionExtractor : Visitor
@@ -125,6 +140,141 @@ namespace _Test
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
+
+        [TestMethod]
+        public void StatementCall()
+        {
+            initializeParser(main("hans();"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new CallStatementNode(L,
+                new MethodCallNode(L,
+                    new BasicDesignatorNode(L, "hans"),
+                    new List<ExpressionNode>()
+                )
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementCallComplex()
+        {
+            initializeParser(main("hans.peters[0].i();"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new CallStatementNode(L, new MethodCallNode(L,
+                new MemberAccessNode(L,
+                    new ElementAccessNode(L,
+                        new MemberAccessNode(L,
+                            new BasicDesignatorNode(L, "i"),
+                            "peters"
+                        ),
+                        new IntegerLiteralNode(L, 0)
+                    ),
+                    "hans"
+                ),
+                new List<ExpressionNode>()
+            ));
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementAssignmentMemberArrayMember()
+        {
+            initializeParser(main("hans.peters[0].i = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new AssignmentNode(L,
+                new MemberAccessNode(L,
+                    new ElementAccessNode(L,
+                        new MemberAccessNode(L,
+                            new BasicDesignatorNode(L, "i"),
+                            "peters"
+                        ),
+                        new IntegerLiteralNode(L, 0)
+                    ),
+                    "hans"
+                ),
+                new IntegerLiteralNode(L, 0)
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementAssignmentArrayMember()
+        {
+            initializeParser(main("peters[0].i = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new AssignmentNode(L,
+                new ElementAccessNode(L,
+                    new MemberAccessNode(L,
+                        new BasicDesignatorNode(L, "i"),
+                        "peters"
+                    ),
+                    new IntegerLiteralNode(L, 0)
+                ),
+                new IntegerLiteralNode(L, 0)
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementAssignmentMemberArray()
+        {
+            initializeParser(main("hans.i[0] = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new AssignmentNode(L,
+                new MemberAccessNode(L,
+                    new ElementAccessNode(L, 
+                        new BasicDesignatorNode(L, "i"),
+                        new IntegerLiteralNode(L,0)
+                    ),
+                    "hans"
+                ),
+                new IntegerLiteralNode(L, 0)
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod]
+        public void StatementAssignmentArray()
+        {
+            initializeParser(main("i[0] = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new AssignmentNode(L,
+                new ElementAccessNode(L, 
+                    new BasicDesignatorNode(L, "i"),
+                    new IntegerLiteralNode(L,0)
+                ),
+                new IntegerLiteralNode(L, 0)
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementAssignmentMember()
+        {
+            initializeParser(main("hans.i = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new AssignmentNode(L,
+                new MemberAccessNode(L, 
+                    new BasicDesignatorNode(L, "i"),
+                    "hans"
+                ),
+                new IntegerLiteralNode(L, 0)
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod]
+        //[TestMethod, Timeout(TIMEOUT)]
+        public void StatementAssignmentBasic()
+        {
+            initializeParser(main("i = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new AssignmentNode(L,
+                new BasicDesignatorNode(L, "i"),
+                new IntegerLiteralNode(L, 0)
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
 
         [TestMethod, Timeout(TIMEOUT)]
         public void StatementLocalDeclarationArray()

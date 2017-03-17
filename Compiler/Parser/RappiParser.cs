@@ -323,7 +323,7 @@ namespace RappiSharp.Compiler.Parser
                 ParseDesignatorRest(identifier);
                 if (Is(Tag.OpenParenthesis))
                 {
-                    ParseMethodCallRest(/*TODO: Designator Tag */);
+                    //ParseMethodCallRest(/*TODO: Designator Tag */);
                     //return methodcall
                 } else
                 {
@@ -389,53 +389,105 @@ namespace RappiSharp.Compiler.Parser
         {
             var location = CurrentLocation();
             var id = ReadIdentifier();
-            if (IsIdentifier() || Is(Tag.OpenBracket)) //local variable declaration
+            if (IsIdentifier())
             {
-                var type = ParseTypeRest(location, id);
+                var type = new BasicTypeNode(location, id);
                 var name = ReadIdentifier();
                 Check(Tag.Semicolon);
                 return new LocalDeclarationNode(location, new VariableNode(location, type, name));
-            } else if (Is(Tag.Equals)) //assignment
+            } else if (Is(Tag.OpenBracket))
             {
-                Check(Tag.Assign);
-                ParseExpression();
-            } else if (Is(Tag.OpenParenthesis)) //method call
-            {
-                ParseMethodCallRest(id);
-                Check(Tag.Semicolon);
-
-            } else
+                Next();
+                if (Is(Tag.CloseBracket))
+                {
+                    Next();
+                    var type = new ArrayTypeNode(location, ArrayTypeBuilder(location, id));
+                    var name = ReadIdentifier();
+                    Check(Tag.Semicolon);
+                    return new LocalDeclarationNode(location, new VariableNode(location, type, name));
+                } else
+                {
+                    //Parse expression; parse designator rest
+                    var index = ParseExpression();
+                    Check(Tag.CloseBracket);
+                    var designator = new ElementAccessNode(
+                        location,
+                        ParseDesignatorRest(id),
+                        index
+                    );
+                    return ParseBasicStatementRest(location, designator);
+                }
+            } else {
+                var designator = ParseDesignatorRest(id);
+                return ParseBasicStatementRest(location, designator);
+            } 
+            /*
+            else
             {
                 Error("Expected identifier, '=' or '('");
                 return null;
             }
+            */
             throw new NotImplementedException();
         }
 
-        private void ParseDesignatorRest(string identifier)
+        private StatementNode ParseBasicStatementRest(Location location, DesignatorNode designator)
         {
-            while (Is(Tag.Period))
+            if (Is(Tag.Assign))
             {
                 Next();
-                ReadIdentifier();
-            }
-            if (Is(Tag.OpenBracket))
+                var right = ParseExpression();
+                Check(Tag.Semicolon);
+                return new AssignmentNode(location, designator, right);
+            } else if (Is(Tag.OpenParenthesis))
             {
-                Next();
-                ParseExpression();
-                Check(Tag.CloseBracket);
-            }
-            if (Is(Tag.Period)) // FIXME: laut EBNF scheint es so, als koennte hier nur nich ein identifier kommen und der Designator waere zuende.
+                return new CallStatementNode(location, ParseMethodCallRest(location, designator));
+                throw new NotImplementedException();
+            } else
             {
-                Next();
-                var identif = ReadIdentifier();
-                ParseDesignatorRest(identif);
+                Error($"Expected '=' or '(', got {_current}");
+                return null;
             }
         }
 
-        private void ParseMethodCallRest(/*TODO: Designator Tag */)
+        private DesignatorNode ParseDesignatorRest(string previousName)
+        {
+            var location = CurrentLocation();
+            if (Is(Tag.OpenBracket))
+            {
+                Next();
+                var index = ParseExpression();
+                Check(Tag.CloseBracket);
+                return new ElementAccessNode(
+                    location,
+                    ParseDesignatorRest(previousName),
+                    index
+                );
+
+            } else if(Is(Tag.Period))
+            {
+                Next();
+                var name = ReadIdentifier();
+                return new MemberAccessNode(
+                    location,
+                    ParseDesignatorRest(name),
+                    previousName
+                );
+            } else
+            {
+                return new BasicDesignatorNode(location, previousName);
+            }
+        }
+
+        private MethodCallNode ParseMethodCallRest(Location location, DesignatorNode designator)
         {
             ParseArgumentList();
+            Check(Tag.Semicolon);
+            return new MethodCallNode(location,
+                designator,
+                new List<ExpressionNode>() //TODO
+            );
+
         }
 
         private void ParseMethodCallRest(string identifier)
