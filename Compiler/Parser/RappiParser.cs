@@ -125,15 +125,20 @@ namespace RappiSharp.Compiler.Parser
             }
         }
 
+        private TypeNode ParseTypeRest(Location location, string identifier)
+        {
+            if (!Is(Tag.OpenBracket))
+            {
+                return new BasicTypeNode(location, identifier);
+            }
+            return ArrayTypeBuilder(location, identifier);
+        }
+
         private TypeNode ParseType()
         {
             var currentLocation = CurrentLocation();
             var identifier = ReadIdentifier();
-            if (!Is(Tag.OpenBracket))
-            {
-                return new BasicTypeNode(currentLocation, identifier);
-            }
-            return ArrayTypeBuilder(currentLocation, identifier);
+            return ParseTypeRest(currentLocation, identifier);
         }
 
         private StatementBlockNode ParseStatementBlock()
@@ -161,7 +166,7 @@ namespace RappiSharp.Compiler.Parser
             }
             else if (Is(Tag.While))
             {
-                ParseWhileStatement();
+                return ParseWhileStatement();
             }
             else if (Is(Tag.Return))
             {
@@ -169,7 +174,7 @@ namespace RappiSharp.Compiler.Parser
             }
             else if (IsIdentifier())
             {
-                ParseBasicStatement();
+                return ParseBasicStatement();
             }
             else if (Is(Tag.Semicolon))
             {
@@ -203,13 +208,15 @@ namespace RappiSharp.Compiler.Parser
             
         }
 
-        private void ParseWhileStatement()
+        private WhileStatementNode ParseWhileStatement()
         {
+            var location = CurrentLocation();
             Check(Tag.While);
             Check(Tag.OpenParenthesis);
-            ParseExpression();
+            var condition = ParseExpression();
             Check(Tag.CloseParenthesis);
-            ParseStatementBlock();
+            var body = ParseStatementBlock();
+            return new WhileStatementNode(location, condition, body);
         }
 
         private ReturnStatementNode ParseReturnStatement()
@@ -378,13 +385,16 @@ namespace RappiSharp.Compiler.Parser
             Next();
         }
 
-        private void ParseBasicStatement()
+        private StatementNode ParseBasicStatement()
         {
+            var location = CurrentLocation();
             var id = ReadIdentifier();
-            if (IsIdentifier()) //local variable declaration
+            if (IsIdentifier() || Is(Tag.OpenBracket)) //local variable declaration
             {
-                ReadIdentifier();
+                var type = ParseTypeRest(location, id);
+                var name = ReadIdentifier();
                 Check(Tag.Semicolon);
+                return new LocalDeclarationNode(location, new VariableNode(location, type, name));
             } else if (Is(Tag.Equals)) //assignment
             {
                 Check(Tag.Assign);
@@ -397,9 +407,9 @@ namespace RappiSharp.Compiler.Parser
             } else
             {
                 Error("Expected identifier, '=' or '('");
+                return null;
             }
-
-            // TODO: Parse local variable declaration, assignment, or method call (ambigious FIRST)
+            throw new NotImplementedException();
         }
 
         private void ParseDesignatorRest(string identifier)

@@ -127,6 +127,46 @@ namespace _Test
 
 
         [TestMethod, Timeout(TIMEOUT)]
+        public void StatementLocalDeclarationArray()
+        {
+            initializeParser(main("int[][] i;"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            var expected = new LocalDeclarationNode(L,
+                new VariableNode(L,
+                    new ArrayTypeNode(L, new ArrayTypeNode(L, new BasicTypeNode(L, "int"))),
+                    "i"
+                )
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementLocalDeclaration()
+        {
+            initializeParser(main("int i;"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            var expected = new LocalDeclarationNode(L,
+                new VariableNode(L, new BasicTypeNode(L, "int"), "i")
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementWhile()
+        {
+            initializeParser(main("while(0){return;}"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            var expected = new WhileStatementNode(L,
+                new IntegerLiteralNode(L, 0),
+                new StatementBlockNode(L, new List<StatementNode>()
+                {
+                    new ReturnStatementNode(L, null)
+                })
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
         public void StatementIfElse()
         {
             initializeParser(main("if(0){}else{return;}"));
