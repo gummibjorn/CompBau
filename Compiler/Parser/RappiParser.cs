@@ -331,6 +331,7 @@ namespace RappiSharp.Compiler.Parser
 
         private ExpressionNode ParseOperand()
         {
+            var location = CurrentLocation();
             if (IsInteger())
             {
                 return new IntegerLiteralNode(CurrentLocation(), ReadInteger(true));
@@ -343,20 +344,15 @@ namespace RappiSharp.Compiler.Parser
             }else if (IsIdentifier())
             {
                 var identifier = ReadIdentifier();
-                ParseDesignatorRest(identifier);
+                var designator = ParseDesignatorRest(identifier);
                 if (Is(Tag.OpenParenthesis))
                 {
-                    //ParseMethodCallRest(/*TODO: Designator Tag */);
-                    //return methodcall
-//                    ParseMethodCallRest();
-                    return null;
+                    return ParseMethodCallRest(location, designator);
                 } else
                 {
-                    //return designator
-                    return null;
+                    return designator;
                 }
             }else if (Is(Tag.New)){
-                var location = CurrentLocation();
                 Next();
                 var ident = ReadIdentifier();
                 if (Is(Tag.OpenParenthesis))
@@ -490,8 +486,9 @@ namespace RappiSharp.Compiler.Parser
                 return new AssignmentNode(location, designator, right);
             } else if (Is(Tag.OpenParenthesis))
             {
-                return new CallStatementNode(location, ParseMethodCallRest(location, designator));
-                throw new NotImplementedException();
+                var call = new CallStatementNode(location, ParseMethodCallRest(location, designator));
+                Check(Tag.Semicolon);
+                return call;
             } else
             {
                 Error($"Expected '=' or '(', got {_current}");
@@ -531,7 +528,6 @@ namespace RappiSharp.Compiler.Parser
         private MethodCallNode ParseMethodCallRest(Location location, DesignatorNode designator)
         {
             ParseArgumentList();
-            Check(Tag.Semicolon);
             return new MethodCallNode(location,
                 designator,
                 new List<ExpressionNode>() //TODO
