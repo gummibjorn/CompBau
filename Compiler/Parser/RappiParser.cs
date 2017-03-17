@@ -428,7 +428,8 @@ namespace RappiSharp.Compiler.Parser
             if (Is(Tag.Period)) // FIXME: laut EBNF scheint es so, als koennte hier nur nich ein identifier kommen und der Designator waere zuende.
             {
                 Next();
-                ReadIdentifier();
+                var identif = ReadIdentifier();
+                ParseDesignatorRest(identif);
             }
         }
 

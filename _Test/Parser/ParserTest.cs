@@ -167,6 +167,13 @@ namespace _Test
         }
 
         [TestMethod, Timeout(1000)]
+        public void ExprDesignatorArrayContinuedMultiple()
+        {
+            initializeParser(expression("test.i[1].peter[2]"));
+            _parser.ParseProgram();
+        }
+
+        [TestMethod, Timeout(1000)]
         public void ExprDesignatorArray()
         {
             initializeParser(expression("test.i[1]"));
