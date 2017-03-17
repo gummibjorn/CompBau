@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RappiSharp.Compiler;
 using RappiSharp.Compiler.Lexer;
 using RappiSharp.Compiler.Lexer.Tokens;
@@ -363,6 +363,57 @@ namespace _Test
             initializeParser(main("return;"));
             var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
             var expected = new ReturnStatementNode(L, null);
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ExprOrOperator()
+        {
+            initializeParser(expression("0 || 0"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new BinaryExpressionNode(L, 
+                new IntegerLiteralNode(L, 0),
+                Operator.Or,
+                new IntegerLiteralNode(L, 0)
+                );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ExprAndOperator()
+        {
+            initializeParser(expression("0 && 0"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new BinaryExpressionNode(L, 
+                new IntegerLiteralNode(L, 0),
+                Operator.And,
+                new IntegerLiteralNode(L, 0)
+                );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ExprNotEquals()
+        {
+            initializeParser(expression("0 != 0"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new BinaryExpressionNode(L, 
+                new IntegerLiteralNode(L, 0),
+                Operator.Unequal,
+                new IntegerLiteralNode(L, 0)
+                );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ExprArrayCreation()
+        {
+            initializeParser(expression("new test[1]"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new ArrayCreationNode(L, 
+                new BasicTypeNode(L, "test"),
+                new IntegerLiteralNode(L, 1)
+                );
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 

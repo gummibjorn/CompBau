@@ -3,6 +3,7 @@ using RappiSharp.Compiler;
 using RappiSharp.Compiler.Lexer;
 using RappiSharp.Compiler.Lexer.Tokens;
 using RappiSharp.Compiler.Parser;
+using System;
 using System.IO;
 
 namespace _Test
@@ -148,8 +149,12 @@ namespace _Test
         public void ExprInvalidMult()
         {
             initializeParser(expression("1 ** 2"));
-            _parser.ParseProgram();
-            AssertDiagnosisContains("Invalid operand: TOKEN Times");
+            try
+            {
+                _parser.ParseProgram();
+            }catch(Exception) {
+                AssertDiagnosisContains("Invalid operand: TOKEN Times");
+            }
         }
 
         [TestMethod, Timeout(1000)]

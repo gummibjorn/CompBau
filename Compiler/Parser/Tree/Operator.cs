@@ -11,6 +11,6 @@
     Or,
     Plus,
     Less, LessEqual,
-    Times,
+    Times
   }
 }

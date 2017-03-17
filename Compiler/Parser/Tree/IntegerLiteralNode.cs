@@ -1,8 +1,8 @@
 ﻿namespace RappiSharp.Compiler.Parser.Tree {
   internal class IntegerLiteralNode : ExpressionNode {
-    public int Value { get; }
+    public long Value { get; }
 
-    public IntegerLiteralNode(Location location, int value) :
+    public IntegerLiteralNode(Location location, long value) :
       base(location) {
       Value = value;
     }

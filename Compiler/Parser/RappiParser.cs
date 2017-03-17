@@ -237,86 +237,109 @@ namespace RappiSharp.Compiler.Parser
         private ExpressionNode ParseExpression()
         {
             var location = CurrentLocation();
-            ParseLogicTerm();
+            var left = ParseLogicTerm();
             while (Is(Tag.Or))
             {
+                var op = Operator.Or;
                 Next();
-                ParseLogicTerm();
+                var right = ParseLogicTerm();
+                left = new BinaryExpressionNode(location, left, op, right);
             }
-            return new IntegerLiteralNode(location, 0); //TODO: implement
+            return left;
         }
 
-        private void ParseLogicTerm()
+        private ExpressionNode ParseLogicTerm()
         {
-            ParseLogicFactor();
+            var location = CurrentLocation();
+            var left = ParseLogicFactor();
             while (Is(Tag.And))
             {
+                var op = Operator.And;
                 Next();
-                ParseLogicFactor();
+                var right = ParseLogicFactor();
+                left = new BinaryExpressionNode(location, left, op, right);
             }
+            return left;
         }
 
-        private void ParseLogicFactor()
+        private ExpressionNode ParseLogicFactor()
         {
-            ParseSimpleExpression();
+            var location = CurrentLocation();
+            var left = ParseSimpleExpression();
             while (IsCompareOperator()){
-                ParseCompareOperator();
-                ParseSimpleExpression();
+                var op = ParseCompareOperator();
+                var right = ParseSimpleExpression();
+                left = new BinaryExpressionNode(location, left, op, right);
             }
+            return left;
         }
 
-        private void ParseSimpleExpression()
+        private ExpressionNode ParseSimpleExpression()
         {
-            ParseTerm();
+            var location = CurrentLocation();
+            var left = ParseTerm();
             while (Is(Tag.Plus) || Is(Tag.Minus))
             {
-                ParseTerm();
+                var op = Is(Tag.Plus) ? Operator.Plus : Operator.Minus;
+                Next();
+                var right = ParseTerm();
+                left = new BinaryExpressionNode(location, left, op, right);
             }
+            return left;
         }
 
-        private void ParseTerm()
+        private ExpressionNode ParseTerm()
         {
-            ParseFactor();
+            var location = CurrentLocation();
+            var left = ParseFactor();
             while(Is(Tag.Times) || Is(Tag.Divide) || Is(Tag.Modulo))
             {
+                var op = Is(Tag.Times) ? Operator.Times : Is(Tag.Divide) ? Operator.Divide : Operator.Modulo;
                 Next();
-                ParseFactor();
+                var right = ParseFactor();
+                left = new BinaryExpressionNode(location, left, op, right);
             }
+            return left;
         }
 
-        private void ParseFactor()
+        private ExpressionNode ParseFactor()
         {
             if (Is(Tag.Not) || Is(Tag.Plus) || Is(Tag.Minus))
             {
-                ParseUnaryExpression(); 
+                return ParseUnaryExpression(); 
             }else if (Is(Tag.OpenParenthesis))
             {
                 //TODO: Implement and add ParseTypeCast here!
                 Next();
-                ParseExpression();
+                var expr = ParseExpression();
                 Check(Tag.CloseParenthesis);
+                return expr;
             }else 
             {
-                ParseOperand();
+                return ParseOperand();
             }
         }
 
-        private void ParseUnaryExpression()
+        private UnaryExpressionNode ParseUnaryExpression()
         {
+            var location = CurrentLocation();
+            var op = Is(Tag.Not) ? Operator.Not : Is(Tag.Plus) ? Operator.Plus : Operator.Minus;
             Next();
-            ParseFactor();
+            var factor = ParseFactor();
+            return new UnaryExpressionNode(location, op, factor);
         }
 
-        private void ParseOperand()
+        private ExpressionNode ParseOperand()
         {
             if (IsInteger())
             {
-                ReadInteger(true);
+                return new IntegerLiteralNode(CurrentLocation(), ReadInteger(true));
             }else if (IsCharacter())
             {
-                ReadCharacter();    
-            }else if (IsString()) {
-                ReadString();
+                return new CharacterLiteralNode(CurrentLocation(), ReadCharacter());    
+            }else if (IsString())
+            {
+                return new StringLiteralNode(CurrentLocation(), ReadString());
             }else if (IsIdentifier())
             {
                 var identifier = ReadIdentifier();
@@ -325,64 +348,90 @@ namespace RappiSharp.Compiler.Parser
                 {
                     //ParseMethodCallRest(/*TODO: Designator Tag */);
                     //return methodcall
+//                    ParseMethodCallRest();
+                    return null;
                 } else
                 {
                     //return designator
+                    return null;
                 }
             }else if (Is(Tag.New)){
+                var location = CurrentLocation();
                 Next();
-                ReadIdentifier();
+                var ident = ReadIdentifier();
                 if (Is(Tag.OpenParenthesis))
                 {
                     Check(Tag.OpenParenthesis);
                     Check(Tag.CloseParenthesis);
+                    return new ObjectCreationNode(location, new BasicTypeNode(CurrentLocation(), ident));
                 }else if (Is(Tag.OpenBracket))
                 {
-                    ParseArrayCreation();
+                    return ParseArrayCreation(ident, location);
+                }else
+                {
+                    Error("Invalid symbol in creation expression: " + _current);
+                    return null;
                 }
             }else
             {
                 Error("Invalid operand: " + _current);
+                return null;
             }
         }
 
-        private void ParseArrayCreation()
+        private ArrayCreationNode ParseArrayCreation(String identifier, Location location)
         {
             Check(Tag.OpenBracket);
-            ParseExpression();
+            var expr = ParseExpression();
             Check(Tag.CloseBracket);
+            TypeNode innerType = new BasicTypeNode(location, identifier);
             while (Is(Tag.OpenBracket))
             {
+                var innerBracketLocation = CurrentLocation();
                 Check(Tag.OpenBracket);
                 Check(Tag.CloseBracket);
+                innerType = new ArrayTypeNode(innerBracketLocation, innerType);
             }
+            return new ArrayCreationNode(location, innerType , expr);
         }
 
-        private void ParseCompareOperator()
+        private Operator ParseCompareOperator()
         {
+            Operator op;
             if (Is(Tag.Equals))
             {
-
-            }else if (Is(Tag.Unequal))
+                op = Operator.Equals;
+            }
+            else if (Is(Tag.Unequal))
             {
-                
-            }else if (Is(Tag.Less))
+                op = Operator.Unequal;
+            }
+            else if (Is(Tag.Less))
             {
-
-            }else if (Is(Tag.LessEqual))
+                op = Operator.Less;
+            }
+            else if (Is(Tag.LessEqual))
             {
-
-            }else if (Is(Tag.Greater))
+                op = Operator.LessEqual;
+            }
+            else if (Is(Tag.Greater))
             {
-
-            }else if (Is(Tag.GreaterEqual))
+                op = Operator.Greater;
+            }
+            else if (Is(Tag.GreaterEqual))
             {
-
-            }else if (Is(Tag.Is))
+                op = Operator.GreaterEqual;
+            }
+            else if (Is(Tag.Is))
             {
-
+                op = Operator.Is;
+            }else
+            {
+                //This should never happen!
+                throw new NotImplementedException();
             }
             Next();
+            return op;
         }
 
         private StatementNode ParseBasicStatement()
@@ -599,7 +648,7 @@ namespace RappiSharp.Compiler.Parser
             var compareTags = new List<Tag>
             {
                 Tag.Equals,
-                Tag.Not,
+                Tag.Unequal,
                 Tag.Less,
                 Tag.LessEqual,
                 Tag.Greater,
