@@ -98,6 +98,101 @@ namespace _Test
         }
 
         [TestMethod, Timeout(TIMEOUT)]
+        public void ExprIntLiteral()
+        {
+            initializeParser(expression("0"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new IntegerLiteralNode(L, 0);
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ClassWithVoidReturn()
+        {
+            initializeParser("class Foo{ void foo(){ return; } }");
+            var result = _parser.ParseProgram();
+            var expected = new ProgramNode(L,
+                new List<ClassNode>(){
+                    new ClassNode(L, "Foo",
+                    new BasicTypeNode(L, "Object"),
+                    new List<VariableNode>() ,
+                    new List<MethodNode>()
+                    {
+                        new MethodNode(L,
+                            new BasicTypeNode(L, "void"),
+                            "foo",
+                            new List<VariableNode>(),
+                            new StatementBlockNode(L, new List<StatementNode>() {
+                                new ReturnStatementNode(L, null)
+                            })
+                        )
+                    }
+                    )
+                }
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ClassWithEmptyMethodParams()
+        {
+            initializeParser("class Foo{ void foo(int x, char[] y){} }");
+            var result = _parser.ParseProgram();
+            var expected = new ProgramNode(L,
+                new List<ClassNode>(){
+                    new ClassNode(L, "Foo",
+                    new BasicTypeNode(L, "Object"),
+                    new List<VariableNode>() ,
+                    new List<MethodNode>()
+                    {
+                        new MethodNode(L, 
+                            new BasicTypeNode(L, "void"),
+                            "foo",
+                            new List<VariableNode>() {
+                                new VariableNode(L,
+                                    new BasicTypeNode(L, "int"),
+                                    "x"
+                                ),
+                                new VariableNode(L,
+                                    new ArrayTypeNode(L, new BasicTypeNode(L, "char")),
+                                    "y"
+                                )
+                            },
+                            new StatementBlockNode(L, new List<StatementNode>())
+                        )
+                    }
+                    )
+                }
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ClassWithEmptyMethod()
+        {
+            initializeParser("class Foo{ void foo(){} }");
+            var result = _parser.ParseProgram();
+            var expected = new ProgramNode(L,
+                new List<ClassNode>(){
+                    new ClassNode(L, "Foo",
+                    new BasicTypeNode(L, "Object"),
+                    new List<VariableNode>() ,
+                    new List<MethodNode>()
+                    {
+                        new MethodNode(L, 
+                            new BasicTypeNode(L, "void"),
+                            "foo",
+                            new List<VariableNode>(),
+                            new StatementBlockNode(L, new List<StatementNode>())
+                        )
+                    }
+                    )
+                }
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
         public void ClassWithMultipleVariables()
         {
             initializeParser("class Foo{ int[][] i; char c; }");

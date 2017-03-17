@@ -54,6 +54,9 @@ namespace RappiSharp.Compiler.Parser
                 if(classMember is VariableNode)
                 {
                     variables.Add((VariableNode)classMember);
+                } else
+                {
+                    methods.Add((MethodNode)classMember);
                 }
             }
             Check(Tag.CloseBrace);
@@ -67,8 +70,7 @@ namespace RappiSharp.Compiler.Parser
             var identifier = ReadIdentifier();
             if (Is(Tag.OpenParenthesis))
             {
-                ParseMethodRest(identifier);
-                return null;
+                return ParseMethodRest(type, identifier);
             }
             else
             {
@@ -77,31 +79,37 @@ namespace RappiSharp.Compiler.Parser
             }
         }
 
-        private void ParseMethodRest(string identifier)
+        private MethodNode ParseMethodRest(TypeNode type, string identifier)
         {
-            ParseParameterList();
-            ParseStatementBlock();
+            var location = CurrentLocation();
+            var parameters = ParseParameterList();
+            var body = ParseStatementBlock();
+            return new MethodNode(location, type, identifier, parameters, body);
         }
 
-        private void ParseParameterList()
+        private List<VariableNode> ParseParameterList()
         {
+            var list = new List<VariableNode>();
             Check(Tag.OpenParenthesis);
             if (IsIdentifier())
             {
-                ParseParameter();
+                list.Add(ParseParameter());
                 while (Is(Tag.Comma))
                 {
                     Next();
-                    ParseParameter();
+                    list.Add(ParseParameter());
                 }
             }
             Check(Tag.CloseParenthesis);
+            return list;
         }
 
-        private void ParseParameter()
+        private VariableNode ParseParameter()
         {
-            ParseType();
-            ReadIdentifier();
+            var location = CurrentLocation();
+            var type = ParseType();
+            var id = ReadIdentifier();
+            return new VariableNode(location, type, id);
         }
 
         private TypeNode ArrayTypeBuilder(Location currentLocation, String identifier)
@@ -128,17 +136,20 @@ namespace RappiSharp.Compiler.Parser
             return ArrayTypeBuilder(currentLocation, identifier);
         }
 
-        private void ParseStatementBlock()
+        private StatementBlockNode ParseStatementBlock()
         {
+            var location = CurrentLocation();
+            var list = new List<StatementNode>();
             Check(Tag.OpenBrace);
             while (!IsEnd() && !Is(Tag.CloseBrace))
             {
-                ParseStatement();
+                list.Add(ParseStatement());
             }
             Check(Tag.CloseBrace);
+            return new StatementBlockNode(location, list);
         }
 
-        private void ParseStatement()
+        private StatementNode ParseStatement()
         {
             if (Is(Tag.If))
             {
@@ -150,7 +161,7 @@ namespace RappiSharp.Compiler.Parser
             }
             else if (Is(Tag.Return))
             {
-                ParseReturnStatement();
+                return ParseReturnStatement();
             }
             else if (IsIdentifier())
             {
@@ -165,6 +176,7 @@ namespace RappiSharp.Compiler.Parser
                 Error($"Invalid statement {_current}");
                 Next();
             }
+            return null; //TODO implement
         }
 
 
@@ -192,27 +204,31 @@ namespace RappiSharp.Compiler.Parser
             ParseStatementBlock();
         }
 
-        private void ParseReturnStatement()
+        private ReturnStatementNode ParseReturnStatement()
         {
+            var location = CurrentLocation();
             Check(Tag.Return);
             if (Is(Tag.Semicolon))
             {
                 Next();
-                //void return
+                return new ReturnStatementNode(location, null);
             } else {
-                ParseExpression();
+                var expression = ParseExpression();
                 Check(Tag.Semicolon);
+                return new ReturnStatementNode(location, expression);
             }
         }
 
-        private void ParseExpression()
+        private ExpressionNode ParseExpression()
         {
+            var location = CurrentLocation();
             ParseLogicTerm();
             while (Is(Tag.Or))
             {
                 Next();
                 ParseLogicTerm();
             }
+            return new IntegerLiteralNode(location, 0); //TODO: implement
         }
 
         private void ParseLogicTerm()
