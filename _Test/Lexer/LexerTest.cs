@@ -76,6 +76,16 @@ namespace _Test
         }
 
         [TestMethod]
+        public void CommentBlockNotClosing()
+        {
+            initializeLexer("/* testcomment");
+
+            Assert.IsTrue(Diagnosis.HasErrors);
+
+            AssertNext(new FixToken(new Location(1, 15), Tag.End));
+        }
+
+        [TestMethod]
         public void SinglelineComment()
         {
             initializeLexer("// testcomment");

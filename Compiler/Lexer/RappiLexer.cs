@@ -188,18 +188,35 @@ namespace RappiSharp.Compiler.Lexer
             {
                 while (_current != '\n' && !_endOfText)
                     ReadNext();
-                    
-            }else if (_current == '*')
+
+            }else
             {
-                while (_current != '/')
-                {
-                    do
-                    {
-                        ReadNext();
-                    } while (_current != '*');
-                    ReadNext();
-                }
+                SkipMultilineBlock();
+            }
+        }
+
+        private void SkipMultilineBlock()
+        {
+            ReadNext();
+            if (_endOfText)
+            {
+                reportError(CurrentLocation(), "unclosed multiline comment");
+                return;
+            }
+            if(_current == '*')
+            {
                 ReadNext();
+                if(_current == '/')
+                {
+                    ReadNext();
+                    return;
+                }else
+                {
+                    SkipMultilineBlock();
+                }
+            }else
+            {
+                SkipMultilineBlock();
             }
         }
 
