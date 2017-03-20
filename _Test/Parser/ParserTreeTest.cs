@@ -155,6 +155,48 @@ namespace _Test
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
+        [TestMethod]
+        public void StatementCallWithArgument()
+        {
+            initializeParser(main("hans(1);"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new CallStatementNode(L,
+                new MethodCallNode(L,
+                    new BasicDesignatorNode(L, "hans"),
+                    new List<ExpressionNode>() {
+                        new IntegerLiteralNode(L, 1),
+                    }
+                )
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementCallWithArguments()
+        {
+            initializeParser(main("hans(1, a, (1+2), arrr[1]);"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = new CallStatementNode(L,
+                new MethodCallNode(L,
+                    new BasicDesignatorNode(L, "hans"),
+                    new List<ExpressionNode>() {
+                        new IntegerLiteralNode(L, 1),
+                        new BasicDesignatorNode(L, "a"),
+                        new BinaryExpressionNode(L,
+                            new IntegerLiteralNode(L, 1),
+                            Operator.Plus,
+                            new IntegerLiteralNode(L, 2)
+                        ),
+                        new ElementAccessNode(L,
+                            new BasicDesignatorNode(L, "arrr"),
+                            new IntegerLiteralNode(L, 1)
+                        )
+                    }
+                )
+            );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
         [TestMethod, Timeout(TIMEOUT)]
         public void StatementCallComplex()
         {

@@ -527,32 +527,28 @@ namespace RappiSharp.Compiler.Parser
 
         private MethodCallNode ParseMethodCallRest(Location location, DesignatorNode designator)
         {
-            ParseArgumentList();
             return new MethodCallNode(location,
                 designator,
-                new List<ExpressionNode>() //TODO
+                ParseArgumentList()
             );
 
         }
 
-        private void ParseMethodCallRest(string identifier)
+        private List<ExpressionNode> ParseArgumentList()
         {
-            ParseDesignatorRest(identifier);
-            ParseArgumentList();
-        }
-
-        private void ParseArgumentList()
-        {
+            var expressions = new List<ExpressionNode>();
             Check(Tag.OpenParenthesis);
-            if (IsIdentifier())
+            if (!Is(Tag.CloseParenthesis))
             {
-                ParseExpression();
+                expressions.Add(ParseExpression());
                 while (Is(Tag.Comma))
                 {
-                    ParseExpression();
+                    Next();
+                    expressions.Add(ParseExpression());
                 }
             }
             Check(Tag.CloseParenthesis);
+            return expressions;
         }
 
 
