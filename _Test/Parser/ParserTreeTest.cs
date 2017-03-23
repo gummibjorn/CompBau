@@ -172,6 +172,14 @@ namespace _Test
         }
 
         [TestMethod, Timeout(TIMEOUT)]
+        public void StatementCallWithArgumentsInvalid()
+        {
+            initializeParser(main("hans(,,,);"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            AssertDiagnosisContains("");
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
         public void StatementCallWithArguments()
         {
             initializeParser(main("hans(1, a, (1+2), arrr[1]);"));
@@ -294,15 +302,15 @@ namespace _Test
         public void StatementAssignmentMember()
         {
             initializeParser(main("hans.i = 0;"));
+            AssertDiagnosisContains("");
+        }
+
+        [TestMethod]
+        public void StatementAssignmentBasicAndInit()
+        {
+            initializeParser(main("int i = 0;"));
             var result = getFirstStatement(_parser.ParseProgram());
-            var expected = new AssignmentNode(L,
-                new MemberAccessNode(L, 
-                    new BasicDesignatorNode(L, "i"),
-                    "hans"
-                ),
-                new IntegerLiteralNode(L, 0)
-            );
-            Assert.AreEqual(expected.ToString(), result.ToString());
+            AssertDiagnosisContains("");
         }
 
         [TestMethod]
@@ -341,6 +349,14 @@ namespace _Test
                 new VariableNode(L, new BasicTypeNode(L, "int"), "i")
             );
             Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementWhileInvalidBody()
+        {
+            initializeParser(main("while(0){{return;}}"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
+            AssertDiagnosisContains("");
         }
 
         [TestMethod, Timeout(TIMEOUT)]
@@ -397,6 +413,14 @@ namespace _Test
             var result = getStatementBlock(_parser.ParseProgram()).Statements[0];
             var expected = new ReturnStatementNode(L, new IntegerLiteralNode(L, 0));
             Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void StatementEmpty()
+        {
+            initializeParser(main(";"));
+            var result = getStatementBlock(_parser.ParseProgram()).Statements;
+            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod, Timeout(TIMEOUT)]

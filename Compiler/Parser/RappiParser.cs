@@ -179,14 +179,17 @@ namespace RappiSharp.Compiler.Parser
             else if (Is(Tag.Semicolon))
             {
                 Next();
+                return null;
             }
+            //hummm?
             else if (!Is(Tag.CloseBrace))
             {
                 Error($"Invalid statement {_current}");
                 Next();
                 return null;
             }
-            throw new NotImplementedException();
+            Error("Invalid statement");
+            return null;
         }
 
 
@@ -391,9 +394,9 @@ namespace RappiSharp.Compiler.Parser
             return new ArrayCreationNode(location, innerType , expr);
         }
 
-        private Operator ParseCompareOperator()
+        private Operator? ParseCompareOperator()
         {
-            Operator op;
+            Operator? op;
             if (Is(Tag.Equals))
             {
                 op = Operator.Equals;
@@ -423,8 +426,8 @@ namespace RappiSharp.Compiler.Parser
                 op = Operator.Is;
             }else
             {
-                //This should never happen!
-                throw new NotImplementedException();
+                Error("Invalid operator");
+                op = null;
             }
             Next();
             return op;
@@ -473,7 +476,6 @@ namespace RappiSharp.Compiler.Parser
                 return null;
             }
             */
-            throw new NotImplementedException();
         }
 
         private StatementNode ParseBasicStatementRest(Location location, DesignatorNode designator)
