@@ -433,6 +433,32 @@ namespace _Test
         }
 
         [TestMethod, Timeout(TIMEOUT)]
+        public void TypeCast()
+        {
+            initializeParser(expression("(int) asdf"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new TypeCastNode(L,new BasicTypeNode(L, "int"), new BasicDesignatorNode(L, "asdf"));
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ExprOperatorPrecedence()
+        {
+            initializeParser(expression("0 || 1 && 2"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new BinaryExpressionNode(L, 
+                new IntegerLiteralNode(L, 0),
+                Operator.Or,
+                new BinaryExpressionNode(L,
+                    new IntegerLiteralNode(L, 1),
+                    Operator.And,
+                    new IntegerLiteralNode(L, 2)
+                ) 
+                );
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
         public void ExprOrOperator()
         {
             initializeParser(expression("0 || 0"));
@@ -482,6 +508,7 @@ namespace _Test
                 );
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
+
 
         [TestMethod, Timeout(TIMEOUT)]
         public void ClassWithVoidReturn()

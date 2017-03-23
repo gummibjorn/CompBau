@@ -237,10 +237,10 @@ namespace RappiSharp.Compiler.Parser
             }
         }
 
-        private ExpressionNode ParseExpression()
+        private ExpressionNode ParseExpression(String ident = null)
         {
             var location = CurrentLocation();
-            var left = ParseLogicTerm();
+            var left = ParseLogicTerm(ident);
             while (Is(Tag.Or))
             {
                 var op = Operator.Or;
@@ -251,10 +251,10 @@ namespace RappiSharp.Compiler.Parser
             return left;
         }
 
-        private ExpressionNode ParseLogicTerm()
+        private ExpressionNode ParseLogicTerm(String ident = null)
         {
             var location = CurrentLocation();
-            var left = ParseLogicFactor();
+            var left = ParseLogicFactor(ident);
             while (Is(Tag.And))
             {
                 var op = Operator.And;
@@ -265,10 +265,10 @@ namespace RappiSharp.Compiler.Parser
             return left;
         }
 
-        private ExpressionNode ParseLogicFactor()
+        private ExpressionNode ParseLogicFactor(String ident = null)
         {
             var location = CurrentLocation();
-            var left = ParseSimpleExpression();
+            var left = ParseSimpleExpression(ident);
             while (IsCompareOperator()){
                 var op = ParseCompareOperator();
                 var right = ParseSimpleExpression();
@@ -277,10 +277,10 @@ namespace RappiSharp.Compiler.Parser
             return left;
         }
 
-        private ExpressionNode ParseSimpleExpression()
+        private ExpressionNode ParseSimpleExpression(String ident = null)
         {
             var location = CurrentLocation();
-            var left = ParseTerm();
+            var left = ParseTerm(ident);
             while (Is(Tag.Plus) || Is(Tag.Minus))
             {
                 var op = Is(Tag.Plus) ? Operator.Plus : Operator.Minus;
@@ -291,10 +291,10 @@ namespace RappiSharp.Compiler.Parser
             return left;
         }
 
-        private ExpressionNode ParseTerm()
+        private ExpressionNode ParseTerm(String ident = null)
         {
             var location = CurrentLocation();
-            var left = ParseFactor();
+            var left = ParseFactor(ident);
             while(Is(Tag.Times) || Is(Tag.Divide) || Is(Tag.Modulo))
             {
                 var op = Is(Tag.Times) ? Operator.Times : Is(Tag.Divide) ? Operator.Divide : Operator.Modulo;
@@ -305,7 +305,7 @@ namespace RappiSharp.Compiler.Parser
             return left;
         }
 
-        private ExpressionNode ParseFactor()
+        private ExpressionNode ParseFactor(String identPassthrough = null)
         {
             if (Is(Tag.Not) || Is(Tag.Plus) || Is(Tag.Minus))
             {
@@ -314,12 +314,30 @@ namespace RappiSharp.Compiler.Parser
             {
                 //TODO: Implement and add ParseTypeCast here!
                 Next();
-                var expr = ParseExpression();
-                Check(Tag.CloseParenthesis);
+                if (IsIdentifier())
+                {
+                    var ident = ReadIdentifier();
+
+                    if (Is(Tag.CloseParenthesis))
+                    {
+                        Next();
+                        return new TypeCastNode(CurrentLocation(), new BasicTypeNode(CurrentLocation(), ident), ParseDesignatorRest(ReadIdentifier()));
+                    }else
+                    {
+                        var expr = ParseExpression(ident);
+                        Check(Tag.CloseParenthesis);
+                        return expr;
+                    }
+                }
+                else
+                {
+                    var expr = ParseExpression();
+                    Check(Tag.CloseParenthesis);
                 return expr;
+                }
             }else 
             {
-                return ParseOperand();
+                return ParseOperand(identPassthrough);
             }
         }
 
@@ -332,7 +350,7 @@ namespace RappiSharp.Compiler.Parser
             return new UnaryExpressionNode(location, op, factor);
         }
 
-        private ExpressionNode ParseOperand()
+        private ExpressionNode ParseOperand(String identPassthrough = null)
         {
             var location = CurrentLocation();
             if (IsInteger())
@@ -344,9 +362,9 @@ namespace RappiSharp.Compiler.Parser
             }else if (IsString())
             {
                 return new StringLiteralNode(CurrentLocation(), ReadString());
-            }else if (IsIdentifier())
+            }else if (IsIdentifier() || identPassthrough != null)
             {
-                var identifier = ReadIdentifier();
+                var identifier = identPassthrough == null ? ReadIdentifier() : identPassthrough;
                 var designator = ParseDesignatorRest(identifier);
                 if (Is(Tag.OpenParenthesis))
                 {
