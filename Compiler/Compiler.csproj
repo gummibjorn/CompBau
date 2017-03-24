@@ -41,6 +41,25 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Checker\General\SymbolTable.cs" />
+    <Compile Include="Checker\Phases\SymbolConstruction.cs" />
+    <Compile Include="Checker\Phases\TypeResolution.cs" />
+    <Compile Include="Checker\RappiChecker.cs" />
+    <Compile Include="Checker\Symbols\ArrayTypeSymbol.cs" />
+    <Compile Include="Checker\Symbols\BaseTypeSymbol.cs" />
+    <Compile Include="Checker\Symbols\ClassSymbol.cs" />
+    <Compile Include="Checker\Symbols\CompilationUnit.cs" />
+    <Compile Include="Checker\Symbols\ConstantSymbol.cs" />
+    <Compile Include="Checker\Symbols\FieldSymbol.cs" />
+    <Compile Include="Checker\Symbols\LocalVariableSymbol.cs" />
+    <Compile Include="Checker\Symbols\MethodSymbol.cs" />
+    <Compile Include="Checker\Symbols\ParameterSymbol.cs" />
+    <Compile Include="Checker\Symbols\Symbol.cs" />
+    <Compile Include="Checker\Symbols\TypeSymbol.cs" />
+    <Compile Include="Checker\Symbols\VariableSymbol.cs" />
+    <Compile Include="Checker\Visitors\DesignatorFixupVisitor.cs" />
+    <Compile Include="Checker\Visitors\LocalVariableVisitor.cs" />
+    <Compile Include="Checker\Visitors\TypeCheckVisitor.cs" />
     <Compile Include="Lexer\RappiLexer.cs" />
     <Compile Include="Lexer\Tokens\CharacterToken.cs" />
     <Compile Include="Lexer\Tokens\ErrorToken.cs" />
