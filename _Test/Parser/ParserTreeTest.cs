@@ -442,6 +442,15 @@ namespace _Test
         }
 
         [TestMethod, Timeout(TIMEOUT)]
+        public void IdentifierInParanthesis()
+        {
+            initializeParser(expression("(asdf)"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new BasicDesignatorNode(L, "asdf");
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
         public void ExprOperatorPrecedence()
         {
             initializeParser(expression("0 || 1 && 2"));
