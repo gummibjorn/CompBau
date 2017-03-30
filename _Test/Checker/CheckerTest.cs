@@ -106,7 +106,7 @@ namespace _Test
         }
 
         [TestMethod]
-        public void AssignmentBinaryExpressionBool()
+        public void BinaryExpressionBool()
         {
             initializeChecker(expression("bool", "true && true"));
         }
@@ -135,6 +135,40 @@ namespace _Test
         {
             initializeChecker();
             AssertDiagnosisContains("invalid argument count");
+        }
+
+        public void BinaryExpressionComparisonLiteral()
+        {
+            initializeChecker(expression("bool", "1234 < 1"));
+        }
+
+        [TestMethod]
+        public void BinaryExpressionComparisonLiteralUnequalTypes()
+        {
+            try
+            {
+                initializeChecker(expression("bool", "1234 < true"));
+            }catch(Exception)
+            {
+                AssertDiagnosisContains("Invalid types");
+            }
+        }
+
+        [TestMethod]
+        public void BinaryExpressionComparison()
+        {
+            initializeChecker(main("int a; int b; bool c; a=123; b=234; c = a != b;"));
+        }
+
+        [TestMethod]
+        public void BinaryExpressionComparisonUnequalTypes()
+        {
+            try { 
+                initializeChecker(main("int a; bool b; bool c; a=123; b=234; c = a != b;"));
+            }catch(Exception)
+            {
+                AssertDiagnosisContains("Invalid types");
+            }
         }
     }
 }
