@@ -32,6 +32,15 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     }
                     break;
                 case Operator.Plus:
+                    checkIntegerMaxValue(operand);
+                    if(type == _symbolTable.Compilation.IntType)
+                    {
+                        _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
+                    } else
+                    {
+                        Diagnosis.ReportError(node.Location, $"Invalid type {type.ToString()} for unary {optr.ToString()}");
+                    }
+                    break;
                 case Operator.Minus:
                     if(type == _symbolTable.Compilation.IntType)
                     {
@@ -46,11 +55,31 @@ namespace RappiSharp.Compiler.Checker.Visitors
             base.Visit(node);
         }
 
+        private void checkIntegerMaxValue(ExpressionNode node)
+        {
+            if(node is IntegerLiteralNode)
+            {
+                if (((IntegerLiteralNode)node).Value > int.MaxValue)
+                {
+                    Diagnosis.ReportError(node.Location, "Integer maxvalue exceeded");
+                }
+            }
+        }
+
+        public override void Visit(IntegerLiteralNode node)
+        {
+            _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
+        }
+
         public override void Visit(BinaryExpressionNode node)
         {
             base.Visit(node);
+
             var leftType = _symbolTable.FindType(node.Left);
             var rightType = _symbolTable.FindType(node.Right);
+
+            checkIntegerMaxValue(node.Left);
+            checkIntegerMaxValue(node.Right);
 
             switch (node.Operator)
             {
@@ -62,8 +91,41 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     }else
                     {
                         Diagnosis.ReportError(node.Location, "comparing apples and oranges gives you scurvies");
-                        throw new System.Exception("Wrong type in binary expression");
+
+                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
                     }
+                    break;
+                case Operator.Divide:
+                case Operator.Times:
+                case Operator.Modulo:
+                case Operator.Minus:
+                case Operator.Plus:
+                    if(leftType == _symbolTable.Compilation.IntType && rightType == _symbolTable.Compilation.IntType)
+                    {
+                        _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
+                    }else
+                    {
+                        Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
+                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                    }
+                    break;
+                case Operator.Less:
+                case Operator.LessEqual:
+                case Operator.Greater:
+                case Operator.GreaterEqual:
+                case Operator.Equals:
+                case Operator.Unequal:
+                    if(leftType.Identifier == rightType.Identifier)
+                    {
+                        _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
+                    }else
+                    {
+                        Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
+                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                    }
+                    break;
+                case Operator.Is:
+                    _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     break;
             }
         }
@@ -74,6 +136,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             base.Visit(node);
             var leftType = _symbolTable.FindType(node.Left);
             var rightType = _symbolTable.FindType(node.Right);
+            checkIntegerMaxValue(node.Right);
             if(leftType != rightType)
             {
                 Diagnosis.ReportError(node.Location, $"Cannot assign {rightType.ToString()} to {leftType.ToString()}");
