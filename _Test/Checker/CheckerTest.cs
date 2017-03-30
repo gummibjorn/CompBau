@@ -35,9 +35,28 @@ namespace _Test
             }
         }
 
+        private void AssertDiagnosisContains(string msg)
+        {
+            Assert.IsTrue(Diagnosis.Messages.ToLower().Contains(msg.ToLower()), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
+            Diagnosis.Clear();
+        }
+
         private string main(string content)
         {
             return "class Prorahm{ void Main(){" + content + "}}";
+        }
+
+        [TestMethod]
+        public void AssignmentAssignInvalidType()
+        {
+            initializeChecker(main("int a; a = true;"));
+            AssertDiagnosisContains("cannot assign bool to int");
+        }
+
+        [TestMethod]
+        public void AssignmentUnaryNot()
+        {
+            initializeChecker(main("bool a; a = !true;"));
         }
 
         [TestMethod]
