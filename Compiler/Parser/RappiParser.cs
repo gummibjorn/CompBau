@@ -38,7 +38,7 @@ namespace RappiSharp.Compiler.Parser
             var currentLocation = CurrentLocation();
             Check(Tag.Class);
             var classIdentifier = ReadIdentifier();
-            var baseClass = new BasicTypeNode(currentLocation, "Object");
+            BasicTypeNode baseClass = null;
             var variables = new List<VariableNode>();
             var methods = new List<MethodNode>();
 

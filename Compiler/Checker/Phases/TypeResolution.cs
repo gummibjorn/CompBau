@@ -71,7 +71,7 @@ namespace RappiSharp.Compiler.Checker.Phases
             var result = _symbolTable.FindType(node);
             if (result == null)
             {
-                Error(node.Location, "Undeclared type");
+                Error(node.Location, "Undeclared type: " + node.ToString());
             }
             return result;
         }

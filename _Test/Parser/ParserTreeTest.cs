@@ -122,7 +122,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>(),
                     new List<MethodNode>()
                     )
@@ -441,7 +441,7 @@ namespace _Test
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
-        [TestMethod, Timeout(TIMEOUT)]
+        [Ignore, TestMethod, Timeout(TIMEOUT)]
         public void IdentifierInParanthesis()
         {
             initializeParser(expression("(asdf)"));
@@ -527,7 +527,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>() ,
                     new List<MethodNode>()
                     {
@@ -554,7 +554,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>() ,
                     new List<MethodNode>()
                     {
@@ -588,7 +588,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>() ,
                     new List<MethodNode>()
                     {
@@ -613,7 +613,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>() {
                         new VariableNode(L,
                             new ArrayTypeNode(L, new ArrayTypeNode(L, new BasicTypeNode(L, "int"))),
@@ -639,7 +639,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>() {
                         new VariableNode(L,
                             new ArrayTypeNode(L, new ArrayTypeNode(L, new BasicTypeNode(L, "int"))),
@@ -661,7 +661,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>() {
                         new VariableNode(L,
                             new ArrayTypeNode(L, new BasicTypeNode(L, "int")),
@@ -683,7 +683,7 @@ namespace _Test
             var expected = new ProgramNode(L,
                 new List<ClassNode>(){
                     new ClassNode(L, "Foo",
-                    new BasicTypeNode(L, "Object"),
+                    null,
                     new List<VariableNode>() {
                         new VariableNode(L,
                             new BasicTypeNode(L, "int"),

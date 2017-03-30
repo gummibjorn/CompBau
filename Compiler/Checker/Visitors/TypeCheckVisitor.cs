@@ -17,5 +17,26 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
         // TODO: Implement type resolution for expressions (except designator)
         // TODO: Implement type checks for entire program
+        public override void Visit(BinaryExpressionNode node)
+        {
+            base.Visit(node);
+            var leftType = _symbolTable.FindType(node.Left);
+            var rightType = _symbolTable.FindType(node.Right);
+
+            switch (node.Operator)
+            {
+                case Operator.Or:
+                case Operator.And:
+                    if(leftType == _symbolTable.Compilation.BoolType && rightType == _symbolTable.Compilation.BoolType)
+                    {
+                        _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
+                    }else
+                    {
+                        Diagnosis.ReportError(node.Location, "comparing apples and oranges gives you scurvies");
+                        throw new System.Exception("Wrong type in binary expression");
+                    }
+                    break;
+            }
+        }
     }
 }
