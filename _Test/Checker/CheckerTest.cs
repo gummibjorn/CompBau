@@ -61,10 +61,36 @@ namespace _Test
         }
 
         [TestMethod]
+        public void ArrayCreation()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void ArrayCreationInvalid()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("");
+        }
+
+        [TestMethod]
         public void AssignmentAssignInvalidType()
         {
             initializeChecker(main("int a; a = true;"));
             AssertDiagnosisContains("cannot assign 'bool' to 'int'");
+        }
+
+        [TestMethod]
+        public void AssignmentArrayLengthInvalid()
+        {
+            try
+            {
+                initializeChecker();
+            }
+            catch (Exception)
+            {
+                AssertDiagnosisContains("length must not be on the left side");
+            }
         }
 
         [TestMethod]
@@ -155,6 +181,7 @@ namespace _Test
             }
         }
 
+
         public void BinaryExpressionComparisonLiteral()
         {
             initializeChecker(expression("bool", "1234 < 1"));
@@ -206,12 +233,6 @@ namespace _Test
         {
             initializeChecker(main("if(1){};"));
             AssertDiagnosisContains("must be");
-        }
-
-        [TestMethod]
-        public void ArrayAssignment()
-        {
-            initializeChecker(main("int[] arr; arr = new int[10];"));
         }
 
         [TestMethod]

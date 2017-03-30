@@ -73,10 +73,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Checker\Mega1.txt" />
+    <Content Include="Checker\AssignmentArrayLengthInvalid.txt" />
+    <Content Include="Checker\ArrayCreationInvalid.txt" />
     <Content Include="Checker\MethodCallArgCountMismatch.txt" />
     <Content Include="Checker\MethodCallArgTypeMismatch.txt" />
     <Content Include="Checker\MethodCallManyArgs.txt" />
     <Content Include="Checker\MethodCallNoArgs.txt" />
+    <Content Include="Checker\ArrayCreation.txt" />
     <Content Include="Checker\MethodReturnStatementInvalid.txt" />
     <Content Include="Checker\MethodReturnStatement.txt" />
     <Content Include="Lexer\CombinedAssignment.txt" />

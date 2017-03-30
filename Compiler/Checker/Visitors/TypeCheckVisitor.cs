@@ -114,8 +114,18 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 case Operator.LessEqual:
                 case Operator.Greater:
                 case Operator.GreaterEqual:
+                    if (leftType == _symbolTable.Compilation.IntType && rightType == _symbolTable.Compilation.IntType)
+                    {
+                        _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
+                    } else
+                    {
+                        Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
+                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                    }
+                    break;
                 case Operator.Equals:
                 case Operator.Unequal:
+                case Operator.Is:
                     if (leftType.Identifier == rightType.Identifier)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
@@ -125,9 +135,21 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
                     }
                     break;
-                case Operator.Is:
-                    _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    break;
+            }
+        }
+
+        private void checkNotLength(DesignatorNode node)
+        {
+            if (node is BasicDesignatorNode)
+            {
+                if(((BasicDesignatorNode)node).Identifier == "length")
+                {
+                    Diagnosis.ReportError(node.Location, "Length must not be on the left side of an assignment");
+                    throw new Exception("Length must not be on the left side of assignment");
+                }
+            }else
+            {
+                checkNotLength(((MemberAccessNode)node).Designator);
             }
         }
 
@@ -138,6 +160,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var leftType = _symbolTable.FindType(node.Left);
             var rightType = _symbolTable.FindType(node.Right);
             checkIntegerMaxValue(node.Right);
+            checkNotLength(node.Left);
+            //TODO: length must not be on left side!
             if (leftType != rightType)
             {
                 Diagnosis.ReportError(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
@@ -216,14 +240,17 @@ namespace RappiSharp.Compiler.Checker.Visitors
         public override void Visit(ArrayCreationNode node)
         {
             base.Visit(node);
-            if(_symbolTable.FindType(node.Expression) != _symbolTable.Compilation.IntType)
-            {
+            var arrayType = _symbolTable.FindType(new ArrayTypeNode(node.Location, node.ElementType));
+            var expressionType = _symbolTable.FindType(node.Expression);
 
-                Diagnosis.ReportError(node.Expression.Location, "Expected integer expression for array length");
-                return;
+            if(expressionType != _symbolTable.Compilation.IntType)
+            {
+                Diagnosis.ReportError(node.Location, "Invalid expression type in array creation");
+
             }
-            //_symbolTable.FixType(node, _symbolTable.FindType(node.ElementType));
-            _symbolTable.FixType(node, _symbolTable.FindType(new ArrayTypeNode(node.Location, node.ElementType)));
+
+            _symbolTable.FixType(node, arrayType);
+
         }
     }
 }

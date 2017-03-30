@@ -1,0 +1,9 @@
+﻿class Program{
+	void Main(){
+		int[] a;
+		int b;
+		b = 1;
+		a = new int[12];
+		a.length = b;
+	}
+}

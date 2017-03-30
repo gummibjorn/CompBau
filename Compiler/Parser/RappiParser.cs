@@ -312,12 +312,12 @@ namespace RappiSharp.Compiler.Parser
                 return ParseUnaryExpression(); 
             }else if (Is(Tag.OpenParenthesis))
             {
-                //TODO: Implement and add ParseTypeCast here!
                 Next();
                 if (IsIdentifier())
                 {
                     var ident = ReadIdentifier();
 
+                    //FIX Bug (identifier);
                     if (Is(Tag.CloseParenthesis))
                     {
                         Next();
