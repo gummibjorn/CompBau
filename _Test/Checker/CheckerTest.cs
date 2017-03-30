@@ -137,6 +137,24 @@ namespace _Test
             AssertDiagnosisContains("invalid argument count");
         }
 
+        [TestMethod]
+        public void MethodReturnStatement()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void MethodReturnStatementInvlid()
+        {
+            try
+            {
+                initializeChecker();
+            }catch(Exception)
+            {
+                AssertDiagnosisContains("");
+            }
+        }
+
         public void BinaryExpressionComparisonLiteral()
         {
             initializeChecker(expression("bool", "1234 < 1"));

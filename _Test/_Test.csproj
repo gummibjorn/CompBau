@@ -76,6 +76,8 @@
     <Content Include="Checker\MethodCallArgTypeMismatch.txt" />
     <Content Include="Checker\MethodCallManyArgs.txt" />
     <Content Include="Checker\MethodCallNoArgs.txt" />
+    <Content Include="Checker\MethodReturnStatementInvalid.txt" />
+    <Content Include="Checker\MethodReturnStatement.txt" />
     <Content Include="Lexer\CombinedAssignment.txt" />
     <Content Include="Lexer\CombinedEverything.txt" />
     <Content Include="Lexer\CombinedHelloWorld.txt" />

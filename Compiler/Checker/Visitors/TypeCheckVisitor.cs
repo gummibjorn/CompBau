@@ -1,6 +1,7 @@
 ﻿using RappiSharp.Compiler.Checker.General;
 using RappiSharp.Compiler.Checker.Symbols;
 using RappiSharp.Compiler.Parser.Tree;
+using System;
 
 namespace RappiSharp.Compiler.Checker.Visitors
 {
@@ -23,7 +24,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             switch (optr)
             {
                 case Operator.Not:
-                    if(type == _symbolTable.Compilation.BoolType)
+                    if (type == _symbolTable.Compilation.BoolType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
@@ -33,7 +34,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     break;
                 case Operator.Plus:
                     checkIntegerMaxValue(operand);
-                    if(type == _symbolTable.Compilation.IntType)
+                    if (type == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
                     } else
@@ -42,7 +43,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     }
                     break;
                 case Operator.Minus:
-                    if(type == _symbolTable.Compilation.IntType)
+                    if (type == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
                     } else
@@ -57,7 +58,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
         private void checkIntegerMaxValue(ExpressionNode node)
         {
-            if(node is IntegerLiteralNode)
+            if (node is IntegerLiteralNode)
             {
                 if (((IntegerLiteralNode)node).Value > int.MaxValue)
                 {
@@ -85,10 +86,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
             {
                 case Operator.Or:
                 case Operator.And:
-                    if(leftType == _symbolTable.Compilation.BoolType && rightType == _symbolTable.Compilation.BoolType)
+                    if (leftType == _symbolTable.Compilation.BoolType && rightType == _symbolTable.Compilation.BoolType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    }else
+                    } else
                     {
                         Diagnosis.ReportError(node.Location, "comparing apples and oranges gives you scurvies");
 
@@ -100,10 +101,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 case Operator.Modulo:
                 case Operator.Minus:
                 case Operator.Plus:
-                    if(leftType == _symbolTable.Compilation.IntType && rightType == _symbolTable.Compilation.IntType)
+                    if (leftType == _symbolTable.Compilation.IntType && rightType == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
-                    }else
+                    } else
                     {
                         Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
                         throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
@@ -115,10 +116,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 case Operator.GreaterEqual:
                 case Operator.Equals:
                 case Operator.Unequal:
-                    if(leftType.Identifier == rightType.Identifier)
+                    if (leftType.Identifier == rightType.Identifier)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    }else
+                    } else
                     {
                         Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
                         throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
@@ -137,7 +138,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var leftType = _symbolTable.FindType(node.Left);
             var rightType = _symbolTable.FindType(node.Right);
             checkIntegerMaxValue(node.Right);
-            if(leftType != rightType)
+            if (leftType != rightType)
             {
                 Diagnosis.ReportError(node.Location, $"Cannot assign {rightType.ToString()} to {leftType.ToString()}");
             }
@@ -148,21 +149,39 @@ namespace RappiSharp.Compiler.Checker.Visitors
             base.Visit(node);
             var methodSymbol = _symbolTable.GetTarget(node.Designator);
             var methodDefinition = _symbolTable.GetDeclarationNode<MethodNode>(methodSymbol);
-            if(methodDefinition.Parameters.Count != node.Arguments.Count)
+            var returnType = _symbolTable.FindType(methodDefinition.ReturnType);
+
+            if (methodDefinition.Parameters.Count != node.Arguments.Count)
             {
                 Diagnosis.ReportError(node.Location, $"Invalid argument count");
                 return;
             }
-            for(var i = 0; i<node.Arguments.Count; i += 1)
+            for (var i = 0; i < node.Arguments.Count; i += 1)
             {
                 var param = methodDefinition.Parameters[i];
                 var paramType = _symbolTable.FindType(param.Type);
                 var arg = node.Arguments[i];
                 var argType = _symbolTable.FindType(arg);
-                if(paramType != argType)
+                if (paramType != argType)
                 {
                     Diagnosis.ReportError(arg.Location, $"Cannot assign argument of type {argType} to parameter {param.Identifier} ({paramType})");
                 }
+            }
+
+            _symbolTable.FixType(node, returnType);
+        }
+
+        public override void Visit(ReturnStatementNode node)
+        {
+            base.Visit(node);
+
+            var returnType = _symbolTable.FindType(node.Expression);
+            var methodReturnType = _method.ReturnType.Identifier;
+
+            if (returnType.Identifier != methodReturnType)
+            {
+                Diagnosis.ReportError(node.Location, $"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
+                throw new Exception($"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
             }
         }
     }
