@@ -13,6 +13,15 @@ namespace _Test
     {
         private RappiChecker _checker;
 
+        public TestContext TestContext { get; set; }
+
+        private void initializeChecker()
+        {
+            var lexer = new RappiLexer(File.OpenText("../../Checker/" + TestContext.TestName + ".txt"));
+            var parser = new RappiParser(lexer);
+            _checker = new RappiChecker(parser.ParseProgram());
+        }
+
         private void initializeChecker(string code)
         {
             var lexer = new RappiLexer(new StringReader(code));
@@ -100,6 +109,32 @@ namespace _Test
         public void AssignmentBinaryExpressionBool()
         {
             initializeChecker(expression("bool", "true && true"));
+        }
+
+        [TestMethod]
+        public void MethodCallNoArgs()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void MethodCallManyArgs()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void MethodCallArgTypeMismatch()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("cannot assign");
+        }
+
+        [TestMethod]
+        public void MethodCallArgCountMismatch()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("invalid argument count");
         }
     }
 }

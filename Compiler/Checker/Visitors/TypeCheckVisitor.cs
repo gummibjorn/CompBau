@@ -142,5 +142,28 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 Diagnosis.ReportError(node.Location, $"Cannot assign {rightType.ToString()} to {leftType.ToString()}");
             }
         }
+
+        public override void Visit(MethodCallNode node)
+        {
+            base.Visit(node);
+            var methodSymbol = _symbolTable.GetTarget(node.Designator);
+            var methodDefinition = _symbolTable.GetDeclarationNode<MethodNode>(methodSymbol);
+            if(methodDefinition.Parameters.Count != node.Arguments.Count)
+            {
+                Diagnosis.ReportError(node.Location, $"Invalid argument count");
+                return;
+            }
+            for(var i = 0; i<node.Arguments.Count; i += 1)
+            {
+                var param = methodDefinition.Parameters[i];
+                var paramType = _symbolTable.FindType(param.Type);
+                var arg = node.Arguments[i];
+                var argType = _symbolTable.FindType(arg);
+                if(paramType != argType)
+                {
+                    Diagnosis.ReportError(arg.Location, $"Cannot assign argument of type {argType} to parameter {param.Identifier} ({paramType})");
+                }
+            }
+        }
     }
 }
