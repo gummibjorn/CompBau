@@ -205,112 +205,12 @@ namespace _Test
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
-        [TestMethod, Timeout(TIMEOUT)]
-        public void StatementCallComplex()
-        {
-            initializeParser(main("hans.peters[0].i();"));
-            var result = getFirstStatement(_parser.ParseProgram());
-            var expected = new CallStatementNode(L, new MethodCallNode(L,
-                new MemberAccessNode(L,
-                    new ElementAccessNode(L,
-                        new MemberAccessNode(L,
-                            new BasicDesignatorNode(L, "i"),
-                            "peters"
-                        ),
-                        new IntegerLiteralNode(L, 0)
-                    ),
-                    "hans"
-                ),
-                new List<ExpressionNode>()
-            ));
-            Assert.AreEqual(expected.ToString(), result.ToString());
-        }
-
-        [TestMethod, Timeout(TIMEOUT)]
-        public void StatementAssignmentMemberArrayMember()
-        {
-            initializeParser(main("hans.peters[0].i = 0;"));
-            var result = getFirstStatement(_parser.ParseProgram());
-            var expected = new AssignmentNode(L,
-                new MemberAccessNode(L,
-                    new ElementAccessNode(L,
-                        new MemberAccessNode(L,
-                            new BasicDesignatorNode(L, "i"),
-                            "peters"
-                        ),
-                        new IntegerLiteralNode(L, 0)
-                    ),
-                    "hans"
-                ),
-                new IntegerLiteralNode(L, 0)
-            );
-            Assert.AreEqual(expected.ToString(), result.ToString());
-        }
-
-        [TestMethod, Timeout(TIMEOUT)]
-        public void StatementAssignmentArrayMember()
-        {
-            initializeParser(main("peters[0].i = 0;"));
-            var result = getFirstStatement(_parser.ParseProgram());
-            var expected = new AssignmentNode(L,
-                new ElementAccessNode(L,
-                    new MemberAccessNode(L,
-                        new BasicDesignatorNode(L, "i"),
-                        "peters"
-                    ),
-                    new IntegerLiteralNode(L, 0)
-                ),
-                new IntegerLiteralNode(L, 0)
-            );
-            Assert.AreEqual(expected.ToString(), result.ToString());
-        }
-
-        [TestMethod, Timeout(TIMEOUT)]
-        public void StatementAssignmentMemberArray()
-        {
-            initializeParser(main("hans.i[0] = 0;"));
-            var result = getFirstStatement(_parser.ParseProgram());
-            var expected = new AssignmentNode(L,
-                new MemberAccessNode(L,
-                    new ElementAccessNode(L, 
-                        new BasicDesignatorNode(L, "i"),
-                        new IntegerLiteralNode(L,0)
-                    ),
-                    "hans"
-                ),
-                new IntegerLiteralNode(L, 0)
-            );
-            Assert.AreEqual(expected.ToString(), result.ToString());
-        }
-
-        [TestMethod]
-        public void StatementAssignmentArray()
-        {
-            initializeParser(main("i[0] = 0;"));
-            var result = getFirstStatement(_parser.ParseProgram());
-            var expected = new AssignmentNode(L,
-                new ElementAccessNode(L, 
-                    new BasicDesignatorNode(L, "i"),
-                    new IntegerLiteralNode(L,0)
-                ),
-                new IntegerLiteralNode(L, 0)
-            );
-            Assert.AreEqual(expected.ToString(), result.ToString());
-        }
-
-        [TestMethod, Timeout(TIMEOUT)]
-        public void StatementAssignmentMember()
-        {
-            initializeParser(main("hans.i = 0;"));
-            AssertDiagnosisContains("");
-        }
-
         [TestMethod]
         public void StatementAssignmentBasicAndInit()
         {
             initializeParser(main("int i = 0;"));
             var result = getFirstStatement(_parser.ParseProgram());
-            AssertDiagnosisContains("");
+            AssertDiagnosisContains("Invalid statement");
         }
 
         [TestMethod]
@@ -696,5 +596,60 @@ namespace _Test
             );
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ToStringStatementCallComplex()
+        {
+            initializeParser(main("hans.peters[0].i();"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = "hans.peters[0].i();";
+            Assert.AreEqual(expected, result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ToStringStatementAssignmentMemberArrayMember()
+        {
+            initializeParser(main("hans.peters[0].i = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = "hans.peters[0].i = 0";
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ToStringStatementAssignmentArrayMember()
+        {
+            initializeParser(main("peters[0].i = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = "peters[0].i = 0";
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ToStringStatementAssignmentMemberArray()
+        {
+            initializeParser(main("hans.i[0] = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = "hans.i[0] = 0;";
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod]
+        public void ToStringStatementAssignmentArray()
+        {
+            initializeParser(main("i[0] = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = "i[0] = 0;";
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
+        [TestMethod, Timeout(TIMEOUT)]
+        public void ToStringStatementAssignmentMember()
+        {
+            initializeParser(main("hans.i = 0;"));
+            var result = getFirstStatement(_parser.ParseProgram());
+            var expected = "hans.i = 0;";
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
     }
 }
