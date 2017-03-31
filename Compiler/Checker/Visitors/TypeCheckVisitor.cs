@@ -17,6 +17,15 @@ namespace RappiSharp.Compiler.Checker.Visitors
             _method = method;
         }
 
+        private void Error(Location location, string msg, bool fatal=false)
+        {
+            Diagnosis.ReportError(location, msg);
+            if (fatal)
+            {
+                throw new CheckerException(msg);
+            }
+        }
+
         public override void Visit(UnaryExpressionNode node)
         {
             base.Visit(node);
@@ -31,7 +40,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, $"Invalid type {type.ToString()} for unary '!'");
+                        Error(node.Location, $"Invalid type {type.ToString()} for unary '!'");
                     }
                     break;
                 case Operator.Plus:
@@ -41,7 +50,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, $"Invalid type {type.ToString()} for unary {optr.ToString()}");
+                        Error(node.Location, $"Invalid type {type.ToString()} for unary {optr.ToString()}");
                     }
                     break;
                 case Operator.Minus:
@@ -50,7 +59,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, $"Invalid type {type.ToString()} for unary {optr.ToString()}");
+                        Error(node.Location, $"Invalid type {type.ToString()} for unary {optr.ToString()}");
                     }
                     break;
             }
@@ -62,7 +71,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             {
                 if (((IntegerLiteralNode)node).Value > int.MaxValue)
                 {
-                    Diagnosis.ReportError(node.Location, "Integer maxvalue exceeded");
+                    Error(node.Location, "Integer maxvalue exceeded");
                 }
             }
         }
@@ -101,9 +110,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, "comparing apples and oranges gives you scurvies");
-
-                        throw new CheckerException($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        Error(node.Location, "comparing apples and oranges gives you scurvies", true);
                     }
                     break;
                 case Operator.Divide:
@@ -116,8 +123,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
-                        throw new CheckerException($"Wrong type in binary expression '{leftType?.ToString()}' '{node.Operator}' '{rightType?.ToString()}'");
+                        Error(node.Location, $"Wrong type in binary expression '{leftType?.ToString()}' '{node.Operator}' '{rightType?.ToString()}'", true);
                     }
                     break;
                 case Operator.Less:
@@ -129,8 +135,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
-                        throw new CheckerException($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        Error(node.Location,$"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
                     }
                     break;
                 case Operator.Equals:
@@ -142,8 +147,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
                     if(!isLeftRef && isRightNull || !isRightRef && isLeftNull)
                     {
-                        Diagnosis.ReportError(node.Location, "Cannot compare null with primitive type");
-                        throw new CheckerException($"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        Error(node.Location, $"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
                     }
 
                     if (leftType.Identifier == rightType.Identifier || isRightNull || isLeftNull)
@@ -151,8 +155,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, "Invalid types in comparison");
-                        throw new CheckerException($"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        Error(node.Location, $"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
                     }
                     break;
                 case Operator.Is:
@@ -183,7 +186,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 {
                     if(_symbolTable.FindType(memberAccessNode.Designator) is ArrayTypeSymbol)
                     {
-                        Diagnosis.ReportError(node.Location, "Length must not be on the left side of an assignment");
+                        Error(node.Location, "Length must not be on the left side of an assignment");
                     }
                 }
             }
@@ -206,7 +209,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             checkNotLength(node.Left);
             if (leftType != rightType)
             {
-                Diagnosis.ReportError(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
+                Error(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
             }
         }
 
@@ -219,7 +222,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
             if (methodDefinition.Parameters.Count != node.Arguments.Count)
             {
-                Diagnosis.ReportError(node.Location, $"Invalid argument count");
+                Error(node.Location, $"Invalid argument count");
                 return;
             }
             for (var i = 0; i < node.Arguments.Count; i += 1)
@@ -230,7 +233,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 var argType = _symbolTable.FindType(arg);
                 if (paramType != argType)
                 {
-                    Diagnosis.ReportError(arg.Location, $"Cannot assign argument of type {argType} to parameter {param.Identifier} ({paramType})");
+                    Error(arg.Location, $"Cannot assign argument of type {argType} to parameter {param.Identifier} ({paramType})");
                 }
             }
 
@@ -257,8 +260,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
             if (returnType.Identifier != methodReturnType)
             {
-                Diagnosis.ReportError(node.Location, $"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
-                throw new CheckerException($"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
+                Error(node.Location, $"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}", true);
             }
         }
 
@@ -267,7 +269,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var type = _symbolTable.FindType(condition);
             if(type != _symbolTable.Compilation.BoolType)
             {
-                Diagnosis.ReportError(condition.Location, $"Condition must be of type bool");
+                Error(condition.Location, $"Condition must be of type bool");
             }
         }
 
@@ -298,7 +300,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
             if(expressionType != _symbolTable.Compilation.IntType)
             {
-                Diagnosis.ReportError(node.Location, "Invalid expression type in array creation");
+                Error(node.Location, "Invalid expression type in array creation");
 
             }
             

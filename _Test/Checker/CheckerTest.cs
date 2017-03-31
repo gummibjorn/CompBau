@@ -191,7 +191,7 @@ namespace _Test
             }
             catch (CheckerException)
             {
-                AssertDiagnosisContains("cannot compare null");
+                AssertDiagnosisContains("Wrong type in comparison");
             }
         }
 
@@ -203,7 +203,7 @@ namespace _Test
                 initializeChecker(expression("bool", "1234 < true"));
             }catch(CheckerException)
             {
-                AssertDiagnosisContains("Invalid types");
+                AssertDiagnosisContains("Wrong type in binary");
             }
         }
 
@@ -220,7 +220,7 @@ namespace _Test
                 initializeChecker(main("int a; bool b; bool c; a=123; b=234; c = a != b;"));
             } catch (CheckerException)
             {
-                AssertDiagnosisContains("Invalid types");
+                AssertDiagnosisContains("Cannot assign");
             }
         }
 

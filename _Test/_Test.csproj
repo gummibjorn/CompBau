@@ -72,7 +72,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Checker\Mega2.txt" />
     <Content Include="Checker\Playground.txt" />
     <Content Include="Checker\AssignLengthOfArray.txt" />
     <Content Include="Checker\AssignLengthOfObject.txt" />
