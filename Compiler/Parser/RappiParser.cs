@@ -320,8 +320,17 @@ namespace RappiSharp.Compiler.Parser
                     //FIX Bug (identifier);
                     if (Is(Tag.CloseParenthesis))
                     {
-                        Next();
-                        return new TypeCastNode(CurrentLocation(), new BasicTypeNode(CurrentLocation(), ident), ParseDesignatorRest(new BasicDesignatorNode(CurrentLocation(), ReadIdentifier())));
+                        Next(); //closeParen
+                        if (IsIdentifier())
+                        {
+                            return new TypeCastNode(CurrentLocation(), 
+                                new BasicTypeNode(CurrentLocation(), ident), 
+                                ParseDesignatorRest(new BasicDesignatorNode(CurrentLocation(), ReadIdentifier()))
+                            );
+                        } else
+                        {
+                            return new BasicDesignatorNode(CurrentLocation(), ident);
+                        }
                     }else
                     {
                         var expr = ParseExpression(ident);

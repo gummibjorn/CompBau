@@ -27,7 +27,7 @@ namespace RappiSharp.Compiler
             var lines = source.Split('\n');
             result += lines[location.Row - 1];
             result += "\r\n";
-            for(var i=0; i< location.Col; i++)
+            for(var i=0; i< location.Col-1; i++)
             {
                 result += ' ';
             }

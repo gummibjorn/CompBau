@@ -342,7 +342,7 @@ namespace _Test
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
-        [Ignore, TestMethod, Timeout(TIMEOUT)]
+        [TestMethod, Timeout(TIMEOUT)]
         public void IdentifierInParanthesis()
         {
             initializeParser(expression("(asdf)"));
