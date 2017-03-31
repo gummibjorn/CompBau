@@ -83,19 +83,6 @@ namespace _Test
         }
 
         [TestMethod]
-        public void AssignmentArrayLengthInvalid()
-        {
-            try
-            {
-                initializeChecker();
-            }
-            catch (Exception)
-            {
-                AssertDiagnosisContains("length must not be on the left side");
-            }
-        }
-
-        [TestMethod]
         public void AssignmentUnaryNot()
         {
             initializeChecker(expression("bool", "!true;"));
@@ -247,6 +234,19 @@ namespace _Test
         public void IfConditionBool()
         {
             initializeChecker(main("if(true){};"));
+        }
+
+        [TestMethod]
+        public void AssignLengthOfObject()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void AssignLengthOfArray()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("must not be on the left side");
         }
 
         [TestMethod]

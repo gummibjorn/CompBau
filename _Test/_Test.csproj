@@ -72,6 +72,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Checker\AssignLengthOfArray.txt" />
+    <Content Include="Checker\AssignLengthOfObject.txt" />
     <Content Include="Checker\Mega1.txt" />
     <Content Include="Checker\AssignmentArrayLengthInvalid.txt" />
     <Content Include="Checker\ArrayCreationInvalid.txt" />

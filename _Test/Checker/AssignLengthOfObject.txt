@@ -1,0 +1,9 @@
+﻿class Program{
+	int length;
+
+	void Main(){
+		Program p;
+		p = new Program();
+		p.length = 5;
+	}
+}

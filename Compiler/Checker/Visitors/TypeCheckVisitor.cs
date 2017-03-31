@@ -18,6 +18,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
         public override void Visit(UnaryExpressionNode node)
         {
+            base.Visit(node);
             var optr = node.Operator;
             var operand = node.Operand;
             var type = _symbolTable.FindType(operand);
@@ -52,8 +53,6 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     }
                     break;
             }
-
-            base.Visit(node);
         }
 
         private void checkIntegerMaxValue(ExpressionNode node)
@@ -140,16 +139,16 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
         private void checkNotLength(DesignatorNode node)
         {
-            if (node is BasicDesignatorNode)
+            if (node is MemberAccessNode)
             {
-                if(((BasicDesignatorNode)node).Identifier == "length")
+                var memberAccessNode = (MemberAccessNode)node;
+                if(memberAccessNode.Identifier == "length")
                 {
-                    Diagnosis.ReportError(node.Location, "Length must not be on the left side of an assignment");
-                    throw new CheckerException("Length must not be on the left side of assignment");
+                    if(_symbolTable.FindType(memberAccessNode.Designator) is ArrayTypeSymbol)
+                    {
+                        Diagnosis.ReportError(node.Location, "Length must not be on the left side of an assignment");
+                    }
                 }
-            }else
-            {
-                checkNotLength(((MemberAccessNode)node).Designator);
             }
         }
 
