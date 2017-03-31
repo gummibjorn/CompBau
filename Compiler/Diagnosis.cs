@@ -13,7 +13,6 @@ namespace RappiSharp.Compiler
 
         public static void ReportError(Location location, string errorMessage)
         {
-
             var message = $"ERROR {errorMessage} at {location}\n" + printCodeLine(location);
             Console.WriteLine(message);
             Messages += message + "\r\n";

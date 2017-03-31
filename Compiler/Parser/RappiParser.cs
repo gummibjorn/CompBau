@@ -700,7 +700,7 @@ namespace RappiSharp.Compiler.Parser
         private void Error(string message)
         {
             Location location = (Location)(_current.Location.HasValue ? _current.Location : new Location(-1, -1));
-          Diagnosis.ReportError(location, message);
+            Diagnosis.ReportError(location, message);
         }
     }
 }

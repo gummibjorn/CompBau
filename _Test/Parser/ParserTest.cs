@@ -187,6 +187,14 @@ namespace _Test
         }
 
         [TestMethod, Timeout(1000)]
+        public void ExprDesignatorArrayEmptyExpression()
+        {
+            initializeParser(expression("i[]"));
+            _parser.ParseProgram();
+            AssertDiagnosisContains("Invalid operand");
+        }
+
+        [TestMethod, Timeout(1000)]
         public void ExprDesignatorMulti()
         {
             initializeParser(expression("test.i"));

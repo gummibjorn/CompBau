@@ -11,9 +11,6 @@ namespace RappiSharp.Compiler.Parser.Tree {
         throw new ArgumentNullException(nameof(designator));
       }
       Designator = designator;
-      if (expression == null) {
-        throw new ArgumentNullException(nameof(expression));
-      }
       Expression = expression;
     }
 
