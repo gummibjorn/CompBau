@@ -1,0 +1,15 @@
+﻿class Program{
+
+	void Main(){
+		A a;
+		B b;
+		
+		b = new B();
+
+		a = (A) b;
+	}
+}
+
+class A{}
+
+class B{}

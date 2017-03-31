@@ -83,13 +83,6 @@ namespace _Test
         }
 
         [TestMethod]
-        public void AssignmentArrayLengthInvalid()
-        {
-            initializeChecker();
-            AssertDiagnosisContains("length must not be on the left side");
-        }
-
-        [TestMethod]
         public void AssignmentUnaryNot()
         {
             initializeChecker(expression("bool", "!true;"));
@@ -273,6 +266,19 @@ namespace _Test
         {
             initializeChecker();
             AssertDiagnosisContains("must not be on the left side");
+        }
+
+        [TestMethod]
+        public void AssignmentTypeCast()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void AssignmentTypeCastInvalid()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("cannot assign");
         }
 
         [TestMethod]

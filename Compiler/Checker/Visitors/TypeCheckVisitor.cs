@@ -72,6 +72,16 @@ namespace RappiSharp.Compiler.Checker.Visitors
             _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
         }
 
+        public override void Visit(CharacterLiteralNode node)
+        {
+            _symbolTable.FixType(node, _symbolTable.Compilation.CharType);
+        }
+
+        public override void Visit(StringLiteralNode node)
+        {
+            _symbolTable.FixType(node, _symbolTable.Compilation.StringType);
+        }
+
         public override void Visit(BinaryExpressionNode node)
         {
             base.Visit(node);
@@ -177,6 +187,13 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     }
                 }
             }
+        }
+
+        public override void Visit(TypeCastNode node)
+        {
+            var sourceType = _symbolTable.FindType(node.Designator);
+            var targetType = _symbolTable.FindType(node.Type) as ClassSymbol;
+            _symbolTable.FixType(node, targetType);
         }
 
         // TODO: Implement type checks for entire program
