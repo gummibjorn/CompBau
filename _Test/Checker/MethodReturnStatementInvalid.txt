@@ -4,6 +4,6 @@
 	}
 
 	int test(){
-		return bool;
+		return true;
 	}
 }

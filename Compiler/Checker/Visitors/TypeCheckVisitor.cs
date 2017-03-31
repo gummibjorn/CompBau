@@ -93,7 +93,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     {
                         Diagnosis.ReportError(node.Location, "comparing apples and oranges gives you scurvies");
 
-                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        throw new CheckerException($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
                     }
                     break;
                 case Operator.Divide:
@@ -107,7 +107,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     } else
                     {
                         Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
-                        throw new System.Exception($"Wrong type in binary expression '{leftType?.ToString()}' '{node.Operator}' '{rightType?.ToString()}'");
+                        throw new CheckerException($"Wrong type in binary expression '{leftType?.ToString()}' '{node.Operator}' '{rightType?.ToString()}'");
                     }
                     break;
                 case Operator.Less:
@@ -120,7 +120,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     } else
                     {
                         Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
-                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        throw new CheckerException($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
                     }
                     break;
                 case Operator.Equals:
@@ -132,7 +132,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     } else
                     {
                         Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
-                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        throw new CheckerException($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
                     }
                     break;
             }
@@ -145,7 +145,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 if(((BasicDesignatorNode)node).Identifier == "length")
                 {
                     Diagnosis.ReportError(node.Location, "Length must not be on the left side of an assignment");
-                    throw new Exception("Length must not be on the left side of assignment");
+                    throw new CheckerException("Length must not be on the left side of assignment");
                 }
             }else
             {
@@ -161,7 +161,6 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var rightType = _symbolTable.FindType(node.Right);
             checkIntegerMaxValue(node.Right);
             checkNotLength(node.Left);
-            //TODO: length must not be on left side!
             if (leftType != rightType)
             {
                 Diagnosis.ReportError(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
@@ -205,7 +204,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             if (returnType.Identifier != methodReturnType)
             {
                 Diagnosis.ReportError(node.Location, $"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
-                throw new Exception($"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
+                throw new CheckerException($"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
             }
         }
 
@@ -248,7 +247,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 Diagnosis.ReportError(node.Location, "Invalid expression type in array creation");
 
             }
-
+            
             _symbolTable.FixType(node, arrayType);
 
         }

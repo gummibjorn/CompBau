@@ -5,6 +5,7 @@ using System.IO;
 using RappiSharp.Compiler.Parser;
 using RappiSharp.Compiler.Checker;
 using RappiSharp.Compiler;
+using RappiSharp.Compiler.Checker.Visitors;
 
 namespace _Test
 {
@@ -47,6 +48,7 @@ namespace _Test
         private void AssertDiagnosisContains(string msg)
         {
             Assert.IsTrue(Diagnosis.Messages.ToLower().Contains(msg.ToLower()), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
+            Assert.IsTrue(Diagnosis.HasErrors);
             Diagnosis.Clear();
         }
 
@@ -170,12 +172,12 @@ namespace _Test
         }
 
         [TestMethod]
-        public void MethodReturnStatementInvlid()
+        public void MethodReturnStatementInvalid()
         {
             try
             {
                 initializeChecker();
-            }catch(Exception)
+            }catch(CheckerException)
             {
                 AssertDiagnosisContains("");
             }
@@ -193,7 +195,7 @@ namespace _Test
             try
             {
                 initializeChecker(expression("bool", "1234 < true"));
-            }catch(Exception)
+            }catch(CheckerException)
             {
                 AssertDiagnosisContains("Invalid types");
             }

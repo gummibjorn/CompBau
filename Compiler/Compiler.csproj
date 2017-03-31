@@ -57,6 +57,7 @@
     <Compile Include="Checker\Symbols\Symbol.cs" />
     <Compile Include="Checker\Symbols\TypeSymbol.cs" />
     <Compile Include="Checker\Symbols\VariableSymbol.cs" />
+    <Compile Include="Checker\CheckerException.cs" />
     <Compile Include="Checker\Visitors\DesignatorFixupVisitor.cs" />
     <Compile Include="Checker\Visitors\LocalVariableVisitor.cs" />
     <Compile Include="Checker\Visitors\TypeCheckVisitor.cs" />

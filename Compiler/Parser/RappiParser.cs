@@ -473,15 +473,17 @@ namespace RappiSharp.Compiler.Parser
                     return new LocalDeclarationNode(location, new VariableNode(location, type, name));
                 } else
                 {
-                    //Parse expression; parse designator rest
                     var index = ParseExpression();
                     Check(Tag.CloseBracket);
-                    var designator = new ElementAccessNode(
+                    var designator = new BasicDesignatorNode(location, id);
+
+                    var elementAccessNode = new ElementAccessNode(
                         location,
-                        ParseDesignatorRest(new BasicDesignatorNode(location, id)),
+                        designator,
                         index
                     );
-                    return ParseBasicStatementRest(location, designator);
+
+                    return ParseBasicStatementRest(location, ParseDesignatorRest(elementAccessNode));
                 }
             } else {
                 var designator = ParseDesignatorRest(new BasicDesignatorNode(location,id));
@@ -524,19 +526,21 @@ namespace RappiSharp.Compiler.Parser
                 Next();
                 var index = ParseExpression();
                 Check(Tag.CloseBracket);
-                var elementAccess = new ElementAccessNode(
+
+                var elementAccessNode = new ElementAccessNode(
                     location,
-                    ParseDesignatorRest(previousName),
+                    previousName,
                     index
                 );
-                return ParseDesignatorRest(elementAccess);
+
+                return ParseDesignatorRest(elementAccessNode);
             } else if(Is(Tag.Period))
             {
                 Next();
                 var name = ReadIdentifier();
                 var memberAccessNode = new MemberAccessNode(
                     location,
-                    ParseDesignatorRest(previousName),
+                    previousName,
                     name
                 );
                 return ParseDesignatorRest(memberAccessNode);
