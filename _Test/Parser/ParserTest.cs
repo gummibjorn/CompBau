@@ -9,56 +9,19 @@ using System.IO;
 namespace _Test
 {
     [TestClass]
-    public class ParserTest {
-        private RappiParser _parser;
+    public class ParserTest : AbstractTest{
+        protected override string getPathInProject() { return "Parser"; }
 
-        public TestContext TestContext { get; set; }
+        private RappiParser _parser;
 
         private void initializeParser()
         {
-            var path = "../../Parser/" + TestContext.TestName + ".txt";
-            var lexer = new RappiLexer(File.OpenText(path));
-            Diagnosis.source = File.ReadAllText(path);
-            _parser = new RappiParser(lexer);
+            _parser = new RappiParser(makeLexer());
         }
 
         private void initializeParser(string code)
         {
-            var lexer = new RappiLexer(new StringReader(code));
-            Diagnosis.source = code;
-            _parser = new RappiParser(lexer);
-        }
-
-        private string main(string content)
-        {
-            return "class Proram{ void main(){" + content + "}}";
-        }
-
-        private string expression(string expr)
-        {
-            return main("return " + expr + ";");
-        }
-
-        private void AssertDiagnosisContains(string msg)
-        {
-            Assert.IsTrue(Diagnosis.Messages.Contains(msg), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
-            Assert.IsTrue(Diagnosis.HasErrors);
-            Diagnosis.Clear();
-        }
-
-        [TestCleanup]
-        public void tearDown()
-        {
-            if (Diagnosis.HasErrors)
-            {
-                Assert.Fail(Diagnosis.Messages);
-            }
-        }
-
-        [TestInitialize]
-        public void setUp()
-        {
-            Diagnosis.Clear();
+            _parser = new RappiParser(makeLexer(code));
         }
 
         [TestMethod]

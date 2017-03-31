@@ -10,51 +10,20 @@ using RappiSharp.Compiler.Checker.Visitors;
 namespace _Test
 {
     [TestClass]
-    public class CheckerTest
+    public class CheckerTest : AbstractTest
     {
-        private RappiChecker _checker;
+        protected override string getPathInProject() { return "Checker"; }
 
-        public TestContext TestContext { get; set; }
+        private RappiChecker _checker;
 
         private void initializeChecker()
         {
-            var lexer = new RappiLexer(File.OpenText("../../Checker/" + TestContext.TestName + ".txt"));
-            var parser = new RappiParser(lexer);
-            _checker = new RappiChecker(parser.ParseProgram());
+            _checker = new RappiChecker(new RappiParser(makeLexer()).ParseProgram());
         }
 
         private void initializeChecker(string code)
         {
-            var lexer = new RappiLexer(new StringReader(code));
-            var parser = new RappiParser(lexer);
-            _checker = new RappiChecker(parser.ParseProgram());
-        }
-
-        [TestInitialize]
-        public void setUp()
-        {
-            Diagnosis.Clear();
-        }
-
-        [TestCleanup]
-        public void tearDown()
-        {
-            if (Diagnosis.HasErrors)
-            {
-                Assert.Fail(Diagnosis.Messages);
-            }
-        }
-
-        private void AssertDiagnosisContains(string msg)
-        {
-            Assert.IsTrue(Diagnosis.Messages.ToLower().Contains(msg.ToLower()), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
-            Assert.IsTrue(Diagnosis.HasErrors);
-            Diagnosis.Clear();
-        }
-
-        private string main(string content)
-        {
-            return "class Prorahm{ void Main(){" + content + "}}";
+            _checker = new RappiChecker(new RappiParser(makeLexer(code)).ParseProgram());
         }
 
         private string expression(string type, string expr)

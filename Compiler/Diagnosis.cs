@@ -22,6 +22,7 @@ namespace RappiSharp.Compiler
         private static string printCodeLine(Location location)
         {
             if(source == null) { return ""; }
+            if(location.Row < 0) { return "CANNOT PRINT CODE FOR ROW " + location.Row; }
             string result = "";
             var lines = source.Split('\n');
             result += lines[location.Row - 1];

@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Checker\CheckerTest.cs" />
     <Compile Include="Lexer\LexerTest.cs" />
+    <Compile Include="AbstractTest.cs" />
     <Compile Include="Parser\ParserTreeTest.cs" />
     <Compile Include="Parser\ParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

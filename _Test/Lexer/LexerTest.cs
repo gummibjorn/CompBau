@@ -1,70 +1,69 @@
-﻿﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RappiSharp.Compiler;
 using RappiSharp.Compiler.Lexer;
 using RappiSharp.Compiler.Lexer.Tokens;
 using System.IO;
+using System;
 
 namespace _Test
 {
     [TestClass]
-    public class LexerTest
+    public class LexerTest : AbstractTest
     {
+        protected override string getPathInProject() { return "Lexer"; }
 
-        RappiLexer _lexer;
-        private Location ZEROLOCATION = new Location(1, 1);
-
-        public TestContext TestContext { get; set; }
+        private RappiLexer _lexer;
 
         private void initializeLexer()
         {
-            _lexer = new RappiLexer(File.OpenText("../../Lexer/" + TestContext.TestName + ".txt"));
+            _lexer = makeLexer();
         }
 
-        private void initializeLexer(string inputString)
+        private void initializeLexer(string code)
         {
-            _lexer = new RappiLexer(new StringReader(inputString));
+            _lexer = makeLexer(code);
         }
 
         [TestMethod]
         public void ReadInteger_Negative_MAX_Test() {
             initializeLexer("2147483648");
 
-            AssertNext(new IntegerToken(ZEROLOCATION, 2147483648));
+            AssertNext(new IntegerToken(L, 2147483648));
         }
 
         [TestMethod]
         public void ReadInteger_Overflow_Test() {
             initializeLexer("2147483649");
 
-            AssertNextError(ZEROLOCATION);
+            AssertNextError(L);
         }
 
         [TestMethod]
         public void ReadInteger_Huge_Overflow_Test() {
             initializeLexer("2147483649234123412341213412345565464561234123841789236478912364078126381723089471230847120893741089243456345634563456345634564");
 
-            AssertNextError(ZEROLOCATION);
+            AssertNextError(L);
         }
 
         [TestMethod]
         public void ReadInteger_Integer() {
             initializeLexer("2147483649");
 
-            AssertNextError(ZEROLOCATION);
+            AssertNextError(L);
         }
 
         [TestMethod]
         public void ReadInteger() {
             initializeLexer("21474");
 
-            AssertNext(new IntegerToken(ZEROLOCATION, 21474));
+            AssertNext(new IntegerToken(L, 21474));
         }
 
         [TestMethod]
         public void ReadInteger_Positive_MAX() {
             initializeLexer("2147483647");
 
-            AssertNext(new IntegerToken(ZEROLOCATION, 2147483647));
+            AssertNext(new IntegerToken(L, 2147483647));
         }
 
         [TestMethod]
@@ -80,9 +79,8 @@ namespace _Test
         {
             initializeLexer("/* testcomment");
 
-            Assert.IsTrue(Diagnosis.HasErrors);
-
             AssertNext(new FixToken(new Location(1, 15), Tag.End));
+            AssertDiagnosisContains("unclosed multiline");
         }
 
         [TestMethod]
@@ -184,7 +182,7 @@ namespace _Test
         public void StringUnterminated()
         {
             initializeLexer("\"look ma, no end");
-            AssertNextError(ZEROLOCATION);
+            AssertNextError(L);
         }
 
         [TestMethod]
@@ -628,7 +626,7 @@ namespace _Test
         public void InvalidCharacters()
         {
             initializeLexer("$a");
-            AssertNextError(ZEROLOCATION);
+            AssertNextError(L);
             AssertNext(new IdentifierToken(null, "a"));
             AssertNext(new FixToken(null, Tag.End));
         }
@@ -648,19 +646,21 @@ namespace _Test
             Assert.AreEqual(expected, actual.Location);
 
             Assert.IsTrue(Diagnosis.HasErrors);
+
+            Diagnosis.Clear();
         }
 
         private void AssertNextString(string content) {
-            AssertNext(new StringToken(ZEROLOCATION, content));
+            AssertNext(new StringToken(L, content));
         }
 
         private void AssertNextIdentifier(string name) {
-            AssertNext(new IdentifierToken(ZEROLOCATION, name));
+            AssertNext(new IdentifierToken(L, name));
         }
 
         private void AssertNextFixToken(Tag t)
         {
-            AssertNext(new FixToken(ZEROLOCATION, t));
+            AssertNext(new FixToken(L, t));
         }
 
         private void AssertNext(Token expected)
@@ -672,5 +672,6 @@ namespace _Test
             }
             Assert.AreEqual(expected.ToString(), actual.ToString());
         }
+
     }
 }
