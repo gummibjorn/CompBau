@@ -2,6 +2,7 @@
 using RappiSharp.Compiler.Checker.Symbols;
 using RappiSharp.Compiler.Parser.Tree;
 using System;
+using System.Collections.Generic;
 
 namespace RappiSharp.Compiler.Checker.Visitors
 {
@@ -216,7 +217,18 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 }
             }
 
-            _symbolTable.FixType(node, returnType);
+            try {
+                //is this _REALLY_ the only way to find out the type is not defined yet?
+                _symbolTable.FindType(node);
+            } catch (KeyNotFoundException e) {
+                _symbolTable.FixType(node, returnType);
+            }
+        }
+
+        public override void Visit(CallStatementNode node)
+        {
+            _symbolTable.FixType(node.Call, null);
+            base.Visit(node);
         }
 
         public override void Visit(ReturnStatementNode node)

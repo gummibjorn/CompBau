@@ -280,5 +280,12 @@ namespace _Test
         {
             initializeChecker();
         }
+
+        [TestMethod]
+        public void Playground()
+        {
+            initializeChecker();
+            Console.Write("BREAK HERE");
+        }
     }
 }
