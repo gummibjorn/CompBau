@@ -124,16 +124,42 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     break;
                 case Operator.Equals:
                 case Operator.Unequal:
-                case Operator.Is:
-                    if (leftType.Identifier == rightType.Identifier)
+                    bool isLeftRef = checkReferenceType(leftType);
+                    bool isRightRef = checkReferenceType(rightType);
+                    bool isLeftNull = leftType == _symbolTable.Compilation.NullType;
+                    bool isRightNull = rightType == _symbolTable.Compilation.NullType;
+
+                    if(!isLeftRef && isRightNull || !isRightRef && isLeftNull)
+                    {
+                        Diagnosis.ReportError(node.Location, "Cannot compare null with primitive type");
+                        throw new CheckerException($"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                    }
+
+                    if (leftType.Identifier == rightType.Identifier || isRightNull || isLeftNull)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
                     {
-                        Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
-                        throw new CheckerException($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        Diagnosis.ReportError(node.Location, "Invalid types in comparison");
+                        throw new CheckerException($"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}");
                     }
                     break;
+                case Operator.Is:
+                    break;
+            }
+        }
+
+        private bool checkReferenceType(TypeSymbol type)
+        {
+            if(type == _symbolTable.Compilation.BoolType
+                || type == _symbolTable.Compilation.CharType
+                || type == _symbolTable.Compilation.StringType
+                || type == _symbolTable.Compilation.IntType)
+            {
+                return false;
+            }else
+            {
+                return true;
             }
         }
 

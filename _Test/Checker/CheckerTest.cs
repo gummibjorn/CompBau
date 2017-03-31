@@ -83,6 +83,13 @@ namespace _Test
         }
 
         [TestMethod]
+        public void AssignmentArrayLengthInvalid()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("length must not be on the left side");
+        }
+
+        [TestMethod]
         public void AssignmentUnaryNot()
         {
             initializeChecker(expression("bool", "!true;"));
@@ -170,10 +177,29 @@ namespace _Test
             }
         }
 
-
+        [TestMethod]
         public void BinaryExpressionComparisonLiteral()
         {
             initializeChecker(expression("bool", "1234 < 1"));
+        }
+
+        [TestMethod]
+        public void BinaryExpressionComparisonReferenceTypeNull()
+        {
+            initializeChecker(main("int[] a; bool c; c = a == null;"));
+        }
+
+        [TestMethod]
+        public void BinaryExpressionComparisonPrimitiveTypeNull()
+        {
+            try
+            {
+                initializeChecker(main("int a; bool c; c = a == null;"));
+            }
+            catch (CheckerException)
+            {
+                AssertDiagnosisContains("cannot compare null");
+            }
         }
 
         [TestMethod]
@@ -199,7 +225,7 @@ namespace _Test
         {
             try {
                 initializeChecker(main("int a; bool b; bool c; a=123; b=234; c = a != b;"));
-            } catch (Exception)
+            } catch (CheckerException)
             {
                 AssertDiagnosisContains("Invalid types");
             }
