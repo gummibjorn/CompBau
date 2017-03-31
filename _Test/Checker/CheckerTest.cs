@@ -64,7 +64,7 @@ namespace _Test
         public void AssignmentAssignInvalidType()
         {
             initializeChecker(main("int a; a = true;"));
-            AssertDiagnosisContains("cannot assign bool to int");
+            AssertDiagnosisContains("cannot assign 'bool' to 'int'");
         }
 
         [TestMethod]
@@ -181,12 +181,55 @@ namespace _Test
         [TestMethod]
         public void BinaryExpressionComparisonUnequalTypes()
         {
-            try { 
+            try {
                 initializeChecker(main("int a; bool b; bool c; a=123; b=234; c = a != b;"));
-            }catch(Exception)
+            } catch (Exception)
             {
                 AssertDiagnosisContains("Invalid types");
             }
+        }
+
+        public void WhileConditionInt()
+        {
+            initializeChecker(main("while(1){};"));
+            AssertDiagnosisContains("must be");
+        }
+
+        [TestMethod]
+        public void WhileConditionBool()
+        {
+            initializeChecker(main("while(true){};"));
+        }
+
+        [TestMethod]
+        public void IfConditionInt()
+        {
+            initializeChecker(main("if(1){};"));
+            AssertDiagnosisContains("must be");
+        }
+
+        [TestMethod]
+        public void ArrayAssignment()
+        {
+            initializeChecker(main("int[] arr; arr = new int[10];"));
+        }
+
+        [TestMethod]
+        public void ArrayLength()
+        {
+            initializeChecker(main("int l; int[] arr; arr = new int[10]; l = arr.length;"));
+        }
+
+        [TestMethod]
+        public void IfConditionBool()
+        {
+            initializeChecker(main("if(true){};"));
+        }
+
+        [TestMethod]
+        public void Mega1()
+        {
+            initializeChecker();
         }
     }
 }

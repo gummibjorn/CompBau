@@ -73,7 +73,15 @@ namespace RappiSharp.Compiler.Checker.General {
     }
 
     public TypeSymbol FindType(ExpressionNode node) {
-      return _typeFixup[node];
+            try
+            {
+              return _typeFixup[node];
+
+            } catch(KeyNotFoundException e)
+            {
+                Diagnosis.ReportError(node.Location, "Type not found for " + node.ToString());
+                throw e;
+            }
     }
   }
 }

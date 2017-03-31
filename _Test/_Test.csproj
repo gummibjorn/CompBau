@@ -72,6 +72,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Checker\Mega1.txt" />
     <Content Include="Checker\MethodCallArgCountMismatch.txt" />
     <Content Include="Checker\MethodCallArgTypeMismatch.txt" />
     <Content Include="Checker\MethodCallManyArgs.txt" />

@@ -107,7 +107,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     } else
                     {
                         Diagnosis.ReportError(node.Location, "Invalid types in binary expression");
-                        throw new System.Exception($"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}");
+                        throw new System.Exception($"Wrong type in binary expression '{leftType?.ToString()}' '{node.Operator}' '{rightType?.ToString()}'");
                     }
                     break;
                 case Operator.Less:
@@ -140,7 +140,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             checkIntegerMaxValue(node.Right);
             if (leftType != rightType)
             {
-                Diagnosis.ReportError(node.Location, $"Cannot assign {rightType.ToString()} to {leftType.ToString()}");
+                Diagnosis.ReportError(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
             }
         }
 
@@ -183,6 +183,47 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 Diagnosis.ReportError(node.Location, $"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
                 throw new Exception($"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}");
             }
+        }
+
+        private void checkBoolCondition(ExpressionNode condition)
+        {
+            var type = _symbolTable.FindType(condition);
+            if(type != _symbolTable.Compilation.BoolType)
+            {
+                Diagnosis.ReportError(condition.Location, $"Condition must be of type bool");
+            }
+        }
+
+        public override void Visit(IfStatementNode node)
+        {
+            base.Visit(node);
+            checkBoolCondition(node.Condition);
+        }
+
+        public override void Visit(WhileStatementNode node)
+        {
+            base.Visit(node);
+            checkBoolCondition(node.Condition);
+        }
+
+        public override void Visit(ObjectCreationNode node)
+        {
+            base.Visit(node);
+            var type = _symbolTable.FindType(node.Type);
+            _symbolTable.FixType(node, type);
+        }
+
+        public override void Visit(ArrayCreationNode node)
+        {
+            base.Visit(node);
+            if(_symbolTable.FindType(node.Expression) != _symbolTable.Compilation.IntType)
+            {
+
+                Diagnosis.ReportError(node.Expression.Location, "Expected integer expression for array length");
+                return;
+            }
+            //_symbolTable.FixType(node, _symbolTable.FindType(node.ElementType));
+            _symbolTable.FixType(node, _symbolTable.FindType(new ArrayTypeNode(node.Location, node.ElementType)));
         }
     }
 }
