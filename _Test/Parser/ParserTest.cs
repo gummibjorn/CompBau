@@ -42,6 +42,7 @@ namespace _Test
         private void AssertDiagnosisContains(string msg)
         {
             Assert.IsTrue(Diagnosis.Messages.Contains(msg), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
+            Assert.IsTrue(Diagnosis.HasErrors);
             Diagnosis.Clear();
         }
 

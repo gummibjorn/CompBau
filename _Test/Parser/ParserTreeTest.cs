@@ -96,6 +96,7 @@ namespace _Test
         private void AssertDiagnosisContains(string msg)
         {
             Assert.IsTrue(Diagnosis.Messages.Contains(msg), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
+            Assert.IsTrue(Diagnosis.HasErrors);
             Diagnosis.Clear();
         }
 
@@ -611,7 +612,7 @@ namespace _Test
         {
             initializeParser(main("hans.peters[0].i = 0;"));
             var result = getFirstStatement(_parser.ParseProgram());
-            var expected = "hans.peters[0].i = 0";
+            var expected = "hans.peters[0].i = 0;";
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
@@ -620,7 +621,7 @@ namespace _Test
         {
             initializeParser(main("peters[0].i = 0;"));
             var result = getFirstStatement(_parser.ParseProgram());
-            var expected = "peters[0].i = 0";
+            var expected = "peters[0].i = 0;";
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 

@@ -321,7 +321,7 @@ namespace RappiSharp.Compiler.Parser
                     if (Is(Tag.CloseParenthesis))
                     {
                         Next();
-                        return new TypeCastNode(CurrentLocation(), new BasicTypeNode(CurrentLocation(), ident), ParseDesignatorRest(ReadIdentifier()));
+                        return new TypeCastNode(CurrentLocation(), new BasicTypeNode(CurrentLocation(), ident), ParseDesignatorRest(new BasicDesignatorNode(CurrentLocation(), ReadIdentifier())));
                     }else
                     {
                         var expr = ParseExpression(ident);
@@ -365,7 +365,7 @@ namespace RappiSharp.Compiler.Parser
             }else if (IsIdentifier() || identPassthrough != null)
             {
                 var identifier = identPassthrough == null ? ReadIdentifier() : identPassthrough;
-                var designator = ParseDesignatorRest(identifier);
+                var designator = ParseDesignatorRest(new BasicDesignatorNode(location, identifier));
                 if (Is(Tag.OpenParenthesis))
                 {
                     return ParseMethodCallRest(location, designator);
@@ -478,13 +478,13 @@ namespace RappiSharp.Compiler.Parser
                     Check(Tag.CloseBracket);
                     var designator = new ElementAccessNode(
                         location,
-                        ParseDesignatorRest(id),
+                        ParseDesignatorRest(new BasicDesignatorNode(location, id)),
                         index
                     );
                     return ParseBasicStatementRest(location, designator);
                 }
             } else {
-                var designator = ParseDesignatorRest(id);
+                var designator = ParseDesignatorRest(new BasicDesignatorNode(location,id));
                 return ParseBasicStatementRest(location, designator);
             } 
             /*
@@ -516,7 +516,7 @@ namespace RappiSharp.Compiler.Parser
             }
         }
 
-        private DesignatorNode ParseDesignatorRest(string previousName)
+        private DesignatorNode ParseDesignatorRest(DesignatorNode previousName)
         {
             var location = CurrentLocation();
             if (Is(Tag.OpenBracket))
@@ -524,24 +524,25 @@ namespace RappiSharp.Compiler.Parser
                 Next();
                 var index = ParseExpression();
                 Check(Tag.CloseBracket);
-                return new ElementAccessNode(
+                var elementAccess = new ElementAccessNode(
                     location,
                     ParseDesignatorRest(previousName),
                     index
                 );
-
+                return ParseDesignatorRest(elementAccess);
             } else if(Is(Tag.Period))
             {
                 Next();
                 var name = ReadIdentifier();
-                return new MemberAccessNode(
+                var memberAccessNode = new MemberAccessNode(
                     location,
-                    ParseDesignatorRest(name),
-                    previousName
+                    ParseDesignatorRest(previousName),
+                    name
                 );
+                return ParseDesignatorRest(memberAccessNode);
             } else
             {
-                return new BasicDesignatorNode(location, previousName);
+                return previousName;
             }
         }
 
