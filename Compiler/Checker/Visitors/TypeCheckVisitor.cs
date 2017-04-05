@@ -218,8 +218,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             base.Visit(node);
             var methodSymbol = _symbolTable.GetTarget(node.Designator);
             var methodDefinition = _symbolTable.GetDeclarationNode<MethodNode>(methodSymbol);
-            var returnType = _symbolTable.FindType(methodDefinition.ReturnType);
-
+            var returnType = _symbolTable.FindType(methodDefinition.ReturnType); 
             if (methodDefinition.Parameters.Count != node.Arguments.Count)
             {
                 Error(node.Location, $"Invalid argument count");
@@ -237,17 +236,16 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 }
             }
 
-            try {
-                //is this _REALLY_ the only way to find out the type is not defined yet?
-                _symbolTable.FindType(node);
-            } catch (KeyNotFoundException e) {
-                _symbolTable.FixType(node, returnType);
-            }
+            _symbolTable.FixType(node, returnType);
         }
 
         public override void Visit(CallStatementNode node)
         {
-            _symbolTable.FixType(node.Call, null);
+            var returnType = _symbolTable.FindType(node.Call.Designator);
+            if (returnType != null)
+            {
+                Error(node.Location, $"Method as Statement must return void {returnType}");
+            }
             base.Visit(node);
         }
 

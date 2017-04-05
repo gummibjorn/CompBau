@@ -122,6 +122,19 @@ namespace _Test
         }
 
         [TestMethod]
+        public void MethodCallStatement()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void MethodCallStatementNonVoid()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("must return void");
+        }
+
+        [TestMethod]
         public void MethodReturnStatement()
         {
             initializeChecker();

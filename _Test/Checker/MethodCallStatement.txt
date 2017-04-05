@@ -1,0 +1,10 @@
+﻿class Program{
+	void Main(){
+		test();
+	}
+
+	void test(){
+		int a;
+		a = 2;
+	}
+}

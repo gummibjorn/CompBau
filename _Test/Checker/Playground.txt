@@ -2,7 +2,6 @@
 	void Main(){
 		int a;
 		a = one();
-		one();
 	}
 
 	int one(){

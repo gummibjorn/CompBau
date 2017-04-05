@@ -1,10 +1,11 @@
 ﻿class Program{
 	void Main(){
-		int a;
-		a = test();
+		test();
 	}
 
 	int test(){
-		return true;
+		int a;
+		a = 2;
+		return a;
 	}
 }

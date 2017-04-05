@@ -1,6 +1,7 @@
 ﻿class Program{
 	void Main(){
-		test();
+		int a;
+		a = test();
 	}
 
 	int test(){
