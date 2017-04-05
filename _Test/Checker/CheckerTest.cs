@@ -219,6 +219,12 @@ namespace _Test
         }
 
         [TestMethod]
+        public void ElementAccess()
+        {
+            initializeChecker(main("int l; int[][] arr; int[] sarr; arr = new int[10][]; sarr = new int[1]; arr[0] = sarr; l = arr[0][0];"));
+        }
+
+        [TestMethod]
         public void IfConditionBool()
         {
             initializeChecker(main("if(true){};"));
