@@ -21,14 +21,21 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
             var type = _symbolTable.FindType(node);
 
-            _assembler.Emit(OpCode.ldc_i, node.Expression);
             _assembler.Emit(OpCode.newarr, type);
         }
 
-        public override void Visit(AssignmentNode node)
+        public override void Visit(IntegerLiteralNode node)
+        {
+            base.Visit(node);
+
+            _assembler.Emit(OpCode.ldc_i, node.Value);
+        }
+
+
+        /*public override void Visit(AssignmentNode node)
         {
             base.Visit(node);
             _assembler.Emit(OpCode.stloc, 0);
-        }
+        }*/
     }
 }
