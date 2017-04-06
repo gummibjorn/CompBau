@@ -98,5 +98,20 @@ namespace _Test
                 .Next(ldc_i, 10)
                 .Next(starg, 0);
         }
+
+        [TestMethod]
+        public void IfStatement()
+        {
+            initializeGenerator(main("int a; if(true){a=0;}else{a=1;}"))
+                .Next(ldc_b, true)
+                .Next(brfalse, 3)
+                .Next(ldc_i, 0)
+                .Next(stloc, 0)
+                .Next(br, 2)
+                .Next(ldc_i, 1)
+                .Next(stloc, 0)
+                .Return();
+        }
+
     }
 }

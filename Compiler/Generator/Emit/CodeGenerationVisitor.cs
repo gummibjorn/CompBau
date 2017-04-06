@@ -24,6 +24,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
             _assembler.Emit(OpCode.newarr, type);
         }
 
+
         public override void Visit(IntegerLiteralNode node)
         {
             base.Visit(node);
@@ -31,6 +32,54 @@ namespace RappiSharp.Compiler.Generator.Emit {
             _assembler.Emit(OpCode.ldc_i, (int)node.Value);
         }
 
+        public override void Visit(CharacterLiteralNode node)
+        {
+            base.Visit(node);
+
+            _assembler.Emit(OpCode.ldc_i, node.Value);
+        }
+
+        public override void Visit(StringLiteralNode node)
+        {
+            base.Visit(node);
+
+            _assembler.Emit(OpCode.ldc_i, node.Value);
+        }
+
+        public override void Visit(IfStatementNode node)
+        {
+
+            var elseLabel = _assembler.CreateLabel();
+            var endLabel = _assembler.CreateLabel();
+
+            node.Condition.Accept(this);
+
+            if(node.Else != null)
+            {
+                _assembler.Emit(OpCode.brfalse, elseLabel);
+            }else
+            {
+                _assembler.Emit(OpCode.brfalse, endLabel);
+            }
+            node.Then.Accept(this);
+            _assembler.Emit(OpCode.br, endLabel);
+            _assembler.SetLabel(elseLabel);
+            node.Else?.Accept(this);
+            _assembler.SetLabel(endLabel);
+        }
+
+        public override void Visit(BasicDesignatorNode node)
+        {
+            if(node.Identifier == "true")
+            {
+                _assembler.Emit(OpCode.ldc_b, true);
+            }
+
+            if(node.Identifier == "false")
+            {
+                _assembler.Emit(OpCode.ldc_b, false);
+            }
+        }
 
         public override void Visit(AssignmentNode node)
         {
