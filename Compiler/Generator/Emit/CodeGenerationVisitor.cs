@@ -32,10 +32,24 @@ namespace RappiSharp.Compiler.Generator.Emit {
         }
 
 
-        /*public override void Visit(AssignmentNode node)
+        public override void Visit(AssignmentNode node)
         {
             base.Visit(node);
-            _assembler.Emit(OpCode.stloc, 0);
-        }*/
+            var target = _symbolTable.GetTarget(node.Left);
+            if(target is ParameterSymbol)
+            {
+                var index = _method.Parameters.IndexOf((ParameterSymbol)target);
+                _assembler.Emit(OpCode.starg, index);
+            } else if (target is LocalVariableSymbol)
+            {
+                var index = _method.LocalVariables.IndexOf((LocalVariableSymbol)target);
+                _assembler.Emit(OpCode.stloc, index);
+            } else
+            {
+                _assembler.Emit(OpCode.stfld, target);
+            }
+            //TODO how do i figure out whether it's an array assignment?
+
+        }
     }
 }

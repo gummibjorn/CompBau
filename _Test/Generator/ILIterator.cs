@@ -20,15 +20,15 @@ namespace _Test.Generator
             
             public ILIterator Next(OpCode opCode)
             {
-                Assert.AreEqual(_code[_index].OpCode, opCode);
+                Assert.AreEqual(opCode, _code[_index].OpCode);
                 _index += 1;
                 return this;
             }
 
             public ILIterator Next(OpCode opCode, Object operand)
             {
-                Assert.AreEqual(_code[_index].OpCode, opCode);
-                Assert.AreEqual(_code[_index].Operand, operand);
+                Assert.AreEqual(opCode, _code[_index].OpCode);
+                Assert.AreEqual(operand, _code[_index].Operand);
                 _index += 1;
                 return this;
             }

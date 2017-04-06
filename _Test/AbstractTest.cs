@@ -50,7 +50,7 @@ namespace _Test
         }
 
         [TestCleanup]
-        public void tearDown()
+        virtual public void tearDown()
         {
             if (Diagnosis.HasErrors)
             {
