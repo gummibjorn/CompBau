@@ -61,6 +61,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Checker\CheckerTest.cs" />
+    <Compile Include="Generator\GeneratorRVMTest.cs" />
     <Compile Include="Generator\GeneratorTest.cs" />
     <Compile Include="Generator\ILIterator.cs" />
     <Compile Include="Lexer\LexerTest.cs" />
@@ -94,6 +95,7 @@
     <Content Include="Checker\MethodReturnStatement.txt" />
     <Content Include="Generator\CallMemberMethodComplex.txt" />
     <Content Include="Generator\ArrayCreation.txt" />
+    <Content Include="Generator\Playground.txt" />
     <Content Include="Lexer\CombinedAssignment.txt" />
     <Content Include="Lexer\CombinedEverything.txt" />
     <Content Include="Lexer\CombinedHelloWorld.txt" />

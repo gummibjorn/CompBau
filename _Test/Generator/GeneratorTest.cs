@@ -199,7 +199,7 @@ namespace _Test
         [TestMethod]
         public void CallMemberMethodComplex()
         {
-            initializeGenerator(program(""))
+            initializeGenerator()
                 .Next(ldthis)
                 .Next(ldc_c, '!')
                 .Next(ldc_i, 1)
