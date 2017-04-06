@@ -18,6 +18,8 @@ namespace RappiSharp.Compiler.Generator.Emit {
         public override void Visit(ArrayCreationNode node)
         {
             base.Visit(node);
+            _assembler.Emit(IL.OpCode.ldc_i, node.Expression);
+            _assembler.Emit(IL.OpCode.newarr);
         }
     }
 }

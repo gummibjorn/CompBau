@@ -1,0 +1,7 @@
+﻿class Program{
+	void Main(){
+		int[] a;
+		int b;
+		a = new int[12];
+	}
+}
