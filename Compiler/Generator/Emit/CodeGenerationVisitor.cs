@@ -46,9 +46,25 @@ namespace RappiSharp.Compiler.Generator.Emit {
             _assembler.Emit(OpCode.ldc_i, node.Value);
         }
 
+
+        public override void Visit(WhileStatementNode node)
+        {
+            var startLabel = _assembler.CreateLabel();
+            var endLabel = _assembler.CreateLabel();
+
+            _assembler.SetLabel(startLabel);
+
+            node.Condition.Accept(this);
+
+            _assembler.Emit(OpCode.brfalse, endLabel);
+
+            node.Body.Accept(this);
+
+            _assembler.SetLabel(endLabel);
+        }
+
         public override void Visit(IfStatementNode node)
         {
-
             var elseLabel = _assembler.CreateLabel();
             var endLabel = _assembler.CreateLabel();
 

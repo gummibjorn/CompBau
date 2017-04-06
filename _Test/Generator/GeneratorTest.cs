@@ -113,5 +113,16 @@ namespace _Test
                 .Return();
         }
 
+        [TestMethod]
+        public void WhileStatement()
+        {
+            initializeGenerator(main("int a; while(true){a=0;}"))
+                .Next(ldc_b, true)
+                .Next(brfalse, 2)
+                .Next(ldc_i, 0)
+                .Next(stloc, 0)
+                .Return();
+        }
+
     }
 }
