@@ -1,6 +1,7 @@
 ﻿using RappiSharp.Compiler.Checker.General;
 using RappiSharp.Compiler.Checker.Symbols;
 using RappiSharp.Compiler.Parser.Tree;
+using RappiSharp.IL;
 
 namespace RappiSharp.Compiler.Generator.Emit {
   internal class CodeGenerationVisitor : Visitor {
@@ -8,18 +9,26 @@ namespace RappiSharp.Compiler.Generator.Emit {
     private readonly MethodSymbol _method;
     private readonly ILAssembler _assembler;
 
-    public CodeGenerationVisitor(SymbolTable symbolTable, MethodSymbol method, ILAssembler assembler) {
-      _symbolTable = symbolTable;
-      _method = method;
-      _assembler = assembler;
-    }
+        public CodeGenerationVisitor(SymbolTable symbolTable, MethodSymbol method, ILAssembler assembler) {
+          _symbolTable = symbolTable;
+          _method = method;
+          _assembler = assembler;
+        }
 
-        // TODO: Implement IL code generation in this visitor
         public override void Visit(ArrayCreationNode node)
         {
             base.Visit(node);
-            _assembler.Emit(IL.OpCode.ldc_i, node.Expression);
-            _assembler.Emit(IL.OpCode.newarr);
+
+            var type = _symbolTable.FindType(node);
+
+            _assembler.Emit(OpCode.ldc_i, node.Expression);
+            _assembler.Emit(OpCode.newarr, type);
+        }
+
+        public override void Visit(AssignmentNode node)
+        {
+            base.Visit(node);
+            _assembler.Emit(OpCode.stloc, 0);
         }
     }
 }
