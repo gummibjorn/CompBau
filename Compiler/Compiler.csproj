@@ -61,6 +61,17 @@
     <Compile Include="Checker\Visitors\DesignatorFixupVisitor.cs" />
     <Compile Include="Checker\Visitors\LocalVariableVisitor.cs" />
     <Compile Include="Checker\Visitors\TypeCheckVisitor.cs" />
+    <Compile Include="Generator\Emit\CodeGenerationVisitor.cs" />
+    <Compile Include="Generator\Emit\ILAssembler.cs" />
+    <Compile Include="Generator\Emit\ILBuilder.cs" />
+    <Compile Include="Generator\IL\ArrayData.cs" />
+    <Compile Include="Generator\IL\ClassData.cs" />
+    <Compile Include="Generator\IL\Instruction.cs" />
+    <Compile Include="Generator\IL\Metadata.cs" />
+    <Compile Include="Generator\IL\MethodData.cs" />
+    <Compile Include="Generator\IL\OpCode.cs" />
+    <Compile Include="Generator\IL\TypeData.cs" />
+    <Compile Include="Generator\RappiGenerator.cs" />
     <Compile Include="Lexer\RappiLexer.cs" />
     <Compile Include="Lexer\Tokens\CharacterToken.cs" />
     <Compile Include="Lexer\Tokens\ErrorToken.cs" />
