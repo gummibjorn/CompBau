@@ -56,6 +56,20 @@ namespace RappiSharp.Compiler.Generator.Emit {
     }
 
     private int GetMethodRef(MethodSymbol method) {
+            if (_symbolTable.Compilation.Methods.Contains(method))
+            {
+                switch (method.Identifier)
+                {
+                    case "Halt": return MethodData.HaltMethod;
+                    case "WriteChar": return MethodData.WriteCharMethod;
+                    case "WriteInt": return MethodData.WriteIntMethod;
+                    case "WriteString": return MethodData.WriteStringMethod;
+                    case "ReadChar": return MethodData.ReadCharMethod;
+                    case "ReadInt": return MethodData.ReadIntMethod;
+                    case "ReadString": return MethodData.ReadStringMethod;
+                }
+
+            }
       return _methodRefs[method];
     }
 
