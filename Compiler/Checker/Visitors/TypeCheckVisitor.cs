@@ -216,18 +216,19 @@ namespace RappiSharp.Compiler.Checker.Visitors
         public override void Visit(MethodCallNode node)
         {
             base.Visit(node);
-            var methodSymbol = _symbolTable.GetTarget(node.Designator);
-            var methodDefinition = _symbolTable.GetDeclarationNode<MethodNode>(methodSymbol);
-            var returnType = _symbolTable.FindType(methodDefinition.ReturnType); 
-            if (methodDefinition.Parameters.Count != node.Arguments.Count)
+            var methodSymbol = (MethodSymbol)_symbolTable.GetTarget(node.Designator);
+            //var methodDefinition = _symbolTable.GetDeclarationNode<MethodNode>(methodSymbol);
+            //var returnType = _symbolTable.FindType(methodDefinition.ReturnType); 
+            var returnType = methodSymbol.ReturnType;
+            if (methodSymbol.Parameters.Count != node.Arguments.Count)
             {
                 Error(node.Location, $"Invalid argument count");
                 return;
             }
             for (var i = 0; i < node.Arguments.Count; i += 1)
             {
-                var param = methodDefinition.Parameters[i];
-                var paramType = _symbolTable.FindType(param.Type);
+                var param = methodSymbol.Parameters[i];
+                var paramType = param.Type;
                 var arg = node.Arguments[i];
                 var argType = _symbolTable.FindType(arg);
                 if (paramType != argType)

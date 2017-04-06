@@ -281,5 +281,47 @@ namespace _Test
             initializeChecker();
             Console.Write("BREAK HERE");
         }
+
+        [TestMethod]
+        public void BuiltinWriteInt()
+        {
+            initializeChecker(main("WriteInt(0);"));
+        }
+
+        [TestMethod]
+        public void BuiltinWriteChar()
+        {
+            initializeChecker(main("WriteChar('!');"));
+        }
+
+        [TestMethod]
+        public void BuiltinWriteString()
+        {
+            initializeChecker(main("WriteString(\"HI\");"));
+        }
+
+        [TestMethod]
+        public void BuiltinHalt()
+        {
+            initializeChecker(main("Halt(\"BYE\");"));
+        }
+
+        [TestMethod]
+        public void BuiltinReadInt()
+        {
+            initializeChecker(expression("int", "ReadInt()"));
+        }
+
+        [TestMethod]
+        public void BuiltinReadChar()
+        {
+            initializeChecker(expression("char", "ReadChar()"));
+        }
+
+        [TestMethod]
+        public void BuiltinReadString()
+        {
+            initializeChecker(expression("string", "ReadString()"));
+        }
     }
 }

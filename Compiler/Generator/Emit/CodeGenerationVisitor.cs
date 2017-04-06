@@ -2,6 +2,7 @@
 using RappiSharp.Compiler.Checker.Symbols;
 using RappiSharp.Compiler.Parser.Tree;
 using RappiSharp.IL;
+using System;
 
 namespace RappiSharp.Compiler.Generator.Emit {
   internal class CodeGenerationVisitor : Visitor {
@@ -36,14 +37,14 @@ namespace RappiSharp.Compiler.Generator.Emit {
         {
             base.Visit(node);
 
-            _assembler.Emit(OpCode.ldc_i, node.Value);
+            _assembler.Emit(OpCode.ldc_c, node.Value);
         }
 
         public override void Visit(StringLiteralNode node)
         {
             base.Visit(node);
 
-            _assembler.Emit(OpCode.ldc_i, node.Value);
+            _assembler.Emit(OpCode.ldc_s, node.Value);
         }
 
 
@@ -115,6 +116,20 @@ namespace RappiSharp.Compiler.Generator.Emit {
             }
             //TODO how do i figure out whether it's an array assignment?
 
+        }
+
+        public override void Visit(MethodCallNode node)
+        {
+            base.Visit(node);
+            var method = (MethodSymbol) _symbolTable.GetTarget(node.Designator);
+            var builtInIndex = _symbolTable.Compilation.Methods.IndexOf(method);
+            if(builtInIndex > -1)
+            {
+                _assembler.Emit(OpCode.call, builtInIndex);
+            } else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

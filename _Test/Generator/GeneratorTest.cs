@@ -124,5 +124,67 @@ namespace _Test
                 .Return();
         }
 
+        [TestMethod]
+        public void BuiltinWriteInt()
+        {
+            initializeGenerator(main("WriteInt(0);"))
+                .Next(ldc_i,0)
+                .Next(call)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BuiltinWriteChar()
+        {
+            initializeGenerator(main("WriteChar('!');"))
+                .Next(ldc_c,'!')
+                .Next(call)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BuiltinWriteString()
+        {
+            initializeGenerator(main("WriteString(\"HELLO\");"))
+                .Next(ldc_s, "HELLO")
+                .Next(call)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BuiltinHalt()
+        {
+            initializeGenerator(main("Halt(\"HELLO\");"))
+                .Next(ldc_s, "HELLO")
+                .Next(call)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BuiltinReadInt()
+        {
+            initializeGenerator(expression("int", "ReadInt()"))
+                .Next(call)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BuiltinReadChar()
+        {
+            initializeGenerator(expression("char", "ReadChar()"))
+                .Next(call)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BuiltinReadString()
+        {
+            initializeGenerator(expression("string", "ReadString()"))
+                .Next(call)
+                .Next(stloc, 0)
+                .Return();
+        }
     }
 }
