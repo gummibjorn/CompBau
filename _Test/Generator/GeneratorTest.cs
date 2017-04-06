@@ -44,7 +44,7 @@ namespace _Test
 
         private string program(string content)
         {
-            return "class Program{ void Main(){} "+content+ "}";
+            return "class Program{ "+content+ "}";
 
         }
 
@@ -93,7 +93,7 @@ namespace _Test
         [TestMethod]
         public void AssignParam()
         {
-            initializeGenerator(program("void A(int i){ i = 10; }"));
+            initializeGenerator(program("void Main(){} void A(int i){ i = 10; }"));
             method("A")
                 .Next(ldc_i, 10)
                 .Next(starg, 0);
@@ -184,6 +184,26 @@ namespace _Test
             initializeGenerator(expression("string", "ReadString()"))
                 .Next(call)
                 .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void CallMemberMethod()
+        {
+            initializeGenerator(program("void Main(){ A(); } void A(){}"))
+                .Next(ldthis)
+                .Next(callvirt, 1)
+                .Return();
+        }
+
+        [TestMethod]
+        public void CallMemberMethodComplex()
+        {
+            initializeGenerator(program(""))
+                .Next(ldthis)
+                .Next(ldc_c, '!')
+                .Next(ldc_i, 1)
+                .Next(callvirt, 1)
                 .Return();
         }
     }

@@ -120,15 +120,18 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
         public override void Visit(MethodCallNode node)
         {
-            base.Visit(node);
             var method = (MethodSymbol) _symbolTable.GetTarget(node.Designator);
             var builtInIndex = _symbolTable.Compilation.Methods.IndexOf(method);
             if(builtInIndex > -1)
             {
-                _assembler.Emit(OpCode.call, builtInIndex);
+                base.Visit(node);
+                //_assembler.Emit(OpCode.call, -(builtInIndex +1)); //HOW WAS I SUPPOSED TO KNOW!?
+                _assembler.Emit(OpCode.call, method);
             } else
             {
-                throw new NotImplementedException();
+                _assembler.Emit(OpCode.ldthis);
+                base.Visit(node);
+                _assembler.Emit(OpCode.callvirt, method);
             }
         }
     }

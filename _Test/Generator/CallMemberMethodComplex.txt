@@ -1,0 +1,12 @@
+﻿class Program{
+	void Main(){ 
+		string result;
+		result = A(1, '!'); 
+		WriteString(result);
+	} 
+	string A(int a, char b){ 
+		WriteInt(a); 
+		WriteChar(b); 
+		return "yay";
+	}
+}
