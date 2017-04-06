@@ -25,10 +25,10 @@ namespace _Test.Generator
                 return this;
             }
 
-            public ILIterator Next(OpCode opCode, int operand)
+            public ILIterator Next(OpCode opCode, Object operand)
             {
                 Assert.AreEqual(_code[_index].OpCode, opCode);
-                Assert.AreEqual(((IntegerLiteralNode)_code[_index].Operand).Value, operand);
+                Assert.AreEqual(_code[_index].Operand, operand);
                 _index += 1;
                 return this;
             }

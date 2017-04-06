@@ -28,7 +28,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
         {
             base.Visit(node);
 
-            _assembler.Emit(OpCode.ldc_i, node.Value);
+            _assembler.Emit(OpCode.ldc_i, (int)node.Value);
         }
 
 
