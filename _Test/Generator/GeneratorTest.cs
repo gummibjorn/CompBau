@@ -1,7 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using _Test.Generator;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RappiSharp.Compiler.Checker;
 using RappiSharp.Compiler.Generator;
+using RappiSharp.Compiler.Lexer;
 using RappiSharp.Compiler.Parser;
+using RappiSharp.Compiler.Parser.Tree;
+using RappiSharp.IL;
+using System;
+using System.Collections.Generic;
+using static RappiSharp.IL.OpCode;
 
 namespace _Test
 {
@@ -12,14 +19,20 @@ namespace _Test
 
         private RappiGenerator _generator;
 
-        private void initializeGenerator()
+        private ILIterator initializeGenerator(RappiLexer lexer)
         {
-            _generator = new RappiGenerator(new RappiChecker(new RappiParser(makeLexer()).ParseProgram()).SymbolTable);
+            _generator = new RappiGenerator(new RappiChecker(new RappiParser(lexer).ParseProgram()).SymbolTable);
+            return new ILIterator(_generator.Metadata.Methods[_generator.Metadata.MainMethod].Code);
         }
 
-        private void initializeGenerator(string code)
+        private ILIterator initializeGenerator()
         {
-            _generator = new RappiGenerator(new RappiChecker(new RappiParser(makeLexer(code)).ParseProgram()).SymbolTable);
+            return initializeGenerator(makeLexer());
+        }
+
+        private ILIterator initializeGenerator(string code)
+        {
+            return initializeGenerator(makeLexer(code));
         }
 
         private string expression(string type, string expr)
@@ -27,15 +40,14 @@ namespace _Test
             return main($"{type} a; a = {expr};");
         }
 
-        /*[TestMethod]
+        [TestMethod]
         public void ArrayCreation()
         {
-            initializeGenerator();
-            _generator.Metadata.Methods[0].Code[0].OpCode = RappiSharp.IL.OpCode.ldc_i;
-            _generator.Metadata.Methods[0].Code[0].Operand = 1;
-            _generator.Metadata.Methods[0].Code[1]. = RappiSharp.IL.OpCode.newarr;
-
-        }*/
+            initializeGenerator(expression("int[]", "new int[10]"))
+                .Next(ldc_i, 10)
+                .Next(newarr)
+                .Return();
+        }
 
     }
 }

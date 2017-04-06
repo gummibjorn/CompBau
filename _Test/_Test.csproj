@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Checker\CheckerTest.cs" />
     <Compile Include="Generator\GeneratorTest.cs" />
+    <Compile Include="Generator\ILIterator.cs" />
     <Compile Include="Lexer\LexerTest.cs" />
     <Compile Include="AbstractTest.cs" />
     <Compile Include="Parser\ParserTreeTest.cs" />
