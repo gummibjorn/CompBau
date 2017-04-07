@@ -255,6 +255,25 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             base.Visit(node);
 
+            if(node.Expression == null)
+            {
+                if (_method.ReturnType != null)
+                {
+                    Error(node.Location, $"Method return type {_method.ReturnType.Identifier} does not match return expression type null", true);
+                }else
+                {
+                    return;
+                }
+            }
+
+            if(_method.ReturnType == null)
+            {
+                if(node.Expression != null)
+                {
+                    Error(node.Location, $"Method return type void does not match return expression type {node.Expression}", true);
+                }
+            }
+
             var returnType = _symbolTable.FindType(node.Expression);
             var methodReturnType = _method.ReturnType.Identifier;
 
