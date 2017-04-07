@@ -200,6 +200,7 @@ namespace _Test
         public void CallMemberReturn()
         {
             initializeGenerator()
+                .Next(ldthis)
                 .Next(callvirt, 1)
                 .Next(stloc, 0)
                 .Return();
@@ -209,14 +210,41 @@ namespace _Test
                 .Return();
 
         }
+
+        [TestMethod]
+        public void CallMemberArg()
+        {
+            initializeGenerator()
+                .Next(ldthis)
+                .Next(ldc_i, 1)
+                .Next(callvirt, 1)
+                .Return();
+
+            method("A")
+                .Next(ldarg, 0)
+                .Next(call)
+                .Return();
+        }
+
         [TestMethod]
         public void CallMemberMethodComplex()
         {
             initializeGenerator()
                 .Next(ldthis)
-                .Next(ldc_c, '!')
                 .Next(ldc_i, 1)
+                .Next(ldc_c, '!')
                 .Next(callvirt, 1)
+                .Next(stloc, 0)
+                .Next(ldloc, 0)
+                .Next(call)
+                .Return();
+
+            method("A")
+                .Next(ldarg, 0)
+                .Next(call)
+                .Next(ldarg, 1)
+                .Next(call)
+                .Next(ldc_s, "yay")
                 .Return();
         }
     }

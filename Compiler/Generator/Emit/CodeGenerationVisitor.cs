@@ -153,12 +153,12 @@ namespace RappiSharp.Compiler.Generator.Emit {
             var builtInIndex = _symbolTable.Compilation.Methods.IndexOf(method);
             if(builtInIndex > -1)
             {
-                base.Visit(node);
+                Expression(()=>base.Visit(node));
                 _assembler.Emit(OpCode.call, method);
             } else
             {
                 _assembler.Emit(OpCode.ldthis);
-                base.Visit(node);
+                Expression(()=>base.Visit(node));
                 _assembler.Emit(OpCode.callvirt, method);
             }
         }

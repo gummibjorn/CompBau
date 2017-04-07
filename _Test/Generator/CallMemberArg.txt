@@ -1,0 +1,10 @@
+class Program{
+	void Main(){
+		A(1);
+	}
+
+	void A(int a){
+		WriteInt(a);
+	}
+
+}

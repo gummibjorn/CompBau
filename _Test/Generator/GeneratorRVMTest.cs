@@ -116,7 +116,14 @@ namespace _Test
         public void CallMemberMethodComplex()
         {
             initializeGenerator();
-            Run("GURKEN");
+            Run("1!yay");
+        }
+
+        [TestMethod]
+        public void CallMemberReturn()
+        {
+            initializeGenerator();
+            Run();
         }
 
         [TestMethod]
