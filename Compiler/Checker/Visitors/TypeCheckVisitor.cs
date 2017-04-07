@@ -242,6 +242,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var methodSymbol = (MethodSymbol)_symbolTable.GetTarget(node.Designator);
             //var methodDefinition = _symbolTable.GetDeclarationNode<MethodNode>(methodSymbol);
             //var returnType = _symbolTable.FindType(methodDefinition.ReturnType); 
+            if(methodSymbol == null)
+            {
+                Error(node.Location, $"Undeclared method '{node.Designator}'", true);
+            }
             var returnType = methodSymbol.ReturnType;
             if (methodSymbol.Parameters.Count != node.Arguments.Count)
             {

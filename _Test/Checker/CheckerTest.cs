@@ -395,5 +395,33 @@ namespace _Test
         {
             initializeChecker("class Base{ void Main(){ Base[] b; b = new Base[1]; b[0] = new Sub(); }} class Sub : Base {}");
         }
+
+        [TestMethod]
+        public void AssignReferenceSubtypeWrongWay()
+        {
+            initializeChecker("class Base{ void Main(){ Sub s; s = new Base(); }} class Sub : Base {}");
+            AssertDiagnosisContains("cannot assign");
+        }
+
+        [TestMethod]
+        public void InexistentClassInheritance()
+        {
+            initializeChecker("class Sub:Base{ void Main(){} }");
+            AssertDiagnosisContains("undeclared type");
+        }
+
+        [TestMethod]
+        public void InexistentClassInstantiation()
+        {
+            initializeChecker(main("Foo f; f = new Foo();"));
+            AssertDiagnosisContains("undeclared type");
+        }
+
+        [TestMethod]
+        public void InexistentMethod()
+        {
+            initializeChecker(main("Foo();"));
+            AssertDiagnosisContains("undeclared method");
+        }
     }
 }
