@@ -528,12 +528,29 @@ namespace _Test
             initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is Base[]);} }");
         }
 
-
         [TestMethod]
         public void InexistentMethod()
         {
             initializeChecker(main("Foo();"));
             AssertDiagnosisContains("undeclared method");
+        }
+
+        [TestMethod]
+        public void CastDown()
+        {
+            initializeChecker("class Base{ void Main(){ Base b; Sub s; b = new Sub(); s = (Sub)b; } } class Sub:Base{}");
+        }
+
+        [TestMethod]
+        public void CastPrimitive()
+        {
+            initializeChecker("class Base{ void Main(){ Base b; int i; b = new Base(); i = (int)b; } }");
+        }
+
+        [TestMethod]
+        public void NewInexistent()
+        {
+            initializeChecker("class Base{ void Main(){ Base b; b = new Sub() } }");
         }
     }
 }

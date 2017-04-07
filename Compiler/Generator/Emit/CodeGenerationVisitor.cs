@@ -206,7 +206,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 }
                 else
                 {
-                    //TODO handle fields, arrays
+                    //FIXME why does throwing an exception here break so many tests? it shouldn't go into this branch!
                     //throw new NotImplementedException();
                 }
         }
