@@ -145,6 +145,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     bool isLeftNull = leftType == _symbolTable.Compilation.NullType;
                     bool isRightNull = rightType == _symbolTable.Compilation.NullType;
 
+                    //FIXME these exceptions don't have to be fatal - we can fix the type even if errors occur
                     if(!isLeftRef && isRightNull || !isRightRef && isLeftNull)
                     {
                         Error(node.Location, $"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
@@ -159,6 +160,31 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     }
                     break;
                 case Operator.Is:
+                    _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
+                    if (!isReferenceType(leftType))
+                    {
+                        Error(node.Location, "Left hand side of 'is' must be a reference type");
+                        break;
+                    }
+                    if(node.Right is BasicDesignatorNode)
+                    {
+                        var identifier = ((BasicDesignatorNode)node.Right).Identifier;
+                        var type = _symbolTable.Compilation.Classes.Find(c => c.Identifier == identifier);
+                        if(type == null)
+                        {
+                            Error(node.Right.Location, $"Undeclared class '{identifier}'");
+                        } else
+                        {
+                            if(!isAssignable(leftType, type))
+                            {
+                                Error(node.Location, $"Left hand side of 'is' can never be '{identifier}'");
+                            }
+                            //OK
+                        }
+                    } else
+                    {
+                        Error(node.Left.Location, "Left hand side of 'is' must be a class name");
+                    }
                     break;
             }
         }

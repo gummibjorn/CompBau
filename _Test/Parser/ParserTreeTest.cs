@@ -620,5 +620,14 @@ namespace _Test
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
+        [TestMethod, Timeout(TIMEOUT)]
+        public void Is()
+        {
+            initializeParser(expression("foo is Bar"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = "(foo Is Bar)";
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
     }
 }

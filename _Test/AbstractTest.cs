@@ -44,7 +44,7 @@ namespace _Test
 
         protected void AssertDiagnosisContains(string msg)
         {
-            Assert.IsTrue(Diagnosis.Messages.ToLower().Contains(msg.ToLower()), $"Expected diagnosis to contain '${msg}', but was '${Diagnosis.Messages}'");
+            Assert.IsTrue(Diagnosis.Messages.ToLower().Contains(msg.ToLower()), $"Expected diagnosis to contain '{msg}', but was '{Diagnosis.Messages}'");
             Assert.IsTrue(Diagnosis.HasErrors);
             Diagnosis.Clear();
         }

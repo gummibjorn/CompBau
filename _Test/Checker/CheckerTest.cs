@@ -452,6 +452,84 @@ namespace _Test
         }
 
         [TestMethod]
+        public void IsSameClass()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Base b; b = new Base(); a = b is Base;} }");
+        }
+
+        [TestMethod]
+        public void IsSameClassInline()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; a = (new Base() is Base);} }");
+        }
+
+        [TestMethod]
+        public void IsRightPrimitive()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is bool);} }");
+            AssertDiagnosisContains("undeclared class");
+        }
+
+        [TestMethod]
+        public void IsLeftPrimitive()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; a = (a is Base);} }");
+            AssertDiagnosisContains("must be a reference");
+        }
+
+        [TestMethod]
+        public void IsRightFunky()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Base b; int[] c; a = (b is c[12]);} }");
+            AssertDiagnosisContains("must be a class name");
+        }
+
+        [TestMethod]
+        public void IsSubtype()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Sub b; a = (b is Base);} } class Sub:Base{}");
+        }
+
+        [TestMethod]
+        public void IsSupertype()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is Sub);} } class Sub:Base{}");
+            AssertDiagnosisContains("can never be");
+        }
+
+        [TestMethod]
+        public void IsOthertype()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Peter p; a = (p is Base);} } class Peter{}");
+            AssertDiagnosisContains("can never be");
+        }
+
+        [TestMethod, Ignore]
+        public void IsLeftPrimitiveArray()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; int[] b; a = (b is Base);} }");
+        }
+
+        [TestMethod, Ignore]
+        public void IsRightPrimitiveArray()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is int[]);} }");
+        }
+
+        [TestMethod, Ignore]
+        public void IsReftypeArray()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Base b[]; a = (b is Base[]);} }");
+        }
+
+        [TestMethod, Ignore]
+        public void IsReftypeArrayWrongLeft()
+        {
+            initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is Base[]);} }");
+        }
+
+
+        [TestMethod]
         public void InexistentMethod()
         {
             initializeChecker(main("Foo();"));
