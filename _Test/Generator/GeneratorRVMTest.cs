@@ -218,7 +218,7 @@ namespace _Test
         [TestMethod]
         public void ArrayAssignNull()
         {
-            initializeGenerator(main("int[] a; a = null; " + writeBool("a == null")));
+            initializeGenerator(main("int[] a; a = new int[10]; a = null; " + writeBool("a == null")));
             Run("TRUE");
         }
     }

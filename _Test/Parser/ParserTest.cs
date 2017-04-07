@@ -25,6 +25,14 @@ namespace _Test
         }
 
         [TestMethod]
+        public void FunctionChaining()
+        {
+            initializeParser("class Test { void Main() { a().b().c(); } }");
+            _parser.ParseProgram();
+            AssertDiagnosisContains("");
+        }
+
+        [TestMethod]
         public void ClassEmpty()
         {
             initializeParser("class Foo{}");

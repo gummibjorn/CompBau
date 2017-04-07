@@ -79,7 +79,7 @@ namespace RappiSharp.Compiler.Checker.General {
 
             } catch(KeyNotFoundException e)
             {
-                //Diagnosis.ReportError(node.Location, "Type not found for " + node.ToString());
+                Diagnosis.ReportError(node.Location, "Type not found for " + node.ToString());
                 throw e;
             }
     }

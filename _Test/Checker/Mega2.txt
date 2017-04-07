@@ -1,0 +1,61 @@
+﻿class Base {
+
+	int i;
+	string s;
+	char c;
+	Second second;
+	void Main(){}
+	void TestMethod() {
+		int i;
+		i = 10;
+		c = 'a';
+		second = new Second();
+		s = ""Hallo"";
+		return;
+	}
+	
+	int DoSomething(int i) {
+		int res;
+		res = 1;
+		while(i>=0) {
+			res = res + (100 / (10 * 10));
+		}
+		/*
+			return 0;
+		*/
+		if(res > 10) {
+			return 1;
+		} else {
+			return 0+10;
+		}
+	}
+
+}
+
+// Ignore this
+
+class Sub : Base {
+
+	bool Test(bool a, bool b, bool c) {
+		if(a && b || c) {
+			while(!b) {
+				b = !b;    // Ignore this
+			}
+			;;;;;;
+            return a;
+		}
+	    return b;
+	}
+
+}
+
+
+class Second {
+
+	bool b;
+	bool switch() {
+		b = !b;
+		return !b;
+	}
+
+}

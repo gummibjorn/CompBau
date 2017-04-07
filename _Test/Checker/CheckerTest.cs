@@ -18,12 +18,19 @@ namespace _Test
 
         private void initializeChecker()
         {
-            _checker = new RappiChecker(new RappiParser(makeLexer()).ParseProgram());
+            initializeChecker(makeLexer());
         }
 
         private void initializeChecker(string code)
         {
-            _checker = new RappiChecker(new RappiParser(makeLexer(code)).ParseProgram());
+            initializeChecker(makeLexer(code));
+        }
+
+        private void initializeChecker(RappiLexer lexer)
+        {
+            var parser = new RappiParser(lexer).ParseProgram();
+            Assert.IsFalse(Diagnosis.HasErrors, Diagnosis.Messages);
+            _checker = new RappiChecker(parser);
         }
 
         private string expression(string type, string expr)
@@ -57,6 +64,7 @@ namespace _Test
             initializeChecker(main("int a; a = null;"));
             AssertDiagnosisContains("cannot assign '@NULL' to 'int'");
         }
+
 
         [TestMethod]
         public void AssignmentAssignBoolToInt()
@@ -296,6 +304,12 @@ namespace _Test
         }
 
         [TestMethod]
+        public void Mega2()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
         public void Playground()
         {
             initializeChecker();
@@ -342,6 +356,39 @@ namespace _Test
         public void BuiltinReadString()
         {
             initializeChecker(expression("string", "ReadString()"));
+        }
+
+        [TestMethod]
+        public void ArrayAsParam()
+        {
+            initializeChecker(@"class Test{void Main() { int[] i; i = new int[10]; Test(i); } void Test(int[] i ) { } }");
+        }
+
+
+        [TestMethod]
+        public void manyBinaryExpressions()
+        {
+            initializeChecker(@"class Test{void Main() { int a; a = 1 + 2 * 3 % !a / b(100);  } int b(int a) { if(a >= a) {return 2*a;} else { return -1;} }}");
+        }
+
+        [TestMethod]
+        public void MissingReturn()
+        {
+            initializeChecker(@"class Test{void Main() { } int a1() { if(1==1) {  } else {   } }  }");
+        }
+
+
+        [TestMethod]
+        public void returnInVoidMethod()
+        {
+            initializeChecker(@"class Test{void Main() { return 1+2; }  }");
+            AssertDiagnosisContains("");
+        }
+
+        [TestMethod]
+        public void ReturnEmpty()
+        {
+            initializeChecker(@"class Test{void Main() { return ; }  }");
         }
     }
 }
