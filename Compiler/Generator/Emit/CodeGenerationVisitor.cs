@@ -194,11 +194,27 @@ namespace RappiSharp.Compiler.Generator.Emit {
             _assembler.SetLabel(endLabel);
         }
 
+        private void Load(Symbol target)
+        {
+                if (target is LocalVariableSymbol)
+                {
+                    _assembler.Emit(OpCode.ldloc, _method.LocalVariables.IndexOf((LocalVariableSymbol)target));
+                }
+                else if (target is ParameterSymbol)
+                {
+                    _assembler.Emit(OpCode.ldarg, _method.Parameters.IndexOf((ParameterSymbol)target));
+                }
+                else
+                {
+                    //TODO handle fields, arrays
+                    //throw new NotImplementedException();
+                }
+        }
+
         public override void Visit(BasicDesignatorNode node)
         {
             if (_expression_level > 0)
             {
-                //FIXME this should only spit out a load if it's used in an expression (i.e. not as left side of an assignment)
                 if (node.Identifier == "true")
                 {
                     _assembler.Emit(OpCode.ldc_b, true);
@@ -210,38 +226,69 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 else
                 {
                     var target = _symbolTable.Find(_method, node.Identifier);
-                    if (target is LocalVariableSymbol)
-                    {
-                        _assembler.Emit(OpCode.ldloc, _method.LocalVariables.IndexOf((LocalVariableSymbol)target));
-                    }
-                    else if (target is ParameterSymbol)
-                    {
-                        _assembler.Emit(OpCode.ldarg, _method.Parameters.IndexOf((ParameterSymbol)target));
-                    }
-                    else
-                    {
-                        //throw new NotImplementedException();
-                    }
+                    Load(target);
                 }
             }
         }
 
+        public override void Visit(MemberAccessNode node)
+        {
+            //base.Visit(node);
+            var target = _symbolTable.GetTarget(node.Designator);
+            var type = _symbolTable.FindType(node.Designator);
+            if(type is ArrayTypeSymbol)
+            {
+                if(node.Identifier == "length")
+                {
+                    Load(target);
+                    _assembler.Emit(OpCode.ldlen);
+                }
+            }
+        }
+
+        public override void Visit(ElementAccessNode node)
+        {
+            //ldelem: Pop index and array instance from stack and push value of the array element at index
+            if(_expression_level > 0)
+            {
+                Load(node);
+                _assembler.Emit(OpCode.ldelem);
+            }
+
+        }
+
+        private void Load(ElementAccessNode node)
+        {
+            var target = _symbolTable.GetTarget(node.Designator);
+            Load(target); //array instance
+            Expression(() => node.Expression.Accept(this)); //index
+        }
+
         public override void Visit(AssignmentNode node)
         {
-            node.Left.Accept(this);
-            Expression(() => node.Right.Accept(this));
-            var target = _symbolTable.GetTarget(node.Left);
-            if(target is ParameterSymbol)
+            //node.Left.Accept(this);
+            if(node.Left is ElementAccessNode)
             {
-                var index = _method.Parameters.IndexOf((ParameterSymbol)target);
-                _assembler.Emit(OpCode.starg, index);
-            } else if (target is LocalVariableSymbol)
-            {
-                var index = _method.LocalVariables.IndexOf((LocalVariableSymbol)target);
-                _assembler.Emit(OpCode.stloc, index);
+                //stelem: Pop value, index and array instance from stack and store value into the array element at index
+                Load((ElementAccessNode)node.Left); //array instance, index
+                Expression(() => node.Right.Accept(this)); //value
+                _assembler.Emit(OpCode.stelem);
             } else
             {
-                _assembler.Emit(OpCode.stfld, target);
+                Expression(() => node.Right.Accept(this));
+                var target = _symbolTable.GetTarget(node.Left);
+                if(target is ParameterSymbol)
+                {
+                    var index = _method.Parameters.IndexOf((ParameterSymbol)target);
+                    _assembler.Emit(OpCode.starg, index);
+                } else if (target is LocalVariableSymbol)
+                {
+                    var index = _method.LocalVariables.IndexOf((LocalVariableSymbol)target);
+                    _assembler.Emit(OpCode.stloc, index);
+                } else
+                {
+                    _assembler.Emit(OpCode.stfld, target);
+                }
             }
             //TODO how do i figure out whether it's an array assignment?
         }

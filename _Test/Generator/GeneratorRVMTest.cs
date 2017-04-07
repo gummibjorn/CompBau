@@ -181,5 +181,19 @@ namespace _Test
             initializeGenerator();
             Run("015");
         }
+
+        [TestMethod]
+        public void ArrayLength()
+        {
+            initializeGenerator(main("int[] a; a = new int[10]; WriteInt(a.length);"));
+            Run("10");
+        }
+
+        [TestMethod]
+        public void ArrayAssignment()
+        {
+            initializeGenerator(main("int[] a; a = new int[10]; a[0] = 5; WriteInt(a[0]);"));
+            Run("5");
+        }
     }
 }
