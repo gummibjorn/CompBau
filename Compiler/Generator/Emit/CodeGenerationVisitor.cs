@@ -223,6 +223,10 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 {
                     _assembler.Emit(OpCode.ldc_b, false);
                 }
+                else if (node.Identifier == "null")
+                {
+                    _assembler.Emit(OpCode.ldnull, false);
+                }
                 else
                 {
                     var target = _symbolTable.Find(_method, node.Identifier);

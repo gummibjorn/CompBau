@@ -50,6 +50,11 @@ namespace _Test
 
         }
 
+        private string writeBool(string expression)
+        {
+            return "if(" + expression + "){ WriteString(\"TRUE\"); } else { WriteString(\"FALSE\"); }";
+        }
+
         private ILIterator method(string name)
         {
             foreach(var method in _generator.Metadata.Methods)
@@ -194,6 +199,27 @@ namespace _Test
         {
             initializeGenerator(main("int[] a; a = new int[10]; a[0] = 5; WriteInt(a[0]);"));
             Run("5");
+        }
+
+        [TestMethod]
+        public void ArrayNullCompareTrue()
+        {
+            initializeGenerator(main("int[] a; " + writeBool("a == null")));
+            Run("TRUE");
+        }
+
+        [TestMethod]
+        public void ArrayNullCompareFalse()
+        {
+            initializeGenerator(main("int[] a; a = new int[10]; " + writeBool("a == null")));
+            Run("FALSE");
+        }
+
+        [TestMethod]
+        public void ArrayAssignNull()
+        {
+            initializeGenerator(main("int[] a; a = null; " + writeBool("a == null")));
+            Run("TRUE");
         }
     }
 }
