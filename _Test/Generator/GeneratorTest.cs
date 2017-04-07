@@ -91,6 +91,24 @@ namespace _Test
         }
 
         [TestMethod]
+        public void AssignLocalBoolTrue()
+        {
+            initializeGenerator(main("bool a; a=true;"))
+                .Next(ldc_b, true)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void AssignLocalBoolFalse()
+        {
+            initializeGenerator(main("bool a; a=false;"))
+                .Next(ldc_b, false)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
         public void AssignParam()
         {
             initializeGenerator(program("void Main(){} void A(int i){ i = 10; }"));

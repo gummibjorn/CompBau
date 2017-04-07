@@ -133,12 +133,18 @@ namespace _Test
             Run();
         }
 
-
         [TestMethod]
-        public void BinaryExpressionOr()
+        public void BinaryExpressionOr1()
         {
             initializeGenerator();
             Run("True");
+        }
+
+        [TestMethod]
+        public void BinaryExpressionOr2()
+        {
+            initializeGenerator();
+            Run("AFalse");
         }
     }
 }

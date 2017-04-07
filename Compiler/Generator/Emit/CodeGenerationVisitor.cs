@@ -191,13 +191,12 @@ namespace RappiSharp.Compiler.Generator.Emit {
                     }
                 }
             }
-
-
         }
 
         public override void Visit(AssignmentNode node)
         {
-            base.Visit(node);
+            node.Left.Accept(this);
+            Expression(() => node.Right.Accept(this));
             var target = _symbolTable.GetTarget(node.Left);
             if(target is ParameterSymbol)
             {
@@ -212,7 +211,11 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 _assembler.Emit(OpCode.stfld, target);
             }
             //TODO how do i figure out whether it's an array assignment?
+        }
 
+        public override void Visit(ReturnStatementNode node)
+        {
+            Expression(() => base.Visit(node));
         }
 
         public override void Visit(MethodCallNode node)

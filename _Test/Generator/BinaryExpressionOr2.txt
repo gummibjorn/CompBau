@@ -1,0 +1,16 @@
+﻿class Program{
+	void Main(){
+		bool a;
+		a = false || A();
+		if(A()){
+			WriteString("True");
+		}else{
+			WriteString("False");
+		}
+	}
+
+	bool A(){
+		WriteString("A");
+		return false;
+	}
+}
