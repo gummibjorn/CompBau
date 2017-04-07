@@ -179,7 +179,7 @@ namespace _Test
         public void BigMath()
         {
             initializeGenerator();
-            Run("015");
+            Run("0-3");
         }
 
         [TestMethod]

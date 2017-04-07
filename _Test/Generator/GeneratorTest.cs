@@ -339,6 +339,38 @@ namespace _Test
         }
 
         [TestMethod]
+        public void UnaryExpressionMinus()
+        {
+            initializeGenerator(main("int a; a = -2; a = -a;"))
+                .Next(ldc_i, 2)
+                .Next(OpCode.neg)
+                .Next(stloc, 0)
+                .Next(ldloc, 0)
+                .Next(OpCode.neg)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void UnaryExpressionNot()
+        {
+            initializeGenerator(main("bool a; a = !true;"))
+                .Next(ldc_b, true)
+                .Next(OpCode.neg)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void UnaryExpressionPlus()
+        {
+            initializeGenerator(main("int a; a = +2;"))
+                .Next(ldc_i, 2)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
         public void BuiltinReadChar()
         {
             initializeGenerator(expression("char", "ReadChar()"))

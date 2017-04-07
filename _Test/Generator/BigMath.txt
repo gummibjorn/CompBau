@@ -33,6 +33,12 @@
 			c = 12; //c should still be 15
 		}
 
+		if(!false){
+			c = 3; //c == 3
+		}
+
+		c = -c; //c == -3
+
 		WriteInt(c);
 
 	}

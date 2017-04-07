@@ -316,7 +316,20 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
         public override void Visit(UnaryExpressionNode node)
         {
-            Expression(() => base.Visit(node));
+            Expression(() =>
+            {
+                base.Visit(node);
+                var op = node.Operator;
+
+                switch (op)
+                {
+                    case Operator.Minus:
+                    case Operator.Not:
+                        _assembler.Emit(OpCode.neg);
+                        break;
+                }
+            });
         }
+
     }
 }
