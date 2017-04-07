@@ -124,6 +124,26 @@ namespace _Test
         }
 
         [TestMethod]
+        public void ComparisonBaseSub()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void ComparisonInvalidTypes()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("wrong type");
+        }
+
+        [TestMethod]
+        public void ComparisonInvalidArrayTypes()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("wrong type");
+        }
+
+        [TestMethod]
         public void MethodCallNoArgs()
         {
             initializeChecker();

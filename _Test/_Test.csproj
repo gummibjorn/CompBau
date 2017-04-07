@@ -73,6 +73,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Checker\ComparisonInvalidArrayTypes.txt" />
+    <Content Include="Checker\ComparisonInvalidTypes.txt" />
+    <Content Include="Checker\ComparisonBaseSub.txt" />
     <Content Include="Checker\Mega2.txt" />
     <Content Include="Checker\MethodCallStatementNonVoid.txt" />
     <Content Include="Checker\MethodCallStatement.txt" />

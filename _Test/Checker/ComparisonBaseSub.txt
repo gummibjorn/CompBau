@@ -1,0 +1,19 @@
+﻿class Program{
+
+	void Main(){
+		Base b;
+		Sub s;
+		
+		b = new Base();
+
+		s = new Sub();
+
+		if(b == s){
+			
+		}
+	}
+}
+
+class Base{}
+
+class Sub : Base{}

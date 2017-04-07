@@ -150,7 +150,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         Error(node.Location, $"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
                     }
 
-                    if (leftType.Identifier == rightType.Identifier || isRightNull || isLeftNull)
+                    if (isAssignable(leftType, rightType) || isAssignable(rightType, leftType))
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
