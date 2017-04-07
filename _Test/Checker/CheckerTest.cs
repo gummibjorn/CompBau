@@ -171,13 +171,8 @@ namespace _Test
         [TestMethod]
         public void MethodReturnStatementInvalid()
         {
-            try
-            {
-                initializeChecker();
-            }catch(CheckerException)
-            {
-                AssertDiagnosisContains("");
-            }
+            initializeChecker();
+            AssertDiagnosisContains("");
         }
 
         [TestMethod]
@@ -195,26 +190,15 @@ namespace _Test
         [TestMethod]
         public void BinaryExpressionComparisonPrimitiveTypeNull()
         {
-            try
-            {
-                initializeChecker(main("int a; bool c; c = a == null;"));
-            }
-            catch (CheckerException)
-            {
-                AssertDiagnosisContains("Wrong type in comparison");
-            }
+            initializeChecker(main("int a; bool c; c = a == null;"));
+            AssertDiagnosisContains("Wrong type in comparison");
         }
 
         [TestMethod]
         public void BinaryExpressionComparisonLiteralUnequalTypes()
         {
-            try
-            {
-                initializeChecker(expression("bool", "1234 < true"));
-            }catch(CheckerException)
-            {
-                AssertDiagnosisContains("Wrong type in binary");
-            }
+            initializeChecker(expression("bool", "1234 < true"));
+            AssertDiagnosisContains("Wrong type in binary");
         }
 
         [TestMethod]
@@ -226,12 +210,8 @@ namespace _Test
         [TestMethod]
         public void BinaryExpressionComparisonUnequalTypes()
         {
-            try {
-                initializeChecker(main("int a; bool b; bool c; a=123; b=234; c = a != b;"));
-            } catch (CheckerException)
-            {
-                AssertDiagnosisContains("Cannot assign");
-            }
+            initializeChecker(main("int a; bool b; bool c; a=123; b=234; c = a != b;"));
+            AssertDiagnosisContains("Cannot assign");
         }
 
         public void WhileConditionInt()
