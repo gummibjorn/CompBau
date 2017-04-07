@@ -120,6 +120,13 @@ namespace _Test
         }
 
         [TestMethod]
+        public void CallMemberArg()
+        {
+            initializeGenerator();
+            Run("1");
+        }
+
+        [TestMethod]
         public void CallMemberReturn()
         {
             initializeGenerator();
