@@ -108,36 +108,47 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
                         break;
                     case Operator.Divide:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.div);
                         break;
                     case Operator.Times:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.mul);
                         break;
                     case Operator.Modulo:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.mod);
                         break;
                     case Operator.Minus:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.sub);
                         break;
                     case Operator.Plus:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.add);
                         break;
                     case Operator.Less:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.clt);
                         break;
                     case Operator.LessEqual:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.cle);
                         break;
                     case Operator.Greater:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.cgt);
                         break;
                     case Operator.GreaterEqual:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.cge);
                         break;
                     case Operator.Equals:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.ceq);
                         break;
                     case Operator.Unequal:
+                        base.Visit(node);
                         _assembler.Emit(OpCode.cne);
                         break;
                     case Operator.Is:

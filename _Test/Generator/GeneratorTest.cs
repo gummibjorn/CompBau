@@ -218,6 +218,127 @@ namespace _Test
         }
 
         [TestMethod]
+        public void BinaryExpressionDivide()
+        {
+            initializeGenerator(main("int a; a = 1/3;"))
+                .Next(ldc_i, 1)
+                .Next(ldc_i, 3)
+                .Next(OpCode.div)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionTimes()
+        {
+            initializeGenerator(main("int a; a = 1*3;"))
+                .Next(ldc_i, 1)
+                .Next(ldc_i, 3)
+                .Next(OpCode.mul)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionModulo()
+        {
+            initializeGenerator(main("int a; a = 10%2;"))
+                .Next(ldc_i, 10)
+                .Next(ldc_i, 2)
+                .Next(OpCode.mod)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionMinus()
+        {
+            initializeGenerator(main("int a; a = 10-2;"))
+                .Next(ldc_i, 10)
+                .Next(ldc_i, 2)
+                .Next(OpCode.sub)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionPlus()
+        {
+            initializeGenerator(main("int a; a = 10+2;"))
+                .Next(ldc_i, 10)
+                .Next(ldc_i, 2)
+                .Next(OpCode.add)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionLess()
+        {
+            initializeGenerator(main("bool a; a = 10<2;"))
+                .Next(ldc_i, 10)
+                .Next(ldc_i, 2)
+                .Next(OpCode.clt)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionLessEqual()
+        {
+            initializeGenerator(main("bool a; a = 10<=2;"))
+                .Next(ldc_i, 10)
+                .Next(ldc_i, 2)
+                .Next(OpCode.cle)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionGreater()
+        {
+            initializeGenerator(main("bool a; a = 10>2;"))
+                .Next(ldc_i, 10)
+                .Next(ldc_i, 2)
+                .Next(OpCode.cgt)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionGreaterEqual()
+        {
+            initializeGenerator(main("bool a; a = 10>=2;"))
+                .Next(ldc_i, 10)
+                .Next(ldc_i, 2)
+                .Next(OpCode.cge)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionEquals()
+        {
+            initializeGenerator(main("bool a; a = true == true;"))
+                .Next(ldc_b, true)
+                .Next(ldc_b, true)
+                .Next(OpCode.ceq)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionNotEquals()
+        {
+            initializeGenerator(main("bool a; a = true != true;"))
+                .Next(ldc_b, true)
+                .Next(ldc_b, true)
+                .Next(OpCode.cne)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
         public void BuiltinReadChar()
         {
             initializeGenerator(expression("char", "ReadChar()"))
