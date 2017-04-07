@@ -132,5 +132,13 @@ namespace _Test
             initializeGenerator(expression("int[]", "new int[10]"));
             Run();
         }
+
+
+        [TestMethod]
+        public void BinaryExpressionOr()
+        {
+            initializeGenerator(main("bool a; a = true || false;"));
+            Run();
+        }
     }
 }

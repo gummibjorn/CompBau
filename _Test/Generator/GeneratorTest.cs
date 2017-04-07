@@ -170,6 +170,20 @@ namespace _Test
         }
 
         [TestMethod]
+        public void BinaryExpressionOr()
+        {
+            initializeGenerator(main("bool a; a = true || false;"))
+                .Next(ldc_b, true)
+                .Next(brtrue, 4)
+                .Next(ldc_b, false)
+                .Next(brtrue, 2)
+                .Next(ldc_b, false)
+                .Next(br, 1)
+                .Next(ldc_b, true)
+                .Return();
+        }
+
+        [TestMethod]
         public void BuiltinReadChar()
         {
             initializeGenerator(expression("char", "ReadChar()"))

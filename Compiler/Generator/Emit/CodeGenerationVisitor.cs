@@ -55,6 +55,72 @@ namespace RappiSharp.Compiler.Generator.Emit {
             _assembler.Emit(OpCode.ldc_s, node.Value);
         }
 
+        public override void Visit(BinaryExpressionNode node)
+        {
+            base.Visit(node);
+            switch (node.Operator)
+            {
+                case Operator.Or:
+                    var endLabel = _assembler.CreateLabel();
+                    var pushTrueLabel = _assembler.CreateLabel();
+
+                    node.Left.Accept(this);
+
+                    _assembler.Emit(OpCode.brtrue, pushTrueLabel);
+
+                    node.Right.Accept(this);
+
+                    _assembler.Emit(OpCode.brtrue, pushTrueLabel);
+
+                    _assembler.Emit(OpCode.ldc_b, false);
+
+                    _assembler.Emit(OpCode.br, endLabel);
+
+                    _assembler.SetLabel(pushTrueLabel);
+
+                    _assembler.Emit(OpCode.ldc_b, true);
+
+                    _assembler.SetLabel(endLabel);
+
+                    break;
+                case Operator.And:
+                case Operator.Divide:
+                    _assembler.Emit(OpCode.div);
+                    break;
+                case Operator.Times:
+                    _assembler.Emit(OpCode.mul);
+                    break;
+                case Operator.Modulo:
+                    _assembler.Emit(OpCode.mod);
+                    break;
+                case Operator.Minus:
+                    _assembler.Emit(OpCode.sub);
+                    break;
+                case Operator.Plus:
+                    _assembler.Emit(OpCode.add);
+                    break;
+                case Operator.Less:
+                    _assembler.Emit(OpCode.clt);
+                    break;
+                case Operator.LessEqual:
+                    _assembler.Emit(OpCode.cle);
+                    break;
+                case Operator.Greater:
+                    _assembler.Emit(OpCode.cgt);
+                    break;
+                case Operator.GreaterEqual:
+                    _assembler.Emit(OpCode.cge);
+                    break;
+                case Operator.Equals:
+                    _assembler.Emit(OpCode.ceq);
+                    break;
+                case Operator.Unequal:
+                    _assembler.Emit(OpCode.cne);
+                    break;
+                case Operator.Is:
+                    break;
+            }
+        }
 
         public override void Visit(WhileStatementNode node)
         {
