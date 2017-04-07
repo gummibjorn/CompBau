@@ -16,12 +16,20 @@
 		results[6] = +9001;
 		results[7] = i;
 		results[8] = (i + +2000);
-		//results[9] = (i); //BONK
+		results[9] = (i); 
+
+		if(calc.isBigger(results[5], results[6])){
+			WriteInt(results[5]);
+		}
 	}
 }
 
 class Calculator{
 	int sum(int a, int b){
 		return a + b;
+	}
+
+	bool isBigger(int a, int b){
+		return a < b;
 	}
 }

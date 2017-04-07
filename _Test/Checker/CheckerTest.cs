@@ -52,6 +52,26 @@ namespace _Test
         }
 
         [TestMethod]
+        public void AssignmentAssignNullToPrimitive()
+        {
+            initializeChecker(main("int a; a = null;"));
+            AssertDiagnosisContains("cannot assign '@NULL' to 'int'");
+        }
+
+        [TestMethod]
+        public void AssignmentAssignBoolToInt()
+        {
+            initializeChecker(main("int a; a = true;"));
+            AssertDiagnosisContains("cannot assign");
+        }
+
+        [TestMethod]
+        public void AssignmentAssignNullToArray()
+        {
+            initializeChecker(main("int[] a; a = null;"));
+        }
+
+        [TestMethod]
         public void AssignmentUnaryNot()
         {
             initializeChecker(expression("bool", "!true;"));

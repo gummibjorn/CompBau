@@ -140,8 +140,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     break;
                 case Operator.Equals:
                 case Operator.Unequal:
-                    bool isLeftRef = checkReferenceType(leftType);
-                    bool isRightRef = checkReferenceType(rightType);
+                    bool isLeftRef = isReferenceType(leftType);
+                    bool isRightRef = isReferenceType(rightType);
                     bool isLeftNull = leftType == _symbolTable.Compilation.NullType;
                     bool isRightNull = rightType == _symbolTable.Compilation.NullType;
 
@@ -163,7 +163,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             }
         }
 
-        private bool checkReferenceType(TypeSymbol type)
+        private bool isReferenceType(TypeSymbol type)
         {
             if(type == _symbolTable.Compilation.BoolType
                 || type == _symbolTable.Compilation.CharType
@@ -207,7 +207,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var rightType = _symbolTable.FindType(node.Right);
             checkIntegerMaxValue(node.Right);
             checkNotLength(node.Left);
-            if (leftType != rightType)
+            var isNullAssignment = (isReferenceType(leftType) && rightType == _symbolTable.Compilation.NullType);
+            if (!isNullAssignment && leftType != rightType)
             {
                 Error(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
             }
