@@ -180,6 +180,7 @@ namespace _Test
                 .Next(ldc_b, false)
                 .Next(br, 1)
                 .Next(ldc_b, true)
+                .Next(stloc, 0)
                 .Return();
         }
 

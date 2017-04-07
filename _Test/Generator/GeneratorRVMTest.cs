@@ -137,8 +137,8 @@ namespace _Test
         [TestMethod]
         public void BinaryExpressionOr()
         {
-            initializeGenerator(main("bool a; a = true || false;"));
-            Run();
+            initializeGenerator();
+            Run("True");
         }
     }
 }
