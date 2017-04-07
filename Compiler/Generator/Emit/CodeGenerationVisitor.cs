@@ -9,6 +9,14 @@ namespace RappiSharp.Compiler.Generator.Emit {
     private readonly SymbolTable _symbolTable;
     private readonly MethodSymbol _method;
     private readonly ILAssembler _assembler;
+        private int _expression_level = 0;
+
+        private void Expression(Action action)
+        {
+            _expression_level += 1;
+            action();
+            _expression_level -= 1;
+        }
 
         public CodeGenerationVisitor(SymbolTable symbolTable, MethodSymbol method, ILAssembler assembler) {
           _symbolTable = symbolTable;
@@ -55,7 +63,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
             _assembler.SetLabel(startLabel);
 
-            node.Condition.Accept(this);
+            Expression(()=>node.Condition.Accept(this));
 
             _assembler.Emit(OpCode.brfalse, endLabel);
 
@@ -69,7 +77,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
             var elseLabel = _assembler.CreateLabel();
             var endLabel = _assembler.CreateLabel();
 
-            node.Condition.Accept(this);
+            Expression(()=>node.Condition.Accept(this));
 
             if(node.Else != null)
             {
@@ -87,25 +95,32 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
         public override void Visit(BasicDesignatorNode node)
         {
-            //FIXME this should only spit out a load if it's used in an expression (i.e. not as left side of an assignment)
-            if(node.Identifier == "true")
+            if (_expression_level > 0)
             {
-                _assembler.Emit(OpCode.ldc_b, true);
-            } else if(node.Identifier == "false")
-            {
-                _assembler.Emit(OpCode.ldc_b, false);
-            } else
-            {
-                var target = _symbolTable.Find(_method, node.Identifier);
-                if (target is LocalVariableSymbol)
+                //FIXME this should only spit out a load if it's used in an expression (i.e. not as left side of an assignment)
+                if (node.Identifier == "true")
                 {
-                    _assembler.Emit(OpCode.ldloc, _method.LocalVariables.IndexOf((LocalVariableSymbol)target));
-                } else if (target is ParameterSymbol)
+                    _assembler.Emit(OpCode.ldc_b, true);
+                }
+                else if (node.Identifier == "false")
                 {
-                    _assembler.Emit(OpCode.ldarg, _method.Parameters.IndexOf((ParameterSymbol)target));
-                } else
+                    _assembler.Emit(OpCode.ldc_b, false);
+                }
+                else
                 {
-                    //throw new NotImplementedException();
+                    var target = _symbolTable.Find(_method, node.Identifier);
+                    if (target is LocalVariableSymbol)
+                    {
+                        _assembler.Emit(OpCode.ldloc, _method.LocalVariables.IndexOf((LocalVariableSymbol)target));
+                    }
+                    else if (target is ParameterSymbol)
+                    {
+                        _assembler.Emit(OpCode.ldarg, _method.Parameters.IndexOf((ParameterSymbol)target));
+                    }
+                    else
+                    {
+                        //throw new NotImplementedException();
+                    }
                 }
             }
 
@@ -139,7 +154,6 @@ namespace RappiSharp.Compiler.Generator.Emit {
             if(builtInIndex > -1)
             {
                 base.Visit(node);
-                //_assembler.Emit(OpCode.call, -(builtInIndex +1)); //HOW WAS I SUPPOSED TO KNOW!?
                 _assembler.Emit(OpCode.call, method);
             } else
             {
@@ -147,6 +161,16 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 base.Visit(node);
                 _assembler.Emit(OpCode.callvirt, method);
             }
+        }
+
+        public override void Visit(UnaryExpressionNode node)
+        {
+            Expression(() => base.Visit(node));
+        }
+
+        public override void Visit(BinaryExpressionNode node)
+        {
+            Expression(() => base.Visit(node));
         }
     }
 }

@@ -197,6 +197,19 @@ namespace _Test
         }
 
         [TestMethod]
+        public void CallMemberReturn()
+        {
+            initializeGenerator()
+                .Next(callvirt, 1)
+                .Next(stloc, 0)
+                .Return();
+
+            method("One")
+                .Next(ldc_i, 1)
+                .Return();
+
+        }
+        [TestMethod]
         public void CallMemberMethodComplex()
         {
             initializeGenerator()

@@ -1,0 +1,10 @@
+class Program{
+	void Main(){
+		int i;
+		i = One();
+	}
+
+	int One(){
+		return 1;
+	}
+}

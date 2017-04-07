@@ -35,10 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -95,6 +91,7 @@
     <Content Include="Checker\MethodReturnStatement.txt" />
     <Content Include="Generator\CallMemberMethodComplex.txt" />
     <Content Include="Generator\ArrayCreation.txt" />
+    <Content Include="Generator\CallMemberReturn.txt" />
     <Content Include="Generator\Playground.txt" />
     <Content Include="Lexer\CombinedAssignment.txt" />
     <Content Include="Lexer\CombinedEverything.txt" />
