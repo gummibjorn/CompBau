@@ -153,5 +153,26 @@ namespace _Test
             initializeGenerator();
             Run("AFalse");
         }
+
+        [TestMethod]
+        public void BinaryExpressionAnd1()
+        {
+            initializeGenerator();
+            Run("True");
+        }
+
+        [TestMethod]
+        public void BinaryExpressionAnd2()
+        {
+            initializeGenerator();
+            Run("False");
+        }
+
+        [TestMethod]
+        public void BinaryExpressionAnd3()
+        {
+            initializeGenerator();
+            Run("AFalse");
+        }
     }
 }

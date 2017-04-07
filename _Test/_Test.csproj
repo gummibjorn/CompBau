@@ -89,6 +89,9 @@
     <Content Include="Checker\ArrayCreation.txt" />
     <Content Include="Checker\MethodReturnStatementInvalid.txt" />
     <Content Include="Checker\MethodReturnStatement.txt" />
+    <Content Include="Generator\BinaryExpressionAnd1.txt" />
+    <Content Include="Generator\BinaryExpressionAnd3.txt" />
+    <Content Include="Generator\BinaryExpressionAnd2.txt" />
     <Content Include="Generator\BinaryExpressionOr1.txt" />
     <Content Include="Generator\BinaryExpressionOr2.txt" />
     <Content Include="Generator\CallMemberMethodComplex.txt" />

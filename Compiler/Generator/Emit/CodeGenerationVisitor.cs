@@ -62,7 +62,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 switch (node.Operator)
                 {
                     case Operator.Or:
-                        var endLabel = _assembler.CreateLabel();
+                        var endLabelOr = _assembler.CreateLabel();
                         var pushTrueLabel = _assembler.CreateLabel();
 
                         node.Left.Accept(this);
@@ -75,16 +75,38 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
                         _assembler.Emit(OpCode.ldc_b, false);
 
-                        _assembler.Emit(OpCode.br, endLabel);
+                        _assembler.Emit(OpCode.br, endLabelOr);
 
                         _assembler.SetLabel(pushTrueLabel);
 
                         _assembler.Emit(OpCode.ldc_b, true);
 
-                        _assembler.SetLabel(endLabel);
+                        _assembler.SetLabel(endLabelOr);
 
                         break;
                     case Operator.And:
+                        var endLabelAnd = _assembler.CreateLabel();
+                        var pushFalseLabel = _assembler.CreateLabel();
+
+                        node.Left.Accept(this);
+
+                        _assembler.Emit(OpCode.brfalse, pushFalseLabel);
+
+                        node.Right.Accept(this);
+
+                        _assembler.Emit(OpCode.brfalse, pushFalseLabel);
+
+                        _assembler.Emit(OpCode.ldc_b, true);
+
+                        _assembler.Emit(OpCode.br, endLabelAnd);
+
+                        _assembler.SetLabel(pushFalseLabel);
+
+                        _assembler.Emit(OpCode.ldc_b, false);
+
+                        _assembler.SetLabel(endLabelAnd);
+
+                        break;
                     case Operator.Divide:
                         _assembler.Emit(OpCode.div);
                         break;

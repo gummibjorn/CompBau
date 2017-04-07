@@ -203,6 +203,21 @@ namespace _Test
         }
 
         [TestMethod]
+        public void BinaryExpressionAnd()
+        {
+            initializeGenerator(main("bool a; a = true && true;"))
+                .Next(ldc_b, true)
+                .Next(brfalse, 4)
+                .Next(ldc_b, true)
+                .Next(brfalse, 2)
+                .Next(ldc_b, true)
+                .Next(br, 1)
+                .Next(ldc_b, false)
+                .Next(stloc, 0)
+                .Return();
+        }
+
+        [TestMethod]
         public void BuiltinReadChar()
         {
             initializeGenerator(expression("char", "ReadChar()"))
