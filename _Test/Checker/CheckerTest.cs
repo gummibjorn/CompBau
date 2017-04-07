@@ -208,6 +208,13 @@ namespace _Test
         }
 
         [TestMethod]
+        public void BinaryExpressionComparisonArrayAccessInvalidExpr()
+        {
+            initializeChecker(main("int[] a; int b; bool c; a = new int[12]; b=2; c = b == a[\"string\"];"));
+            AssertDiagnosisContains("must be of type int");
+        }
+
+        [TestMethod]
         public void BinaryExpressionComparisonPrimitiveTypeNull()
         {
             initializeChecker(main("int a; bool c; c = a == null;"));
@@ -263,6 +270,13 @@ namespace _Test
         public void ElementAccess()
         {
             initializeChecker(main("int l; int[][] arr; int[] sarr; arr = new int[10][]; sarr = new int[1]; arr[0] = sarr; l = arr[0][0];"));
+        }
+
+        [TestMethod]
+        public void ElementAccessInvalidExpression()
+        {
+            initializeChecker(main("int[] a; int b; a = new int[10]; b = a[true];"));
+            AssertDiagnosisContains("");
         }
 
         [TestMethod]

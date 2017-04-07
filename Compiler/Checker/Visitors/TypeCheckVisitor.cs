@@ -223,6 +223,17 @@ namespace RappiSharp.Compiler.Checker.Visitors
             return sub == baseType;
         }
 
+        public override void Visit(ElementAccessNode node)
+        {
+            base.Visit(node);
+            var expressionType = _symbolTable.FindType(node.Expression);
+
+            if(expressionType != _symbolTable.Compilation.IntType)
+            {
+                Error(node.Location, $"Expression in element access must be of type int");
+            }
+        }
+
         public override void Visit(AssignmentNode node)
         {
             base.Visit(node);
