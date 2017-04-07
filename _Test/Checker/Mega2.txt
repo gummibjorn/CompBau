@@ -10,7 +10,7 @@
 		i = 10;
 		c = 'a';
 		second = new Second();
-		s = ""Hallo"";
+		s = "Hallo";
 		return;
 	}
 	

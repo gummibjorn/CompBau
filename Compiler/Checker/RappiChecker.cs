@@ -14,11 +14,17 @@ namespace RappiSharp.Compiler.Checker
 
         public RappiChecker(ProgramNode syntaxTree)
         {
-            _syntaxTree = syntaxTree;
-            SymbolConstruction.Run(SymbolTable, _syntaxTree);
-            TypeResolution.Run(SymbolTable);
-            FixSyntaxTree();
-            CheckSingleMain();
+            try
+            {
+                _syntaxTree = syntaxTree;
+                SymbolConstruction.Run(SymbolTable, _syntaxTree);
+                TypeResolution.Run(SymbolTable);
+                FixSyntaxTree();
+                CheckSingleMain();
+            } catch (CheckerException)
+            {
+                Diagnosis.ReportError(new Location(1, 1), "Checker terminated with errors");
+            }
         }
 
         private void FixSyntaxTree()

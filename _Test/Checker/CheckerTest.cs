@@ -369,6 +369,7 @@ namespace _Test
         public void manyBinaryExpressions()
         {
             initializeChecker(@"class Test{void Main() { int a; a = 1 + 2 * 3 % !a / b(100);  } int b(int a) { if(a >= a) {return 2*a;} else { return -1;} }}");
+            AssertDiagnosisContains("");
         }
 
         [TestMethod]

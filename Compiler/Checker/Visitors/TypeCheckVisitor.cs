@@ -40,7 +40,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
                     } else
                     {
-                        Error(node.Location, $"Invalid type {type.ToString()} for unary '!'");
+                        Error(node.Location, $"Invalid type {type.ToString()} for unary '!'", true);
                     }
                     break;
                 case Operator.Plus:

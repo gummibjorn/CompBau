@@ -57,7 +57,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Checker\CheckerTest.cs" />
-    <Compile Include="Checker\RappiCheckerInvalidSemanticException.cs" />
     <Compile Include="Generator\GeneratorRVMTest.cs" />
     <Compile Include="Generator\GeneratorTest.cs" />
     <Compile Include="Generator\ILIterator.cs" />
