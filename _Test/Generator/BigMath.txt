@@ -1,0 +1,47 @@
+﻿class Program{
+	void Main(){
+		int a;
+		int b;
+		int c;
+		
+		a = B();
+		
+		b = a/2;
+
+		if(b == 5){
+			c = b % 2; //c == 1
+			c = c + 7; //c == 8
+		}
+
+		if(A() != true){
+			c  = c - 8; //c == 0
+		}
+
+		if(5 > c){
+			WriteInt(c);
+		}
+
+		if(c >= 0){
+			c = 15; //c == 15
+		}
+
+		if(c < 0){
+			c = 10; //c should still be 15
+		}
+
+		if(c <= 3*4){
+			c = 12; //c should still be 15
+		}
+
+		WriteInt(c);
+
+	}
+
+	bool A(){
+		return false;
+	}
+
+	int B(){
+		return 10*1;
+	}
+}

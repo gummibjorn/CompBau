@@ -174,5 +174,12 @@ namespace _Test
             initializeGenerator();
             Run("AFalse");
         }
+
+        [TestMethod]
+        public void BigMath()
+        {
+            initializeGenerator();
+            Run("015");
+        }
     }
 }
