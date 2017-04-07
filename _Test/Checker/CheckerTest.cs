@@ -371,5 +371,29 @@ namespace _Test
         {
             initializeChecker(@"class Test{void Main() { return ; }  }");
         }
+
+        [TestMethod]
+        public void AssignReferenceType()
+        {
+            initializeChecker("class Base{ void Main(){ Base b; b = new Base(); }}");
+        }
+        
+        [TestMethod]
+        public void AssignReferenceSubtype()
+        {
+            initializeChecker("class Base{ void Main(){ Base b; b = new Sub(); }} class Sub : Base {}");
+        }
+
+        [TestMethod]
+        public void AssignReferenceArrayType()
+        {
+            initializeChecker("class Base{ void Main(){ Base[] b; b = new Base[1]; b[0] = new Base(); }}");
+        }
+        
+        [TestMethod]
+        public void AssignReferenceArraySubtype()
+        {
+            initializeChecker("class Base{ void Main(){ Base[] b; b = new Base[1]; b[0] = new Sub(); }} class Sub : Base {}");
+        }
     }
 }

@@ -199,7 +199,30 @@ namespace RappiSharp.Compiler.Checker.Visitors
             _symbolTable.FixType(node, targetType);
         }
 
-        // TODO: Implement type checks for entire program
+        private bool isAssignable(TypeSymbol sub, TypeSymbol baseType)
+        {
+            if(sub == null) { return false; }
+            if(sub == _symbolTable.Compilation.NullType && isReferenceType(baseType)) { return true; }
+
+            if(sub is ArrayTypeSymbol && baseType is ArrayTypeSymbol)
+            {
+                return isAssignable(((ArrayTypeSymbol)sub).ElementType, ((ArrayTypeSymbol)baseType).ElementType);
+            }
+
+            if(sub is ClassSymbol && baseType is ClassSymbol)
+            {
+                var subClass = (ClassSymbol)sub;
+                var baseClass = (ClassSymbol)baseType;
+                if(subClass == baseClass)
+                {
+                    return true;
+                }
+                return isAssignable(subClass.BaseClass, baseClass);
+            }
+
+            return sub == baseType;
+        }
+
         public override void Visit(AssignmentNode node)
         {
             base.Visit(node);
@@ -207,8 +230,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var rightType = _symbolTable.FindType(node.Right);
             checkIntegerMaxValue(node.Right);
             checkNotLength(node.Left);
-            var isNullAssignment = (isReferenceType(leftType) && rightType == _symbolTable.Compilation.NullType);
-            if (!isNullAssignment && leftType != rightType)
+            if (!isAssignable(rightType, leftType))
             {
                 Error(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
             }
