@@ -1,0 +1,15 @@
+﻿class Program{
+	void Main(){
+		A asub;
+		asub = new B();
+		asub.foo();
+	}
+}
+
+class A{
+	void foo(){}
+}
+
+class B : A{
+	void foo(){}
+}

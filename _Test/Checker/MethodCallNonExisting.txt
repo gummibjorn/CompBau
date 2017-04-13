@@ -1,0 +1,11 @@
+﻿class Program{
+	void Main(){
+		A a;
+		a = new A();
+		a.foo();
+	}
+}
+
+class A{
+}
+

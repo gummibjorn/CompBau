@@ -144,6 +144,21 @@ namespace _Test
         }
 
         [TestMethod]
+        public void CyclicInheritance()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("cyclic inheritance is not allowed");
+        }
+
+        [TestMethod]
+        public void SelfInheritance()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("cyclic inheritance is not allowed");
+        }
+
+
+        [TestMethod]
         public void MethodCallNoArgs()
         {
             initializeChecker();
@@ -173,6 +188,19 @@ namespace _Test
         public void MethodCallStatement()
         {
             initializeChecker();
+        }
+
+        [TestMethod]
+        public void MethodCallSubClass()
+        {
+            initializeChecker();
+        }
+
+        [TestMethod]
+        public void MethodCallNonExisting()
+        {
+            initializeChecker();
+            AssertDiagnosisContains("inexistent member");
         }
 
         [TestMethod]

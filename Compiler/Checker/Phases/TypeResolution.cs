@@ -1,6 +1,8 @@
-﻿using RappiSharp.Compiler.Checker.General;
+﻿using System;
+using RappiSharp.Compiler.Checker.General;
 using RappiSharp.Compiler.Checker.Symbols;
 using RappiSharp.Compiler.Parser.Tree;
+using System.Collections.Generic;
 
 namespace RappiSharp.Compiler.Checker.Phases
 {
@@ -31,6 +33,7 @@ namespace RappiSharp.Compiler.Checker.Phases
             var classNode = _symbolTable.GetDeclarationNode<ClassNode>(classSymbol);
             if (classNode.BaseClass != null)
             {
+                checkCyclicInheritance(classNode);
                 classSymbol.BaseClass = ResolveType(classNode.BaseClass);
             }
             foreach (var field in classSymbol.Fields)
@@ -40,6 +43,31 @@ namespace RappiSharp.Compiler.Checker.Phases
             foreach (var method in classSymbol.Methods)
             {
                 ResolveTypesInSymbol(method);
+            }
+        }
+
+        private void checkCyclicInheritance(ClassNode classNode)
+        {
+            var baseClasses = new HashSet<String>();
+
+            while(classNode.BaseClass != null)
+            {
+                if (baseClasses.Add(classNode.Identifier)) { }
+                else
+                {
+                    Diagnosis.ReportError(classNode.Location, "Cyclic inheritance is not allowed");
+                    return;
+                }
+
+
+                var classType = ResolveType(classNode.BaseClass);
+                if (classType != null)
+                {
+                    classNode = _symbolTable.GetDeclarationNode<ClassNode>(classType);
+                }else
+                {
+                    return;
+                }
             }
         }
 

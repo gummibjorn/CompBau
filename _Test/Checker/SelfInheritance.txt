@@ -1,0 +1,11 @@
+﻿class Program{
+	void Main(){
+	}
+}
+
+class B : A{
+}
+
+class A : A{
+}
+
