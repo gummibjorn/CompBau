@@ -204,7 +204,12 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 {
                     _assembler.Emit(OpCode.ldarg, _method.Parameters.IndexOf((ParameterSymbol)target));
                 }
-                else
+                else if (target is FieldSymbol)
+                {
+                    var classScope = (ClassSymbol)target.Scope;
+                    _assembler.Emit(OpCode.ldthis);
+                    _assembler.Emit(OpCode.ldfld, classScope.Fields.IndexOf(target as FieldSymbol));
+                } else 
                 {
                     //FIXME why does throwing an exception here break so many tests? it shouldn't go into this branch!
                     //throw new NotImplementedException();
@@ -279,22 +284,27 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 _assembler.Emit(OpCode.stelem);
             } else
             {
-                Expression(() => node.Right.Accept(this));
                 var target = _symbolTable.GetTarget(node.Left);
-                if(target is ParameterSymbol)
+                if(target is FieldSymbol)
                 {
-                    var index = _method.Parameters.IndexOf((ParameterSymbol)target);
-                    _assembler.Emit(OpCode.starg, index);
-                } else if (target is LocalVariableSymbol)
-                {
-                    var index = _method.LocalVariables.IndexOf((LocalVariableSymbol)target);
-                    _assembler.Emit(OpCode.stloc, index);
+                    _assembler.Emit(OpCode.ldthis);
+                    Expression(() => node.Right.Accept(this));
+                    var index = ((ClassSymbol)target.Scope).Fields.IndexOf(target as FieldSymbol);
+                    _assembler.Emit(OpCode.stfld, index);
                 } else
                 {
-                    _assembler.Emit(OpCode.stfld, target);
+                    Expression(() => node.Right.Accept(this));
+                    if(target is ParameterSymbol)
+                    {
+                        var index = _method.Parameters.IndexOf((ParameterSymbol)target);
+                        _assembler.Emit(OpCode.starg, index);
+                    } else if (target is LocalVariableSymbol)
+                    {
+                        var index = _method.LocalVariables.IndexOf((LocalVariableSymbol)target);
+                        _assembler.Emit(OpCode.stloc, index);
+                    }
                 }
             }
-            //TODO how do i figure out whether it's an array assignment?
         }
 
         public override void Visit(ReturnStatementNode node)
