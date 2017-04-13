@@ -10,6 +10,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
     private readonly MethodSymbol _method;
     private readonly ILAssembler _assembler;
         private int _expression_level = 0;
+        private int _designator_level = 0;
 
         private void Expression(Action action)
         {
@@ -260,7 +261,11 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
         public override void Visit(MemberAccessNode node)
         {
+            _designator_level++;
+            _expression_level++;
             base.Visit(node);
+            _designator_level--;
+            _expression_level--;
             //Symbol target;
             if(node.Designator is ElementAccessNode)
             {
@@ -283,24 +288,36 @@ namespace RappiSharp.Compiler.Generator.Emit {
             {
                 var ct = (ClassSymbol)type;
                 var field = ct.Fields.Find(f => f.Identifier == node.Identifier);
-                _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
+
+                if(_designator_level > 0)
+                {
+                    _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
+                }else
+                {
+                    if(_expression_level > 0)
+                    {
+                        _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
+                    }else
+                    {
+                        //_assembler.Emit(OpCode.stfld, ct.Fields.IndexOf(field));
+                    }
+                }
             }
         }
 
         public override void Visit(ElementAccessNode node)
         {
             //ldelem: Pop index and array instance from stack and push value of the array element at index
-            //if(_expression_level > 0)
+            if(_expression_level > 0)
             {
                 Load(node);
                 _assembler.Emit(OpCode.ldelem);
             }
-
         }
 
         public override void Visit(AssignmentNode node)
         {
-            //node.Left.Accept(this);
+            node.Left.Accept(this);
             if(node.Left is ElementAccessNode)
             {
                 //stelem: Pop value, index and array instance from stack and store value into the array element at index
@@ -312,7 +329,10 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 var target = _symbolTable.GetTarget(node.Left);
                 if(target is FieldSymbol)
                 {
-                    _assembler.Emit(OpCode.ldthis);
+                    if(node.Left is BasicDesignatorNode)
+                    {
+                        _assembler.Emit(OpCode.ldthis);
+                    }
                     Expression(() => node.Right.Accept(this));
                     var index = ((ClassSymbol)target.Scope).Fields.IndexOf(target as FieldSymbol);
                     _assembler.Emit(OpCode.stfld, index);

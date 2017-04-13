@@ -191,6 +191,13 @@ namespace _Test
         }
 
         [TestMethod]
+        public void ClassMemberAccess()
+        {
+            initializeGenerator();
+            Run("0");
+        }
+
+        [TestMethod]
         public void ArrayLength()
         {
             initializeGenerator(main("int[] a; a = new int[10]; WriteInt(a.length);"));
