@@ -13,6 +13,7 @@ using System.Xml.Serialization;
 using System.IO;
 using System.Diagnostics;
 using System.Text;
+using RappiSharp.Compiler;
 
 namespace _Test
 {
@@ -25,7 +26,9 @@ namespace _Test
 
         private ILIterator initializeGenerator(RappiLexer lexer)
         {
-            _generator = new RappiGenerator(new RappiChecker(new RappiParser(lexer).ParseProgram()).SymbolTable);
+            var checker = new RappiChecker(new RappiParser(lexer).ParseProgram()).SymbolTable;
+            Assert.IsFalse(Diagnosis.HasErrors, "Errors before generator: " + Diagnosis.Messages);
+            _generator = new RappiGenerator(checker);
             return new ILIterator(_generator.Metadata.Methods[_generator.Metadata.MainMethod].Code);
         }
 
@@ -220,6 +223,20 @@ namespace _Test
         {
             initializeGenerator(main("int[] a; a = new int[10]; a = null; " + writeBool("a == null")));
             Run("TRUE");
+        }
+
+        [TestMethod]
+        public void MemberAccessThisImplicitPrimitive()
+        {
+            initializeGenerator(program("int i; void Main(){ i = 5; WriteInt(i); }"));
+            Run("5");
+        }
+
+        [TestMethod]
+        public void MemberAccessThisPrimitive()
+        {
+            initializeGenerator(program("int i; void Main(){ this.i = 5; WriteInt(this.i); }"));
+            Run("5");
         }
     }
 }

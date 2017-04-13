@@ -554,5 +554,24 @@ namespace _Test
             initializeChecker("class Base{ void Main(){ Base b; b = new Sub(); } }");
             AssertDiagnosisContains("undeclared type");
         }
+
+        [TestMethod]
+        public void DesignatorComplex()
+        {
+            initializeChecker();
+            Console.Write("BREAK");
+        }
+
+        [TestMethod]
+        public void MemberAccessThisImplicitPrimitive()
+        {
+            initializeChecker("class Program{ int i; void Main(){ i = 5; WriteInt(i); } }");
+        }
+
+        [TestMethod]
+        public void MemberAccessThisPrimitive()
+        {
+            initializeChecker("class Program{ int i; void Main(){ this.i = 5; WriteInt(this.i); } }");
+        }
     }
 }
