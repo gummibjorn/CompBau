@@ -310,6 +310,15 @@ namespace _Test
             Assert.AreEqual(expected.ToString(), result.ToString());
         }
 
+        [TestMethod]
+        public void IdentifierInParanthesisEvil()
+        {
+            initializeParser(expression("(asdf - a)"));
+            var result = getExpression(_parser.ParseProgram());
+            var expected = new BinaryExpressionNode(L, new BasicDesignatorNode(L, "asdf"),Operator.Minus, new BasicDesignatorNode(L,"a"));
+            Assert.AreEqual(expected.ToString(), result.ToString());
+        }
+
         [TestMethod, Timeout(TIMEOUT)]
         public void ExprOperatorPrecedence()
         {

@@ -280,7 +280,7 @@ namespace RappiSharp.Compiler.Parser
         private ExpressionNode ParseSimpleExpression(String ident = null)
         {
             var location = CurrentLocation();
-            var left = ParseTerm(ident);
+            var left = ident == null ? ParseTerm(ident) : new BasicDesignatorNode(location, ident);
             while (Is(Tag.Plus) || Is(Tag.Minus))
             {
                 var op = Is(Tag.Plus) ? Operator.Plus : Operator.Minus;
