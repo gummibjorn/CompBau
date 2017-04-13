@@ -281,5 +281,33 @@ namespace _Test
             Run("5");
         }
 
+        [TestMethod]
+        public void MemberAccessThisImplicitMethod()
+        {
+            initializeGenerator(program("void Foo(){ WriteInt(5); } void Main(){ Foo(); }"));
+            Run("5");
+        }
+
+        [TestMethod]
+        public void MemberAccessThisMethod()
+        {
+            initializeGenerator(program("void Foo(){ WriteInt(5); } void Main(){ this.Foo(); }"));
+            Run("5");
+        }
+
+        [TestMethod]
+        public void MemberAccessMemberMethod()
+        {
+            initializeGenerator("class Program{ void Main(){ Foo f; f = new Foo(); f.Foo(); } } class Foo{ void Foo(){WriteInt(5); } }");
+            Run("5");
+        }
+
+        [TestMethod]
+        public void MemberAccessMemberArrayMethod()
+        {
+            initializeGenerator("class Program{ void Main(){ Foo[] fs; fs = new Foo[10]; fs[0] = new Foo(); fs[0].Foo(); } } class Foo{ void Foo(){WriteInt(5); } }");
+            Run("5");
+        }
+
     }
 }
