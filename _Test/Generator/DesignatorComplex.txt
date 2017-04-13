@@ -1,0 +1,45 @@
+﻿class Program{
+	void Main(){
+		Crate crate;
+		crate = new Crate();
+		crate.fruits = new Fruit[5];
+		crate.fruits[0] = makeFruit("Apple");
+		crate.fruits[1] = new Fruit();
+		crate.fruits[1].name = "Banana";
+		crate.fruits[1].bites = 3;
+		Fruit apple;
+		apple = crate.fruits[0];
+
+		WriteString(crate.fruits[0].name);
+		crate.fruits[0].Eat();
+		apple.Eat();
+		WriteInt(crate.fruits[0].getBites());
+	}
+
+	Fruit makeFruit(string name){
+		Fruit f;
+		f = new Fruit();
+		f.name = name;
+		f.bites = 5;
+		return f;
+	}
+}
+
+class Crate{
+	Fruit[] fruits;
+}
+
+class Fruit{
+	string name;
+	int bites;
+
+	int getBites(){
+		return bites;
+	}
+
+	void Eat(){
+		WriteString("OM NOM NOM, TASTY ");
+		WriteString(name);
+		bites = bites - 1;
+	}
+}

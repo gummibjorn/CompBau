@@ -448,5 +448,31 @@ namespace _Test
                 .Next(ldc_s, "yay")
                 .Return();
         }
+
+        [TestMethod]
+        public void MemberAccessThisImplicitPrimitive()
+        {
+            initializeGenerator(program("int i; void Main(){ i = 5; WriteInt(i); }"))
+                .Next(ldthis)
+                .Next(ldc_i, 5)
+                .Next(stfld, 0)
+                .Next(ldthis)
+                .Next(ldfld, 0)
+                .Next(call)
+                .Return();
+        }
+
+        [TestMethod]
+        public void MemberAccessThisPrimitive()
+        {
+            initializeGenerator(program("int i; void Main(){ this.i = 5; WriteInt(this.i); }"))
+                .Next(ldthis)
+                .Next(ldc_i, 5)
+                .Next(stfld, 0)
+                .Next(ldthis)
+                .Next(ldfld, 0)
+                .Next(call)
+                .Return();
+        }
     }
 }

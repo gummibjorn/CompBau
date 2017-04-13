@@ -33,6 +33,13 @@ namespace RappiSharp.Compiler.Generator.Emit {
             _assembler.Emit(OpCode.newarr, type);
         }
 
+        public override void Visit(ObjectCreationNode node)
+        {
+            //base.Visit(node);
+            var type = _symbolTable.FindType(node);
+            _assembler.Emit(OpCode.newobj, type);
+
+        }
 
         public override void Visit(IntegerLiteralNode node)
         {
@@ -216,6 +223,13 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 }
         }
 
+        private void Load(ElementAccessNode node)
+        {
+            var target = _symbolTable.GetTarget(node.Designator);
+            Load(target); //array instance
+            Expression(() => node.Expression.Accept(this)); //index
+        }
+
         public override void Visit(BasicDesignatorNode node)
         {
             if (_expression_level > 0)
@@ -230,7 +244,11 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 }
                 else if (node.Identifier == "null")
                 {
-                    _assembler.Emit(OpCode.ldnull, false);
+                    _assembler.Emit(OpCode.ldnull, false); //FIXME does this need the false?
+                }
+                else if (node.Identifier == "this")
+                {
+                    _assembler.Emit(OpCode.ldthis);
                 }
                 else
                 {
@@ -242,35 +260,42 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
         public override void Visit(MemberAccessNode node)
         {
-            //base.Visit(node);
-            var target = _symbolTable.GetTarget(node.Designator);
+            base.Visit(node);
+            //Symbol target;
+            if(node.Designator is ElementAccessNode)
+            {
+                //target = 
+            } else
+            {
+
+            }
+
+
+//            var target = _symbolTable.GetTarget(node.Designator);
             var type = _symbolTable.FindType(node.Designator);
             if(type is ArrayTypeSymbol)
             {
                 if(node.Identifier == "length")
                 {
-                    Load(target);
                     _assembler.Emit(OpCode.ldlen);
                 }
+            } else
+            {
+                var ct = (ClassSymbol)type;
+                var field = ct.Fields.Find(f => f.Identifier == node.Identifier);
+                _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
             }
         }
 
         public override void Visit(ElementAccessNode node)
         {
             //ldelem: Pop index and array instance from stack and push value of the array element at index
-            if(_expression_level > 0)
+            //if(_expression_level > 0)
             {
                 Load(node);
                 _assembler.Emit(OpCode.ldelem);
             }
 
-        }
-
-        private void Load(ElementAccessNode node)
-        {
-            var target = _symbolTable.GetTarget(node.Designator);
-            Load(target); //array instance
-            Expression(() => node.Expression.Accept(this)); //index
         }
 
         public override void Visit(AssignmentNode node)

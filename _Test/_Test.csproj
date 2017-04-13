@@ -108,6 +108,7 @@
     <Content Include="Generator\ArrayCreation.txt" />
     <Content Include="Generator\CallMemberReturn.txt" />
     <Content Include="Generator\CallMemberArg.txt" />
+    <Content Include="Generator\DesignatorComplex.txt" />
     <Content Include="Generator\Playground.txt" />
     <Content Include="Lexer\CombinedAssignment.txt" />
     <Content Include="Lexer\CombinedEverything.txt" />

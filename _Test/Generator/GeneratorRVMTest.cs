@@ -238,5 +238,19 @@ namespace _Test
             initializeGenerator(program("int i; void Main(){ this.i = 5; WriteInt(this.i); }"));
             Run("5");
         }
+
+        [TestMethod]
+        public void DesignatorComplex()
+        {
+            initializeGenerator();
+            Run("Apple" + "OM NOM NOM, TASTY APPLE" + "OM NOM NOM, TASTY APPLE3");
+        }
+
+        [TestMethod]
+        public void ObjectCreation()
+        {
+            initializeGenerator(main("Program p; p = new Program();"));
+            Run();
+        }
     }
 }
