@@ -266,5 +266,20 @@ namespace _Test
             initializeGenerator(main("int[][] aa; int[] a; aa = new int[10][]; a = new int[10]; aa[0] = a; aa[0][0] = 1; WriteInt(aa[0][0]);"));
             Run("1");
         }
+
+        [TestMethod]
+        public void ClassMemberAccessArray()
+        {
+            initializeGenerator();
+            Run("5");
+        }
+
+        [TestMethod]
+        public void ClassMemberAccessMemberArray()
+        {
+            initializeGenerator();
+            Run("5");
+        }
+
     }
 }

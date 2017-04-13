@@ -106,6 +106,8 @@
     <Content Include="Generator\BinaryExpressionOr2.txt" />
     <Content Include="Generator\CallMemberMethodComplex.txt" />
     <Content Include="Generator\ArrayCreation.txt" />
+    <Content Include="Generator\ClassMemberAccessMemberArray.txt" />
+    <Content Include="Generator\ClassMemberAccessArray.txt" />
     <Content Include="Generator\ClassMemberAccess.txt" />
     <Content Include="Generator\CallMemberReturn.txt" />
     <Content Include="Generator\CallMemberArg.txt" />

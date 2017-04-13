@@ -1,0 +1,16 @@
+class Program{
+
+	int i;
+
+	void Main(){
+		Program[] arr;
+		arr = new Program[1];
+		arr[0] = new Program();
+
+		arr[0].i = 5;
+
+		WriteInt(arr[0].i);
+	}
+}
+
+

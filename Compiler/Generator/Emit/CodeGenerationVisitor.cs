@@ -215,7 +215,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 else if (target is FieldSymbol)
                 {
                     var classScope = (ClassSymbol)target.Scope;
-                    _assembler.Emit(OpCode.ldthis);
+                    //_assembler.Emit(OpCode.ldthis);
                     _assembler.Emit(OpCode.ldfld, classScope.Fields.IndexOf(target as FieldSymbol));
                 } else 
                 {
@@ -254,6 +254,10 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 else
                 {
                     var target = _symbolTable.Find(_method, node.Identifier);
+                    if(target is FieldSymbol)
+                    {
+                        _assembler.Emit(OpCode.ldthis);
+                    }
                     Load(target);
                 }
             }
@@ -308,9 +312,10 @@ namespace RappiSharp.Compiler.Generator.Emit {
         public override void Visit(ElementAccessNode node)
         {
             //ldelem: Pop index and array instance from stack and push value of the array element at index
+            node.Designator.Accept(this);
             if(_expression_level > 0)
             {
-                Load(node);
+                Expression(() => node.Expression.Accept(this)); //index
                 _assembler.Emit(OpCode.ldelem);
             }
         }
