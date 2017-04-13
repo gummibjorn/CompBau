@@ -222,6 +222,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             var sourceType = _symbolTable.FindType(node.Designator);
             var targetType = _symbolTable.FindType(node.Type) as ClassSymbol;
+            if(targetType == null)
+            {
+                Error(node.Location, $"cannot cast to '{node.Type.Identifier}' as it is not a class", true);
+            }
             _symbolTable.FixType(node, targetType);
         }
 
@@ -371,6 +375,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             base.Visit(node);
             var type = _symbolTable.FindType(node.Type);
+            if(type == null)
+            {
+                Error(node.Location, $"Undeclared type '{node.Type.Identifier}'", true);
+            }
             _symbolTable.FixType(node, type);
         }
 

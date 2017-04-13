@@ -545,12 +545,14 @@ namespace _Test
         public void CastPrimitive()
         {
             initializeChecker("class Base{ void Main(){ Base b; int i; b = new Base(); i = (int)b; } }");
+            AssertDiagnosisContains("cannot cast");
         }
 
         [TestMethod]
         public void NewInexistent()
         {
-            initializeChecker("class Base{ void Main(){ Base b; b = new Sub() } }");
+            initializeChecker("class Base{ void Main(){ Base b; b = new Sub(); } }");
+            AssertDiagnosisContains("undeclared type");
         }
     }
 }
