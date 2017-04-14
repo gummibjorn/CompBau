@@ -254,7 +254,15 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 else
                 {
                     var target = _symbolTable.Find(_method, node.Identifier);
-                    if(target is FieldSymbol)
+                    if(target is MethodSymbol)
+                    {
+                        var isBuiltIn = _symbolTable.Compilation.Methods.IndexOf((MethodSymbol)target) != -1;
+                        if (!isBuiltIn)
+                        {
+                            _assembler.Emit(OpCode.ldthis);
+                        }
+                    }
+                    if(target is FieldSymbol) 
                     {
                         _assembler.Emit(OpCode.ldthis);
                     }
@@ -270,15 +278,6 @@ namespace RappiSharp.Compiler.Generator.Emit {
             base.Visit(node);
             _designator_level--;
             _expression_level--;
-            //Symbol target;
-            if(node.Designator is ElementAccessNode)
-            {
-                //target = 
-            } else
-            {
-
-            }
-
 
 //            var target = _symbolTable.GetTarget(node.Designator);
             var type = _symbolTable.FindType(node.Designator);
@@ -300,7 +299,10 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 {
                     if(_expression_level > 0)
                     {
-                        _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
+                        if(ct.Fields.IndexOf(field) != -1) //else its a method call
+                        {
+                            _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
+                        }
                     }else
                     {
                         //_assembler.Emit(OpCode.stfld, ct.Fields.IndexOf(field));
@@ -365,14 +367,14 @@ namespace RappiSharp.Compiler.Generator.Emit {
         public override void Visit(MethodCallNode node)
         {
             var method = (MethodSymbol) _symbolTable.GetTarget(node.Designator);
-            var builtInIndex = _symbolTable.Compilation.Methods.IndexOf(method);
-            if(builtInIndex > -1)
+            var isBuiltIn = _symbolTable.Compilation.Methods.IndexOf(method) != -1;
+            if(isBuiltIn)
             {
                 Expression(()=>base.Visit(node));
                 _assembler.Emit(OpCode.call, method);
             } else
             {
-                _assembler.Emit(OpCode.ldthis);
+                //_assembler.Emit(OpCode.ldthis);
                 Expression(()=>base.Visit(node));
                 _assembler.Emit(OpCode.callvirt, method);
             }

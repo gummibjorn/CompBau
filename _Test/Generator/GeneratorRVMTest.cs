@@ -100,7 +100,7 @@ namespace _Test
             }
             if(expectedOutput != null)
             {
-                Assert.IsTrue(str.Contains(expectedOutput), $"Expected to find '{expectedOutput}' in: '{str}'");
+                Assert.IsTrue(str.ToLower().Contains(expectedOutput.ToLower()), $"Expected to find '{expectedOutput}' in: '{str}'");
             }
             return output.ToString();
         }
@@ -250,7 +250,7 @@ namespace _Test
         public void DesignatorComplex()
         {
             initializeGenerator();
-            Run("Apple" + "OM NOM NOM, TASTY APPLE" + "OM NOM NOM, TASTY APPLE3");
+            Run("Apple" + "OM NOM NOM, TASTY Apple" + "OM NOM NOM, TASTY Apple3");
         }
 
         [TestMethod]
