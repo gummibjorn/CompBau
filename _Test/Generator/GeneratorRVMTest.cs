@@ -309,5 +309,12 @@ namespace _Test
             Run("5");
         }
 
+        [TestMethod]
+        public void ReturnStatement()
+        {
+            initializeGenerator(main("WriteInt(1); return; WriteInt(2);"));
+            Run("1");
+        }
+
     }
 }

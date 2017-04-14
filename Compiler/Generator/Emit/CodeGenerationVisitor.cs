@@ -362,6 +362,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
         public override void Visit(ReturnStatementNode node)
         {
             Expression(() => base.Visit(node));
+            _assembler.Emit(OpCode.ret);
         }
 
         public override void Visit(MethodCallNode node)
