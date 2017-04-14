@@ -314,25 +314,31 @@ namespace RappiSharp.Compiler.Generator.Emit {
         public override void Visit(ElementAccessNode node)
         {
             //ldelem: Pop index and array instance from stack and push value of the array element at index
-            node.Designator.Accept(this);
-            if(_expression_level > 0)
+            _designator_level++;
+            Expression(() => node.Designator.Accept(this));
+            _designator_level--;
+            Expression(() => node.Expression.Accept(this)); //index
+            if(_designator_level > 0)
             {
-                Expression(() => node.Expression.Accept(this)); //index
+                _assembler.Emit(OpCode.ldelem);
+            }else if(_expression_level > 0)
+            {
                 _assembler.Emit(OpCode.ldelem);
             }
         }
 
         public override void Visit(AssignmentNode node)
         {
-            node.Left.Accept(this);
             if(node.Left is ElementAccessNode)
             {
+                node.Left.Accept(this);
                 //stelem: Pop value, index and array instance from stack and store value into the array element at index
-                Load((ElementAccessNode)node.Left); //array instance, index
+                //Load((ElementAccessNode)node.Left); //array instance, index
                 Expression(() => node.Right.Accept(this)); //value
                 _assembler.Emit(OpCode.stelem);
             } else
             {
+                node.Left.Accept(this);
                 var target = _symbolTable.GetTarget(node.Left);
                 if(target is FieldSymbol)
                 {

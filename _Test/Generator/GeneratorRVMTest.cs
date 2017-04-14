@@ -263,7 +263,7 @@ namespace _Test
         [TestMethod]
         public void NestedArrayAccess()
         {
-            initializeGenerator(main("int[][] aa; int[] a; aa = new int[10][]; a = new int[10]; aa[0] = a; aa[0][0] = 1; WriteInt(aa[0][0]);"));
+            initializeGenerator();
             Run("1");
         }
 
