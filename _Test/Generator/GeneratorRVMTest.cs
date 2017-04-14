@@ -315,6 +315,12 @@ namespace _Test
             initializeGenerator(main("WriteInt(1); return; WriteInt(2);"));
             Run("1");
         }
-
+        
+        [TestMethod]
+        public void WhileStatement()
+        {
+            initializeGenerator(main("int i; while(i<5){i=i+1; WriteInt(i);};"));
+            Run("12345");
+        }
     }
 }

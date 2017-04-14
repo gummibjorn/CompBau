@@ -136,9 +136,10 @@ namespace _Test
         {
             initializeGenerator(main("int a; while(true){a=0;}"))
                 .Next(ldc_b, true)
-                .Next(brfalse, 2)
+                .Next(brfalse, 3)
                 .Next(ldc_i, 0)
                 .Next(stloc, 0)
+                .Next(br, -5)
                 .Return();
         }
 

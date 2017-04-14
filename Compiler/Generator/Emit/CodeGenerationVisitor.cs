@@ -178,6 +178,8 @@ namespace RappiSharp.Compiler.Generator.Emit {
 
             node.Body.Accept(this);
 
+            _assembler.Emit(OpCode.br, startLabel);
+
             _assembler.SetLabel(endLabel);
         }
 
