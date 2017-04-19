@@ -60,6 +60,7 @@
     <Compile Include="Generator\GeneratorRVMTest.cs" />
     <Compile Include="Generator\GeneratorTest.cs" />
     <Compile Include="Generator\ILIterator.cs" />
+    <Compile Include="Interpreter\InterpreterTest.cs" />
     <Compile Include="Lexer\LexerTest.cs" />
     <Compile Include="AbstractTest.cs" />
     <Compile Include="Parser\ParserTreeTest.cs" />
@@ -70,6 +71,10 @@
     <ProjectReference Include="..\Compiler\Compiler.csproj">
       <Project>{be03a659-0496-4439-9530-4a89cf0791fb}</Project>
       <Name>Compiler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VirtualMachine\VirtualMachine.csproj">
+      <Project>{8f5aafbb-017e-45c4-b0ed-e76ecf8857f8}</Project>
+      <Name>VirtualMachine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
