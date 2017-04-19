@@ -6,8 +6,12 @@ namespace RappiSharp.VirtualMachine.Runtime {
   internal class Interpreter {
     private readonly Loader _loader;
     private readonly CallStack _callStack;
+        private IConsole _console;
 
-    public Interpreter(Metadata metadata) {
+    public Interpreter(Metadata metadata) : this(metadata, new SystemConsole()) { }
+
+    public Interpreter(Metadata metadata, IConsole console) {
+            _console = console;
       _loader = new Loader(metadata);
       _callStack = new CallStack();
     }

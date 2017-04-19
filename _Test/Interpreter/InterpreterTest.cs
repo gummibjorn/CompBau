@@ -22,6 +22,7 @@ namespace _Test
         protected override string getPathInProject() { return "Interpreter"; }
 
         private Interpreter _interpreter;
+        private TestConsole _console;
 
         private void initializeInterpreter(RappiLexer lexer)
         {
@@ -30,7 +31,8 @@ namespace _Test
             {
                 Assert.Fail("Error while generating code: " + Diagnosis.Messages);
             }
-            _interpreter = new Interpreter(generator.Metadata);
+            _console = new TestConsole();
+            _interpreter = new Interpreter(generator.Metadata, _console);
             _interpreter.Run();
         }
 
@@ -42,6 +44,35 @@ namespace _Test
         private void initializeInterpreter(string code)
         {
             initializeInterpreter(makeLexer(code));
+        }
+
+        class TestConsole : IConsole
+        {
+
+            //TODO: add a way to provide input
+            private Queue<int> _input = new Queue<int>();
+            private StringWriter _output = new StringWriter();
+
+            public StringWriter Output
+            {
+                get { return _output; }
+                set { _output = value; }
+            }
+
+            public int Read()
+            {
+                if(_input.Count == 0)
+                {
+                    Assert.Fail("Reading from empty Queue!");
+                }
+                return _input.Dequeue();
+            }
+
+            public void Write(object o)
+            {
+                _output.Write(o);
+            }
+
         }
 
         private string program(string content)
