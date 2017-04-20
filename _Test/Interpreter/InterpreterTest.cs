@@ -23,6 +23,7 @@ namespace _Test
 
         private Interpreter _interpreter;
         private TestConsole _console;
+        private bool _didRun;
 
         private void initializeInterpreter(RappiLexer lexer)
         {
@@ -33,7 +34,18 @@ namespace _Test
             }
             _console = new TestConsole();
             _interpreter = new Interpreter(generator.Metadata, _console);
-            _interpreter.Run();
+        }
+
+        private void runInterpreter()
+        {
+            initializeInterpreter(makeLexer());
+            Run();
+        }
+
+        private void runInterpreter(string code)
+        {
+            initializeInterpreter(makeLexer(code));
+            Run();
         }
 
         private void initializeInterpreter()
@@ -46,10 +58,30 @@ namespace _Test
             initializeInterpreter(makeLexer(code));
         }
 
+        public void Run()
+        {
+            _didRun = true;
+            _interpreter.Run();
+        }
+
+        [TestInitialize]
+        public void Before()
+        {
+            _didRun = false;
+        }
+
+        [TestCleanup]
+        public void After()
+        {
+            if (!_didRun)
+            {
+                Assert.Fail("Test didn't run!");
+            }
+        }
+
         class TestConsole : IConsole
         {
 
-            //TODO: add a way to provide input
             private Queue<int> _input = new Queue<int>();
             private StringWriter _output = new StringWriter();
 
@@ -61,10 +93,6 @@ namespace _Test
 
             public int Read()
             {
-                if(_input.Count == 0)
-                {
-                    Assert.Fail("Reading from empty Queue!");
-                }
                 return _input.Dequeue();
             }
 
@@ -109,30 +137,49 @@ namespace _Test
         [TestMethod]
         public void WriteString()
         {
-            initializeInterpreter(main("WriteString(\"Hello World\");"));
+            runInterpreter(main("WriteString(\"Hello World\");"));
             Assert.AreEqual("Hello World", _console.Output.ToString());
         }
 
         [TestMethod]
         public void WriteChar()
         {
-            initializeInterpreter(main("WriteChar('\n');"));
+            runInterpreter(main("WriteChar('\n');"));
             Assert.AreEqual("\n", _console.Output.ToString());
         }
 
         [TestMethod]
         public void WriteInt()
         {
-            initializeInterpreter(main("WriteInt(12);"));
+            runInterpreter(main("WriteInt(12);"));
             Assert.AreEqual("12", _console.Output.ToString());
         }
 
         [TestMethod]
         public void ReadString()
         {
-            _console.Send("Hello Wurld");
             initializeInterpreter(main("WriteString(ReadString());"));
+            _console.Send("Hello Wurld");
+            Run();
             Assert.AreEqual("Hello Wurld", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ReadChar()
+        {
+            initializeInterpreter(main("WriteChar(ReadChar());"));
+            _console.Send('x');
+            Run();
+            Assert.AreEqual("x", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ReadInt()
+        {
+            initializeInterpreter(main("WriteInt(ReadInt());"));
+            _console.Send("9001");
+            Run();
+            Assert.AreEqual("9001", _console.Output.ToString());
         }
     }
 }
