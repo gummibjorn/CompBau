@@ -126,6 +126,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(Locals[Verify<int>(operand)]);
                     break;
                 case OpCode.stloc:
+                    Stloc(operand);
                     break;
                 case OpCode.ldarg:
                     break;
@@ -172,7 +173,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void Neg()
         {
             var a = Stack.Pop();
-            if(a is bool)
+            if (a is bool)
             {
                 Stack.Push(!Verify<bool>(a));
             } else
@@ -181,39 +182,64 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
-        private void Call(object Operand)
+        private void Stloc(object operand)
         {
-                if(Operand == MethodDescriptor.WriteString)
+            var value = Stack.Pop();
+            var index = Verify<int>(operand);
+            var localType = _loader.MainMethod.LocalTypes[index];
+
+            if(localType == InbuiltType.Bool)
+            {
+                Locals[index] = Verify<bool>(value);
+            }else if(localType == InbuiltType.Int)
+            {
+                Locals[index] = Verify<int>(value);
+            }else if(localType == InbuiltType.String)
+            {
+                Locals[index] = Verify<string>(value);
+            }else if(localType == InbuiltType.Char)
+            {
+                Locals[index] = Verify<char>(value);
+            }else
+            {
+                throw new InvalidILException("Wrong type in stloc");
+            }
+
+        }
+
+        private void Call(object operand)
+        {
+                if(operand == MethodDescriptor.WriteString)
                 {
                     var arg = Stack.Pop<string>();
                     _console.Write(arg);
                 }
 
-                if(Operand == MethodDescriptor.WriteChar)
+                if(operand == MethodDescriptor.WriteChar)
                 {
                     var arg = Stack.Pop<char>();
                     _console.Write(arg);
                 }
 
-                if(Operand == MethodDescriptor.WriteInt)
+                if(operand == MethodDescriptor.WriteInt)
                 {
                     var arg = Stack.Pop<int>();
                     _console.Write(arg);
                 }
 
-                if(Operand == MethodDescriptor.ReadString)
+                if(operand == MethodDescriptor.ReadString)
                 {
                     string input = _console.ReadLine();
                     Stack.Push(input);
                 }
 
-                if(Operand == MethodDescriptor.ReadChar)
+                if(operand == MethodDescriptor.ReadChar)
                 {
                     char input = (char) _console.Read();
                     Stack.Push(input);
                 }
 
-                if(Operand == MethodDescriptor.ReadInt)
+                if(operand == MethodDescriptor.ReadInt)
                 {
                     int input = int.Parse(_console.ReadLine());
                     Stack.Push(input);
