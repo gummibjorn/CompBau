@@ -61,17 +61,62 @@ namespace RappiSharp.VirtualMachine.Runtime
             switch (instruction.OpCode)
             {
                 case OpCode.ldc_s:
-                    Stack.Push(Verify<String>(instruction.Operand));
+                    Stack.Push(Verify<string>(instruction.Operand));
+                    break;
+                case OpCode.ldc_i:
+                    Stack.Push(Verify<int>(instruction.Operand));
+                    break;
+                case OpCode.ldc_c:
+                    Stack.Push(Verify<char>(instruction.Operand));
                     break;
                 case OpCode.call:
-                    var arg = Stack.Pop<String>();
-                    _console.Write(arg);
+                    Call(instruction.Operand);
                     break;
                 case OpCode.ret:
                     _callStack.Pop();
                     break;
             }
         }
+
+        private void Call(object Operand)
+        {
+                if(Operand == MethodDescriptor.WriteString)
+                {
+                    var arg = Stack.Pop<string>();
+                    _console.Write(arg);
+                }
+
+                if(Operand == MethodDescriptor.WriteChar)
+                {
+                    var arg = Stack.Pop<char>();
+                    _console.Write(arg);
+                }
+
+                if(Operand == MethodDescriptor.WriteInt)
+                {
+                    var arg = Stack.Pop<int>();
+                    _console.Write(arg);
+                }
+
+                if(Operand == MethodDescriptor.ReadString)
+                {
+                    string input = _console.ReadLine();
+                    Stack.Push(input);
+                }
+
+                if(Operand == MethodDescriptor.ReadChar)
+                {
+                    char input = (char) _console.Read();
+                    Stack.Push(input);
+                }
+
+                if(Operand == MethodDescriptor.ReadInt)
+                {
+                    int input = int.Parse(_console.ReadLine());
+                    Stack.Push(input);
+                }
+        }
+
 
 
         private object[] InitializedVariables(TypeDescriptor[] types)

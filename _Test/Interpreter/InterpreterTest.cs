@@ -75,6 +75,7 @@ namespace _Test
                 while(c != '\n')
                 {
                     s += (char)c;
+                    c = _input.Dequeue();
                 }
                 return s;
             }
@@ -106,10 +107,32 @@ namespace _Test
         }
 
         [TestMethod]
-        public void Hello()
+        public void WriteString()
         {
             initializeInterpreter(main("WriteString(\"Hello World\");"));
             Assert.AreEqual("Hello World", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void WriteChar()
+        {
+            initializeInterpreter(main("WriteChar('\n');"));
+            Assert.AreEqual("\n", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void WriteInt()
+        {
+            initializeInterpreter(main("WriteInt(12);"));
+            Assert.AreEqual("12", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ReadString()
+        {
+            _console.Send("Hello Wurld");
+            initializeInterpreter(main("WriteString(ReadString());"));
+            Assert.AreEqual("Hello Wurld", _console.Output.ToString());
         }
     }
 }
