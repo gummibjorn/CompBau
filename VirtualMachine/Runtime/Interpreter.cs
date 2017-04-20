@@ -76,10 +76,15 @@ namespace RappiSharp.VirtualMachine.Runtime
                 case OpCode.ldnull:
                     break;
                 case OpCode.br:
+                    InstructionPointer += Verify<int>(operand);
                     break;
                 case OpCode.brtrue:
+                    if (Verify<bool>(Stack.Pop()))
+                        InstructionPointer += Verify<int>(operand);
                     break;
                 case OpCode.brfalse:
+                    if (!Verify<bool>(Stack.Pop()))
+                        InstructionPointer += Verify<int>(operand);
                     break;
                 case OpCode.neg:
                     Neg();

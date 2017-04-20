@@ -134,6 +134,11 @@ namespace _Test
 
         }
 
+        private string WriteBool(string expression)
+        {
+            return "if(" + expression + "){ WriteString(\"TRUE\"); } else { WriteString(\"FALSE\"); }";
+        }
+
         [TestMethod]
         public void WriteString()
         {
@@ -224,6 +229,146 @@ namespace _Test
         {
             runInterpreter(main("WriteInt(17%5);"));
             Assert.AreEqual("2", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCltTrue()
+        {
+            runInterpreter(main(WriteBool("1 < 2")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCltFalse()
+        {
+            runInterpreter(main(WriteBool("2 < 1")));
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCleTrue()
+        {
+            runInterpreter(main(WriteBool("1 <= 2")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCleFalse()
+        {
+            runInterpreter(main(WriteBool("2 <= 1")));
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCleEqual()
+        {
+            runInterpreter(main(WriteBool("2 <= 2")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCgtTrue()
+        {
+            runInterpreter(main(WriteBool("2 > 1")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCgtFalse()
+        {
+            runInterpreter(main(WriteBool("1 > 2")));
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCgeTrue()
+        {
+            runInterpreter(main(WriteBool("2 >= 1")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCgeFalse()
+        {
+            runInterpreter(main(WriteBool("1 >= 2")));
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCgeEqual()
+        {
+            runInterpreter(main(WriteBool("2 >= 2")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCeqTrue()
+        {
+            runInterpreter(main(WriteBool("1 == 1")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCeqFalse()
+        {
+            runInterpreter(main(WriteBool("1 == 2")));
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCneTrue()
+        {
+            runInterpreter(main(WriteBool("1 != 2")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpCneFalse()
+        {
+            runInterpreter(main(WriteBool("1 != 1")));
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IfFalse()
+        {
+            runInterpreter(main("if(false){ WriteInt(0); } WriteInt(1);"));
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IfTrue()
+        {
+            runInterpreter(main("if(true){ WriteInt(0); } WriteInt(1);"));
+            Assert.AreEqual("01", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IfElseTrue()
+        {
+            runInterpreter(main($"{WriteBool("true")} WriteInt(0);"));
+            Assert.AreEqual("TRUE0", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IfElseFalse()
+        {
+            runInterpreter(main($"{WriteBool("false")} WriteInt(0);"));
+            Assert.AreEqual("FALSE0", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void WhileSkip()
+        {
+            runInterpreter(main("while(false){ WriteInt(0); } WriteInt(1);"));
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
+
+        [TestMethod, Ignore]
+        public void While()
+        {
+            runInterpreter(main("int i; while(i < 5){ WriteInt(i); i = i+1; }"));
+            Assert.AreEqual("01234", _console.Output.ToString());
         }
     }
 }
