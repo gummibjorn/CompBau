@@ -70,11 +70,71 @@ namespace RappiSharp.VirtualMachine.Runtime
                 case OpCode.ldc_i:
                     Stack.Push(Verify<char>(operand));
                     break;
+                case OpCode.ldnull:
+                    break;
+                case OpCode.br:
+                    break;
+                case OpCode.brtrue:
+                    break;
+                case OpCode.brfalse:
+                    break;
+                case OpCode.neg:
+                    break;
+                case OpCode.add:
+                    break;
+                case OpCode.sub:
+                    break;
+                case OpCode.mul:
+                    break;
+                case OpCode.div:
+                    break;
+                case OpCode.mod:
+                    break;
+                case OpCode.clt:
+                    break;
+                case OpCode.cle:
+                    break;
+                case OpCode.cgt:
+                    break;
+                case OpCode.cge:
+                    break;
+                case OpCode.ceq:
+                    break;
+                case OpCode.cne:
+                    break;
                 case OpCode.ldloc:
                     Stack.Push(Locals[Verify<int>(operand)]);
                     break;
+                case OpCode.stloc:
+                    break;
+                case OpCode.ldarg:
+                    break;
+                case OpCode.starg:
+                    break;
+                case OpCode.ldfld:
+                    break;
+                case OpCode.stfld:
+                    break;
+                case OpCode.newarr:
+                    break;
+                case OpCode.ldlen:
+                    break;
+                case OpCode.ldelem:
+                    break;
+                case OpCode.stelem:
+                    break;
                 case OpCode.call:
                     Call(operand);
+                    break;
+                case OpCode.newobj:
+                    break;
+                case OpCode.ldthis:
+                    break;
+                case OpCode.callvirt:
+                    break;
+                case OpCode.isinst:
+                    break;
+                case OpCode.castclass:
                     break;
                 case OpCode.ret:
                     _callStack.Pop();
