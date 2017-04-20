@@ -84,6 +84,8 @@ namespace _Test
         [TestMethod]
         public void Hello()
         {
+            initializeInterpreter(main("WriteString(\"Hello World\");"));
+            Assert.AreEqual("Hello World", _console.Output.ToString());
         }
     }
 }
