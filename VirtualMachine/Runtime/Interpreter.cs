@@ -62,13 +62,16 @@ namespace RappiSharp.VirtualMachine.Runtime
             switch (instruction.OpCode)
             {
                 case OpCode.ldc_b:
-                    Stack.Push(Verify<string>(operand));
+                    Stack.Push(Verify<bool>(operand));
                     break;
                 case OpCode.ldc_c:
-                    Stack.Push(Verify<int>(operand));
+                    Stack.Push(Verify<char>(operand));
                     break;
                 case OpCode.ldc_i:
-                    Stack.Push(Verify<char>(operand));
+                    Stack.Push(Verify<int>(operand));
+                    break;
+                case OpCode.ldc_s:
+                    Stack.Push(Verify<string>(operand));
                     break;
                 case OpCode.ldnull:
                     break;
@@ -79,28 +82,40 @@ namespace RappiSharp.VirtualMachine.Runtime
                 case OpCode.brfalse:
                     break;
                 case OpCode.neg:
+                    Neg();
                     break;
                 case OpCode.add:
+                    BinaryOp((a, b) => a + b);
                     break;
                 case OpCode.sub:
+                    BinaryOp((a, b) => a - b);
                     break;
                 case OpCode.mul:
+                    BinaryOp((a, b) => a * b);
                     break;
                 case OpCode.div:
+                    BinaryOp((a, b) => a / b);
                     break;
                 case OpCode.mod:
+                    BinaryOp((a, b) => a % b);
                     break;
                 case OpCode.clt:
+                    BinaryOp((a, b) => a < b);
                     break;
                 case OpCode.cle:
+                    BinaryOp((a, b) => a <= b);
                     break;
                 case OpCode.cgt:
+                    BinaryOp((a, b) => a > b);
                     break;
                 case OpCode.cge:
+                    BinaryOp((a, b) => a >= b);
                     break;
                 case OpCode.ceq:
+                    BinaryOp((a, b) => a == b);
                     break;
                 case OpCode.cne:
+                    BinaryOp((a, b) => a != b);
                     break;
                 case OpCode.ldloc:
                     Stack.Push(Locals[Verify<int>(operand)]);
@@ -139,6 +154,25 @@ namespace RappiSharp.VirtualMachine.Runtime
                 case OpCode.ret:
                     _callStack.Pop();
                     break;
+            }
+        }
+
+        private void BinaryOp<T>(Func<int,int,T> action)
+        {
+            var right = Stack.Pop<int>();
+            var left = Stack.Pop<int>();
+            Stack.Push(action(left, right));
+        }
+
+        private void Neg()
+        {
+            var a = Stack.Pop();
+            if(a is bool)
+            {
+                Stack.Push(!Verify<bool>(a));
+            } else
+            {
+                Stack.Push(-Verify<int>(a));
             }
         }
 

@@ -190,5 +190,40 @@ namespace _Test
             Run();
             Assert.AreEqual("9001", _console.Output.ToString());
         }
+
+        [TestMethod]
+        public void OpAdd()
+        {
+            runInterpreter(main("WriteInt(1+2);"));
+            Assert.AreEqual("3", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpSub()
+        {
+            runInterpreter(main("WriteInt(1-2);"));
+            Assert.AreEqual("-1", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpMul()
+        {
+            runInterpreter(main("WriteInt(2*4);"));
+            Assert.AreEqual("8", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpDiv()
+        {
+            runInterpreter(main("WriteInt(15/3);"));
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void OpMod()
+        {
+            runInterpreter(main("WriteInt(17%5);"));
+            Assert.AreEqual("2", _console.Output.ToString());
+        }
     }
 }
