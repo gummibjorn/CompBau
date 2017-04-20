@@ -10,6 +10,7 @@ namespace RappiSharp.VirtualMachine.Runtime
     {
         void Write(object o);
         int Read();
+        string ReadLine();
     }
 
     public class SystemConsole : IConsole
@@ -18,13 +19,16 @@ namespace RappiSharp.VirtualMachine.Runtime
         void IConsole.Write(object o)
         {
             Console.Write(o);
-            throw new NotImplementedException();
         }
 
         int IConsole.Read()
         {
             return Console.Read();
-            throw new NotImplementedException();
+        }
+
+        public string ReadLine()
+        {
+            return Console.ReadLine();
         }
     }
 }

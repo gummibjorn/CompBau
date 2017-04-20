@@ -68,9 +68,33 @@ namespace _Test
                 return _input.Dequeue();
             }
 
+            public string ReadLine()
+            {
+                string s = "";
+                int c = _input.Dequeue();
+                while(c != '\n')
+                {
+                    s += (char)c;
+                }
+                return s;
+            }
+
             public void Write(object o)
             {
                 _output.Write(o);
+            }
+
+            public void Send(char input)
+            {
+                _input.Enqueue(input);
+            }
+
+            public void Send(string input)
+            {
+                foreach(var c in input.ToCharArray()){
+                    _input.Enqueue(c);
+                }
+                _input.Enqueue('\n');
             }
 
         }
