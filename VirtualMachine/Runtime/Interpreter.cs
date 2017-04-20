@@ -61,17 +61,17 @@ namespace RappiSharp.VirtualMachine.Runtime
             var operand = instruction.Operand;
             switch (instruction.OpCode)
             {
-                case OpCode.ldloc:
-                    Stack.Push(Locals[Verify<int>(operand)]);
-                    break;
-                case OpCode.ldc_s:
+                case OpCode.ldc_b:
                     Stack.Push(Verify<string>(operand));
                     break;
-                case OpCode.ldc_i:
+                case OpCode.ldc_c:
                     Stack.Push(Verify<int>(operand));
                     break;
-                case OpCode.ldc_c:
+                case OpCode.ldc_i:
                     Stack.Push(Verify<char>(operand));
+                    break;
+                case OpCode.ldloc:
+                    Stack.Push(Locals[Verify<int>(operand)]);
                     break;
                 case OpCode.call:
                     Call(operand);

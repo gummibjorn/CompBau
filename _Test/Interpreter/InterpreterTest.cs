@@ -181,5 +181,14 @@ namespace _Test
             Run();
             Assert.AreEqual("9001", _console.Output.ToString());
         }
+
+        [TestMethod]
+        public void LocalsLoadAndStore()
+        {
+            initializeInterpreter(main("int i; i = 12; WriteInt(i)"));
+            _console.Send("9001");
+            Run();
+            Assert.AreEqual("9001", _console.Output.ToString());
+        }
     }
 }
