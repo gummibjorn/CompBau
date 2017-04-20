@@ -1,4 +1,5 @@
-﻿using RappiSharp.IL;
+﻿using System;
+using RappiSharp.IL;
 using RappiSharp.VirtualMachine.Descriptors;
 using RappiSharp.VirtualMachine.Error;
 
@@ -46,8 +47,32 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void Interpret()
         {
-            // TODO: Implement interpreter
+
+            while (_callStack.Count != 0)
+            {
+                var instruction = ActiveFrame.Method.Code[InstructionPointer];
+                InstructionPointer++;
+                Execute(instruction);
+            }
         }
+
+        private void Execute(Instruction instruction)
+        {
+            switch (instruction.OpCode)
+            {
+                case OpCode.ldc_s:
+                    Stack.Push(Verify<String>(instruction.Operand));
+                    break;
+                case OpCode.call:
+                    var arg = Stack.Pop<String>();
+                    _console.Write(arg);
+                    break;
+                case OpCode.ret:
+                    _callStack.Pop();
+                    break;
+            }
+        }
+
 
         private object[] InitializedVariables(TypeDescriptor[] types)
         {
