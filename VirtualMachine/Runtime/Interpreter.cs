@@ -399,7 +399,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             if (!(value is T))
             {
-                throw new InvalidILException($"Expected {typeof(T)} instead of {value}");
+                throw new InvalidILException($"Expected {typeof(T)} instead of {value.GetType()} ({value})");
             }
             return (T)value;
         }

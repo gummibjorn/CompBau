@@ -13,6 +13,7 @@ using System.Xml.Serialization;
 using System.IO;
 using RappiSharp.VirtualMachine.Runtime;
 using RappiSharp.Compiler;
+using RappiSharp.VirtualMachine.Error;
 
 namespace _Test
 {
@@ -45,6 +46,13 @@ namespace _Test
         private void runInterpreter(string code)
         {
             initializeInterpreter(makeLexer(code));
+            Run();
+        }
+
+        private void runInterpreter(Metadata _metadata)
+        {
+            _console = new TestConsole();
+            _interpreter = new Interpreter(_metadata, _console);
             Run();
         }
 
@@ -195,10 +203,27 @@ namespace _Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(InvalidILException))]
+        public void InvalidLoad()
+        {
+            runInterpreter(
+                new MetadataBuilder()
+                .addMainInst(OpCode.ldc_b, 12)
+                .build()
+                );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidILException))]
         public void LocalsStoreInvalidType()
         {
-            runInterpreter(main("int i; i = false;"));
-            Assert.AreEqual("12", _console.Output.ToString());
+            runInterpreter(
+                new MetadataBuilder()
+                .addMainLocal(-3)
+                .addMainInst(OpCode.ldc_b, false)
+                .addMainInst(OpCode.stloc, 0)
+                .build()
+                );
         }
 
         [TestMethod]

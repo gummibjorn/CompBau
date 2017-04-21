@@ -61,6 +61,7 @@
     <Compile Include="Generator\GeneratorTest.cs" />
     <Compile Include="Generator\ILIterator.cs" />
     <Compile Include="Interpreter\InterpreterTest.cs" />
+    <Compile Include="Interpreter\MetadataBuilder.cs" />
     <Compile Include="Lexer\LexerTest.cs" />
     <Compile Include="AbstractTest.cs" />
     <Compile Include="Parser\ParserTreeTest.cs" />
