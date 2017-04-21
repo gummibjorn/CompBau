@@ -160,9 +160,19 @@ namespace RappiSharp.Compiler.Generator.Emit {
                         _assembler.Emit(OpCode.cne);
                         break;
                     case Operator.Is:
+                        base.Visit(node);
+                        var type = _symbolTable.Find(_method, ((BasicDesignatorNode)node.Right).Identifier);
+                        _assembler.Emit(OpCode.isinst, type);
                         break;
                 }
             });
+        }
+
+        public override void Visit(TypeCastNode node)
+        {
+            base.Visit(node);
+            var type = _symbolTable.Find(_method, node.Type.Identifier);
+            _assembler.Emit(OpCode.castclass, type);
         }
 
         public override void Visit(WhileStatementNode node)

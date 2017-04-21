@@ -110,6 +110,8 @@
     <Content Include="Generator\BinaryExpressionOr1.txt" />
     <Content Include="Generator\BigMath.txt" />
     <Content Include="Generator\BinaryExpressionOr2.txt" />
+    <Content Include="Generator\ClassCast.txt" />
+    <Content Include="Generator\IsOperator.txt" />
     <Content Include="Generator\CallMemberMethodComplex.txt" />
     <Content Include="Generator\ArrayCreation.txt" />
     <Content Include="Generator\NestedArrayAccess.txt" />

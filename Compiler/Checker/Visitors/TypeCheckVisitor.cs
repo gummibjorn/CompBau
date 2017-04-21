@@ -175,9 +175,9 @@ namespace RappiSharp.Compiler.Checker.Visitors
                             Error(node.Right.Location, $"Undeclared class '{identifier}'");
                         } else
                         {
-                            if(!isAssignable(leftType, type))
+                            if(!isAssignable(type, leftType) && !isAssignable(leftType, type))
                             {
-                                Error(node.Location, $"Left hand side of 'is' can never be '{identifier}'");
+                                Error(node.Location, $"Left hand side of 'is' can never be of type '{leftType.Identifier}'");
                             }
                             //OK
                         }

@@ -1,0 +1,19 @@
+class Program{
+	void Main(){
+		A a;
+		B b;
+
+		a = new B();
+		
+		b = (B) a;
+		b.foo();
+	}
+}
+
+class A{}
+
+class B : A{
+	void foo(){
+		WriteString("b.foo");
+	}
+}

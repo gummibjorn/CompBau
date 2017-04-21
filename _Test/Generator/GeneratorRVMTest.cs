@@ -282,6 +282,13 @@ namespace _Test
         }
 
         [TestMethod]
+        public void ClassCast()
+        {
+            initializeGenerator();
+            Run("b.foo");
+        }
+
+        [TestMethod]
         public void MemberAccessThisImplicitMethod()
         {
             initializeGenerator(program("void Foo(){ WriteInt(5); } void Main(){ Foo(); }"));
@@ -314,6 +321,13 @@ namespace _Test
         {
             initializeGenerator(main("WriteInt(1); return; WriteInt(2);"));
             Run("1");
+        }
+
+        [TestMethod]
+        public void IsOperator()
+        {
+            initializeGenerator();
+            Run("a is B");
         }
         
         [TestMethod]

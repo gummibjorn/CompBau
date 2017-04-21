@@ -522,7 +522,6 @@ namespace _Test
         public void IsSupertype()
         {
             initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is Sub);} } class Sub:Base{}");
-            AssertDiagnosisContains("can never be");
         }
 
         [TestMethod]

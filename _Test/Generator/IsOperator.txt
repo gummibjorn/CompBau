@@ -1,0 +1,16 @@
+class Program{
+	void Main(){
+		A a;
+
+		a = new B();
+
+		if(a is B){
+			WriteString("a is B");
+		}
+	}
+}
+
+class A{}
+
+class B : A{}
+
