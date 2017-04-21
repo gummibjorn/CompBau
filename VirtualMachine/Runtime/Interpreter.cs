@@ -139,12 +139,16 @@ namespace RappiSharp.VirtualMachine.Runtime
                 case OpCode.stfld:
                     break;
                 case OpCode.newarr:
+                    NewArr(Verify<ArrayDescriptor>(operand));
                     break;
                 case OpCode.ldlen:
+                    Stack.Push(Stack.Pop<ArrayObject>().Elements.Length);
                     break;
                 case OpCode.ldelem:
+                    Ldelem();
                     break;
                 case OpCode.stelem:
+                    Stelem();
                     break;
                 case OpCode.call:
                     Call(operand);
@@ -164,6 +168,28 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Ret();
                     break;
             }
+        }
+
+        private void Ldelem()
+        {
+            var index = Stack.Pop<int>();
+            var array = Stack.Pop<ArrayObject>();
+            Stack.Push(array.Elements[index]);
+        }
+
+        private void Stelem()
+        {
+            var value = Stack.Pop();
+            var index = Stack.Pop<int>();
+            var array = Stack.Pop<ArrayObject>();
+            Verify(value, array.Type.ElementType);
+            array.Elements[index] = value;
+        }
+
+        private void NewArr(ArrayDescriptor arrayDescriptor)
+        {
+            var length = Stack.Pop<int>();
+            Stack.Push(new ArrayObject(arrayDescriptor, length));
         }
 
         private void Ret()
@@ -243,6 +269,15 @@ namespace RappiSharp.VirtualMachine.Runtime
             }else if(type == InbuiltType.Char)
             {
                 return Verify<char>(value);
+            }else if(type is ArrayDescriptor) {
+                if(value is ArrayObject)
+                {
+                    if((value as ArrayObject).Type.ElementType == (type as ArrayDescriptor).ElementType)
+                    {
+                        return value;
+                    }
+                }
+                throw new InvalidILException($"Expected {(type as ArrayDescriptor).ElementType}[]");
             }else
             {
                 throw new InvalidILException($"Expected {type}");

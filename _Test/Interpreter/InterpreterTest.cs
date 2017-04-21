@@ -442,5 +442,33 @@ namespace _Test
             runInterpreter(program("void Main(){ WriteInt(F()); } int F(){return 1;}"));
             Assert.AreEqual("1", _console.Output.ToString());
         }
+
+        [TestMethod]
+        public void ArrayLength()
+        {
+            runInterpreter(main("int[] i; i = new int[5]; WriteInt(i.length);"));
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ArrayAssignment()
+        {
+            runInterpreter(main("int[] i; i = new int[5]; i[3] = 7; WriteInt(i[3]);"));
+            Assert.AreEqual("7", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallVirtWithArray()
+        {
+            runInterpreter(program("void Main(){ int[] i; i = new int[5]; F(i); WriteInt(i[0]);} void F(int[] i){ i[0] = 7; }"));
+            Assert.AreEqual("7", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallVirtReturnArray()
+        {
+            runInterpreter(program("void Main(){ int[] i; i = F(); WriteInt(i[0]);} int[] F(){ int[] x; x = new int[5]; x[0] = 7; return x;}"));
+            Assert.AreEqual("7", _console.Output.ToString());
+        }
     }
 }
