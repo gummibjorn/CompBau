@@ -161,8 +161,22 @@ namespace RappiSharp.VirtualMachine.Runtime
                 case OpCode.castclass:
                     break;
                 case OpCode.ret:
-                    _callStack.Pop();
+                    Ret();
                     break;
+            }
+        }
+
+        private void Ret()
+        {
+            var type = ActiveFrame.Method.ReturnType;
+            if(type != null)
+            {
+                var value = Verify(Stack.Pop(), type);
+                _callStack.Pop();
+                Stack.Push(value);
+            } else
+            {
+                _callStack.Pop();
             }
         }
 

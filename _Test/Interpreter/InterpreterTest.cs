@@ -410,5 +410,12 @@ namespace _Test
             runInterpreter(program("void Main(){ F(); } void F(){ int i; i=1; WriteInt(i);}"));
             Assert.AreEqual("1", _console.Output.ToString());
         }
+
+        [TestMethod]
+        public void ReturnValue()
+        {
+            runInterpreter(program("void Main(){ WriteInt(F()); } int F(){return 1;}"));
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
     }
 }
