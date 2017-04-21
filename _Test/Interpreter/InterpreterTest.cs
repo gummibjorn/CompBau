@@ -20,7 +20,7 @@ namespace _Test
     [TestClass]
     public class InterpreterTest : AbstractTest
     {
-        protected override string getPathInProject() { return "Interpreter"; }
+        protected override string getPathInProject() { return "Generator"; }
 
         private Interpreter _interpreter;
         private TestConsole _console;
@@ -470,5 +470,34 @@ namespace _Test
             runInterpreter(program("void Main(){ int[] i; i = F(); WriteInt(i[0]);} int[] F(){ int[] x; x = new int[5]; x[0] = 7; return x;}"));
             Assert.AreEqual("7", _console.Output.ToString());
         }
+
+        [TestMethod]
+        public void ObjectNew()
+        {
+            runInterpreter(main("Program p; p = new Program();"));
+            //Assert.AreEqual("7", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ObjectField()
+        {
+            runInterpreter(program("int i; void Main(){ i = 5; WriteInt(i); }"));
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallMemberArg()
+        {
+            runInterpreter();
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void NestedArrayAccess()
+        {
+            runInterpreter();
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
+
     }
 }

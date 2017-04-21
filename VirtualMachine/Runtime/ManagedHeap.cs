@@ -12,7 +12,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         public ClassObject(ClassDescriptor type)
         {
             Type = type;
-            Fields = new object[type.FieldTypes.Length];
+            Fields = Interpreter.InitializedVariables(type.FieldTypes);
         }
         public ClassDescriptor Type { get; }
         public object[] Fields { get; }

@@ -39,10 +39,9 @@ namespace RappiSharp.VirtualMachine.Runtime
             _callStack.Push(new ActivationFrame(mainMethod, mainObject, new object[0], locals));
         }
 
-        private object NewObject(ClassDescriptor mainClass)
+        private object NewObject(ClassDescriptor descriptor)
         {
-            // TODO: Implement object orientation later
-            return null;
+            return new ClassObject(descriptor);
         }
 
         private void Interpret()
@@ -135,8 +134,10 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Starg(Verify<int>(operand));
                     break;
                 case OpCode.ldfld:
+                    LdFld(Verify<int>(operand));
                     break;
                 case OpCode.stfld:
+                    StFld(Verify<int>(operand));
                     break;
                 case OpCode.newarr:
                     NewArr(Verify<ArrayDescriptor>(operand));
@@ -154,8 +155,10 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Call(operand);
                     break;
                 case OpCode.newobj:
+                    Stack.Push(NewObject(Verify<ClassDescriptor>(operand)));
                     break;
                 case OpCode.ldthis:
+                    Stack.Push(ActiveFrame.ThisReference);
                     break;
                 case OpCode.callvirt:
                     CallVirt(Verify<MethodDescriptor>(operand));
@@ -168,6 +171,20 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Ret();
                     break;
             }
+        }
+
+        private void StFld(int fieldIndex)
+        {
+            var value = Stack.Pop();
+            var instance = Stack.Pop<ClassObject>();
+            Verify(value, instance.Type.FieldTypes[fieldIndex]);
+            instance.Fields[fieldIndex] = value;
+        }
+
+        private void LdFld(int fieldIndex)
+        {
+            var instance = Stack.Pop<ClassObject>();
+            Stack.Push(instance.Fields[fieldIndex]);
         }
 
         private void Ldelem()
@@ -216,8 +233,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 args[i] = Verify(Stack.Pop(), type);
 
             }
-            //var thisReference = Stack.Pop();
-            object thisReference = null;
+            var thisReference = Stack.Pop<ClassObject>();
             var frame = new ActivationFrame(method, thisReference, args, locals);
             _callStack.Push(frame);
         }
@@ -278,8 +294,14 @@ namespace RappiSharp.VirtualMachine.Runtime
                     }
                 }
                 throw new InvalidILException($"Expected {(type as ArrayDescriptor).ElementType}[]");
-            }else
-            {
+            } else {
+                if(value is ClassObject)
+                {
+                    if((value as ClassObject).Type == type)
+                    {
+                        return value;
+                    }
+                }
                 throw new InvalidILException($"Expected {type}");
             }
         }
@@ -332,7 +354,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
 
 
-        private object[] InitializedVariables(TypeDescriptor[] types)
+        public static object[] InitializedVariables(TypeDescriptor[] types)
         {
             var variables = new object[types.Length];
             for (int index = 0; index < variables.Length; index++)
@@ -342,7 +364,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             return variables;
         }
 
-        private object DefaultValue(TypeDescriptor type)
+        private static object DefaultValue(TypeDescriptor type)
         {
             if (type is InbuiltType)
             {
