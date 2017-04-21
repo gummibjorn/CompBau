@@ -396,5 +396,19 @@ namespace _Test
             runInterpreter(program("void Main(){ F(1, 'c', \"foo\", true); } void F(int i, char c, string s, bool b){ WriteInt(i); WriteChar(c); WriteString(s); "+WriteBool("b")+"}"));
             Assert.AreEqual("1cfooTRUE", _console.Output.ToString());
         }
+
+        [TestMethod]
+        public void Starg()
+        {
+            runInterpreter(program("void Main(){ F(1); } void F(int i){ WriteInt(i); i = 2; WriteInt(i); }"));
+            Assert.AreEqual("12", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void Stloc()
+        {
+            runInterpreter(program("void Main(){ F(); } void F(){ int i; i=1; WriteInt(i);}"));
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
     }
 }

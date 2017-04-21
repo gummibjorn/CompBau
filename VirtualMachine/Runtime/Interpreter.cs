@@ -126,12 +126,13 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(Locals[Verify<int>(operand)]);
                     break;
                 case OpCode.stloc:
-                    Stloc(operand);
+                    Stloc(Verify<int>(operand));
                     break;
                 case OpCode.ldarg:
                     Stack.Push(Arguments[Verify<int>(operand)]);
                     break;
                 case OpCode.starg:
+                    Starg(Verify<int>(operand));
                     break;
                 case OpCode.ldfld:
                     break;
@@ -200,12 +201,17 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
-        private void Stloc(object operand)
+        private void Starg(int index)
         {
             var value = Stack.Pop();
-            var index = Verify<int>(operand);
-            var localType = _loader.MainMethod.LocalTypes[index];
+            var localType = ActiveFrame.Method.ParameterTypes[index];
+            Arguments[index] = Verify(value, localType);
+        }
 
+        private void Stloc(int index)
+        {
+            var value = Stack.Pop();
+            var localType = ActiveFrame.Method.LocalTypes[index];
             Locals[index] = Verify(value, localType);
         }
 
