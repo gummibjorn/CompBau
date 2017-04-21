@@ -144,7 +144,7 @@ namespace _Test
         [TestMethod]
         public void ArrayCreation()
         {
-            initializeGenerator(expression("int[]", "new int[10]"));
+            initializeGenerator();
             Run();
         }
 

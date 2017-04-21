@@ -191,6 +191,10 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var index = Stack.Pop<int>();
             var array = Stack.Pop<ArrayObject>();
+            if(array.Elements.Length <= index || 0 > index)
+            {
+                throw new VMException("index out of array range");
+            }
             Stack.Push(array.Elements[index]);
         }
 

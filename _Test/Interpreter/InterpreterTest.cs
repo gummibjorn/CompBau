@@ -243,6 +243,26 @@ namespace _Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(VMException))]
+        public void InvalidIndexArrayAccess()
+        {
+            runInterpreter(
+                new MetadataBuilder()
+                .addArrayType(-3)
+                .addMainLocal(1)
+                .addMainLocal(-3)
+                .addMainInst(OpCode.ldc_i, 2)
+                .addMainInst(OpCode.newarr, 1)
+                .addMainInst(OpCode.stloc, 0)
+                .addMainInst(OpCode.ldloc, 0)
+                .addMainInst(OpCode.ldc_i, 12)
+                .addMainInst(OpCode.ldelem)
+                .addMainInst(OpCode.stloc, 0)
+                .build()
+                );
+        }
+
+        [TestMethod]
         [ExpectedException(typeof(InvalidILException))]
         public void LocalsStoreInvalidType()
         {
