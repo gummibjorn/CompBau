@@ -369,11 +369,32 @@ namespace _Test
             Assert.AreEqual("1", _console.Output.ToString());
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void While()
         {
             runInterpreter(main("int i; while(i < 5){ WriteInt(i); i = i+1; }"));
             Assert.AreEqual("01234", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallVirtSimple()
+        {
+            runInterpreter(program("void Main(){ F(); } void F(){ WriteInt(0); }"));
+            Assert.AreEqual("0", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallVirtArg()
+        {
+            runInterpreter(program("void Main(){ F(1); } void F(int i){ WriteInt(i); }"));
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallVirtArgs()
+        {
+            runInterpreter(program("void Main(){ F(1, 'c', \"foo\", true); } void F(int i, char c, string s, bool b){ WriteInt(i); WriteChar(c); WriteString(s); "+WriteBool("b")+"}"));
+            Assert.AreEqual("1cfooTRUE", _console.Output.ToString());
         }
     }
 }

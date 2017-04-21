@@ -129,6 +129,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stloc(operand);
                     break;
                 case OpCode.ldarg:
+                    Stack.Push(Arguments[Verify<int>(operand)]);
                     break;
                 case OpCode.starg:
                     break;
@@ -152,6 +153,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 case OpCode.ldthis:
                     break;
                 case OpCode.callvirt:
+                    CallVirt(Verify<MethodDescriptor>(operand));
                     break;
                 case OpCode.isinst:
                     break;
@@ -161,6 +163,22 @@ namespace RappiSharp.VirtualMachine.Runtime
                     _callStack.Pop();
                     break;
             }
+        }
+
+        private void CallVirt(MethodDescriptor method)
+        {
+            var locals = InitializedVariables(method.LocalTypes);
+            var args = new object[method.ParameterTypes.Length];
+            for(var i = method.ParameterTypes.Length -1; i >= 0; i--)
+            {
+                var type = method.ParameterTypes[i];
+                args[i] = Verify(Stack.Pop(), type);
+
+            }
+            //var thisReference = Stack.Pop();
+            object thisReference = null;
+            var frame = new ActivationFrame(method, thisReference, args, locals);
+            _callStack.Push(frame);
         }
 
         private void BinaryOp<T>(Func<int,int,T> action)
@@ -188,23 +206,27 @@ namespace RappiSharp.VirtualMachine.Runtime
             var index = Verify<int>(operand);
             var localType = _loader.MainMethod.LocalTypes[index];
 
-            if(localType == InbuiltType.Bool)
+            Locals[index] = Verify(value, localType);
+        }
+
+        private object Verify(object value, TypeDescriptor type)
+        {
+            if(type == InbuiltType.Bool)
             {
-                Locals[index] = Verify<bool>(value);
-            }else if(localType == InbuiltType.Int)
+                return Verify<bool>(value);
+            }else if(type == InbuiltType.Int)
             {
-                Locals[index] = Verify<int>(value);
-            }else if(localType == InbuiltType.String)
+                return Verify<int>(value);
+            }else if(type == InbuiltType.String)
             {
-                Locals[index] = Verify<string>(value);
-            }else if(localType == InbuiltType.Char)
+                return Verify<string>(value);
+            }else if(type == InbuiltType.Char)
             {
-                Locals[index] = Verify<char>(value);
+                return Verify<char>(value);
             }else
             {
-                throw new InvalidILException("Wrong type in stloc");
+                throw new InvalidILException($"Expected {type}");
             }
-
         }
 
         private void Call(object operand)
@@ -243,6 +265,13 @@ namespace RappiSharp.VirtualMachine.Runtime
                 {
                     int input = int.Parse(_console.ReadLine());
                     Stack.Push(input);
+                }
+
+                if(operand == MethodDescriptor.Halt)
+                {
+                    var arg = Stack.Pop<string>();
+                    _console.Write(arg);
+                    Environment.Exit(1);
                 }
         }
 
