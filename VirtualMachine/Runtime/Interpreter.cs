@@ -212,14 +212,25 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void Ret()
         {
             var type = ActiveFrame.Method.ReturnType;
+
             if(type != null)
             {
                 var value = Verify(Stack.Pop(), type);
+                checkEvaluationStackEmpty();
                 _callStack.Pop();
                 Stack.Push(value);
             } else
             {
+                checkEvaluationStackEmpty();
                 _callStack.Pop();
+            }
+        }
+
+        private void checkEvaluationStackEmpty()
+        {
+            if(Stack.Count != 0)
+            {
+                throw new VMException("evaluation stack is not empty after ret");
             }
         }
 

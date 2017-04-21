@@ -204,11 +204,40 @@ namespace _Test
 
         [TestMethod]
         [ExpectedException(typeof(InvalidILException))]
-        public void InvalidLoad()
+        public void InvalidLoadConstant()
         {
             runInterpreter(
                 new MetadataBuilder()
-                .addMainInst(OpCode.ldc_b, 12)
+                .addMainLocal(-3)
+                .addMainInst(OpCode.ldc_i, false)
+                .addMainInst(OpCode.stloc, 0)
+                .build()
+                );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidILException))]
+        public void InvalidTopOfStackInBreakFalse()
+        {
+            runInterpreter(
+                new MetadataBuilder()
+                .addMainInst(OpCode.ldc_i, 12)
+                .addMainInst(OpCode.brfalse, 0)
+                .build()
+                );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidILException))]
+        public void InvalidTypesInAddition()
+        {
+            runInterpreter(
+                new MetadataBuilder()
+                .addMainLocal(-3)
+                .addMainInst(OpCode.ldc_i, 12)
+                .addMainInst(OpCode.ldc_b, false)
+                .addMainInst(OpCode.add)
+                .addMainInst(OpCode.stloc, 0)
                 .build()
                 );
         }
