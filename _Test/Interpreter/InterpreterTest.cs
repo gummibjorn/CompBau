@@ -616,5 +616,48 @@ namespace _Test
             Assert.AreEqual("1", _console.Output.ToString());
         }
 
+        [TestMethod]
+        public void IsSameClass()
+        {
+            //runInterpreter("class P { void Main(A a; a=new a(); "+WriteBool("a is A")+") } class A{}");
+            runInterpreter("class P { void Main(){A a; a=new A(); "+WriteBool("a is A")+" }} class A{}");
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IsNull()
+        {
+            runInterpreter("class P { void Main(){A a; "+WriteBool("a is A")+" }} class A{}");
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IsOtherClass()
+        {
+            runInterpreter("class P { void Main(){A a; a = new A1(); "+WriteBool("a is A2")+" }} class A{} class A1:A{} class A2:A{}");
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IsSubClass()
+        {
+            runInterpreter("class P { void Main(){A a; a=new B(); "+WriteBool("a is B")+" }} class A{} class B:A{}");
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void AssignNullArray()
+        {
+            runInterpreter(main("Program[] p; p = null;" +WriteBool("p == null")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void AssignNullObject()
+        {
+            runInterpreter(main("Program p; p = null;" +WriteBool("p == null")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
     }
 }

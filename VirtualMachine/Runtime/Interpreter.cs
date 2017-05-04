@@ -165,6 +165,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     CallVirt(Verify<MethodDescriptor>(operand));
                     break;
                 case OpCode.isinst:
+                    Stack.Push(IsInst(Verify<ClassDescriptor>(operand)));
                     break;
                 case OpCode.castclass:
                     break;
@@ -172,6 +173,18 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Ret();
                     break;
             }
+        }
+
+        private bool IsInst(ClassDescriptor op)
+        {
+            var instance = Stack.Pop();
+            if(instance == null)
+            {
+                return false;
+            }
+            var obj = (ClassObject) instance;
+            return obj.Type.BaseTypes[op.Level] == op;
+
         }
 
         private void StFld(int fieldIndex)
@@ -319,6 +332,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             {
                 return Verify<char>(value);
             }else if(type is ArrayDescriptor) {
+                if (value == null) return null;
                 if(value is ArrayObject)
                 {
                     if((value as ArrayObject).Type.ElementType == (type as ArrayDescriptor).ElementType)
@@ -328,6 +342,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 }
                 throw new InvalidILException($"Expected {(type as ArrayDescriptor).ElementType}[]");
             } else {
+                if (value == null) return null;
                 if(value is ClassObject)
                 {
                     if((value as ClassObject).Type.BaseTypes[(type as ClassDescriptor).Level] == type)
