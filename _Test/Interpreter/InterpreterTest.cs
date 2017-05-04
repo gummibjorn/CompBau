@@ -542,6 +542,33 @@ namespace _Test
         }
 
         [TestMethod]
+        public void ClassMemberAccess()
+        {
+            runInterpreter();
+            Assert.AreEqual("0", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallClassMemberMethod()
+        {
+            runInterpreter();
+            Assert.AreEqual("Lul", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void DynamicDispatch()
+        {
+            runInterpreter();
+            Assert.AreEqual("LulB", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void Polymorphism()
+        {
+            runInterpreter();
+        }
+
+        [TestMethod]
         public void NestedArrayAccess()
         {
             runInterpreter();

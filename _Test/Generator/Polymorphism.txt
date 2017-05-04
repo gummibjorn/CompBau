@@ -1,0 +1,12 @@
+class Program{
+	void Main(){
+		A a;
+		a = new B();
+	}
+}
+
+class A{
+}
+
+class B : A{
+}

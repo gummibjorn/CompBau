@@ -312,7 +312,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             } else {
                 if(value is ClassObject)
                 {
-                    if((value as ClassObject).Type == type)
+                    if((value as ClassObject).Type == (type as ClassDescriptor).BaseTypes[(type as ClassDescriptor).Level])
                     {
                         return value;
                     }
