@@ -1,0 +1,32 @@
+class Program{
+	void Main(){
+		A a;
+		a = new B();
+
+		A a1 = a;
+
+		B b = new B();
+
+		if(a == null){
+			WriteString("what!? never!");
+		}
+
+		if(a == a1){
+			WriteString("yes!");
+		}
+
+		if(a != null){
+			WriteString("i want");
+		}
+
+		if(a != b){
+			WriteString(" Cookies!");
+		}
+	}
+}
+
+class A{
+}
+
+class B : A{
+}

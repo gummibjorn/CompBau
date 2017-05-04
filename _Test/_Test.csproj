@@ -110,6 +110,7 @@
     <Content Include="Generator\BinaryExpressionOr1.txt" />
     <Content Include="Generator\BigMath.txt" />
     <Content Include="Generator\BinaryExpressionOr2.txt" />
+    <Content Include="Generator\BinaryExprRef.txt" />
     <Content Include="Generator\PolymorphismComplex.txt" />
     <Content Include="Generator\Polymorphism.txt" />
     <Content Include="Generator\DynamicDispatch.txt" />

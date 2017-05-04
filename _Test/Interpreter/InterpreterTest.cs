@@ -575,6 +575,13 @@ namespace _Test
         }
 
         [TestMethod]
+        public void BinaryExprRef()
+        {
+            runInterpreter();
+            Assert.AreEqual("yes!i want Cookies!", _console.Output.ToString());
+        }
+
+        [TestMethod]
         public void NestedArrayAccess()
         {
             runInterpreter();
