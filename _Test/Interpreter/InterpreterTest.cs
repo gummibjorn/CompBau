@@ -617,7 +617,6 @@ namespace _Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(VMException))]
         public void ClassCastNull()
         {
             runInterpreter();

@@ -273,12 +273,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var instance = Stack.Pop();
 
-            if(instance == null)
-            {
-                throw new VMException("Null reference exception");
-            }
-
-            if((instance as ClassObject).Type.BaseTypes[targetType.Level] != targetType)
+            if(instance != null && (instance as ClassObject).Type.BaseTypes[targetType.Level] != targetType)
             {
                 throw new VMException("Invalid cast");
             }
