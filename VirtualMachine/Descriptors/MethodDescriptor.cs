@@ -7,6 +7,7 @@ namespace RappiSharp.VirtualMachine.Descriptors {
     public string Identifier { get; }
     public ClassDescriptor Parent { get; set; }
 
+    public int Position { get; set; }
     public TypeDescriptor ReturnType { get; set; }
     public TypeDescriptor[] ParameterTypes { get; set; } 
     public TypeDescriptor[] LocalTypes { get; set; }

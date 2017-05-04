@@ -238,18 +238,19 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
-        private void CallVirt(MethodDescriptor method)
+        private void CallVirt(MethodDescriptor staticMethod)
         {
-            var locals = InitializedVariables(method.LocalTypes);
-            var args = new object[method.ParameterTypes.Length];
-            for(var i = method.ParameterTypes.Length -1; i >= 0; i--)
+            var locals = InitializedVariables(staticMethod.LocalTypes);
+            var args = new object[staticMethod.ParameterTypes.Length];
+            for(var i = staticMethod.ParameterTypes.Length -1; i >= 0; i--)
             {
-                var type = method.ParameterTypes[i];
+                var type = staticMethod.ParameterTypes[i];
                 args[i] = Verify(Stack.Pop(), type);
 
             }
             var thisReference = Stack.Pop<ClassObject>();
-            var frame = new ActivationFrame(method, thisReference, args, locals);
+            var dynamicMethod = thisReference.Type.VirtualTable[staticMethod.Position];
+            var frame = new ActivationFrame(dynamicMethod, thisReference, args, locals);
             _callStack.Push(frame);
         }
 

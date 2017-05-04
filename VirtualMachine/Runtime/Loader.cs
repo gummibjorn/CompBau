@@ -19,18 +19,21 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             _metadata = metadata;
             RegisterInbuilts();
-            try
-            {
                 RegisterTypes();
                 RegisterMethods();
                 FixHierarchyDepth();
                 FixTypes();
                 FixMethods();
                 MainMethod = _methods[_metadata.MainMethod];
-            }
-            catch (Exception)
+            try
             {
-                throw new InvalidILException($"Invalid IL format");
+            }
+            catch (Exception e)
+            {
+
+                Console.WriteLine(e);
+                //throw new InvalidILException($"Invalid IL format");
+                throw e;
             }
         }
 
@@ -152,7 +155,52 @@ namespace RappiSharp.VirtualMachine.Runtime
             classDescriptor.BaseTypes = new ClassDescriptor[_hierarchyDepth];
             FixBaseTypes(classDescriptor, classData);
             classDescriptor.FieldTypes = MapTypes(classData.FieldTypes);
+            MapVirtualTable(classDescriptor, classData);
             FixMethodParent(classDescriptor, classData);
+        }
+
+        private void MapVirtualTable(ClassDescriptor classDescriptor, ClassData classData)
+        {
+            var baseTable = new MethodDescriptor[0];
+            if(classDescriptor.Level > 0)
+            {
+                var baseClassDescriptor = classDescriptor.BaseTypes[classDescriptor.Level - 1];
+                ClassData baseClassData = (ClassData)_metadata.Types[(int)classData.BaseType];
+                MapVirtualTable(baseClassDescriptor, baseClassData);
+                baseTable = baseClassDescriptor.VirtualTable;
+            }
+            var nextPosition = baseTable.Length;
+            foreach(var methodIndex in classData.Methods)
+            {
+                var method = _methods[methodIndex];
+                var matched = false;
+                foreach(var baseMethod in baseTable)
+                {
+                    if(baseMethod.Identifier == method.Identifier)
+                    {
+                        method.Position = baseMethod.Position;
+                        matched = true;
+                    }
+                }
+                if (!matched)
+                {
+                    method.Position = nextPosition++;
+                }
+            }
+
+            var table = new MethodDescriptor[nextPosition];
+            for(var i = 0; i < baseTable.Length; i++)
+            {
+                table[i] = baseTable[i];
+            }
+
+            foreach (var methodIndex in classData.Methods)
+            {
+                var method = _methods[methodIndex];
+                table[method.Position] = method;
+            }
+
+            classDescriptor.VirtualTable = table;
         }
 
         private void FixMethodParent(ClassDescriptor classDescriptor, ClassData classData)
