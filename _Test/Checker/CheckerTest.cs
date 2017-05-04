@@ -600,5 +600,11 @@ namespace _Test
         {
             initializeChecker("class Program{ int i; void Main(){ this.i = 5; WriteInt(this.i); } }");
         }
+
+        [TestMethod]
+        public void ReturnArray()
+        {
+            initializeChecker("class Program{ void Main(){} int[] Arr(){int[] i; i = new int[5]; return i; } }");
+        }
     }
 }
