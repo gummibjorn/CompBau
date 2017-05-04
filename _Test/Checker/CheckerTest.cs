@@ -531,30 +531,6 @@ namespace _Test
             AssertDiagnosisContains("can never be");
         }
 
-        [TestMethod, Ignore]
-        public void IsLeftPrimitiveArray()
-        {
-            initializeChecker("class Base{ void Main(){ bool a; int[] b; a = (b is Base);} }");
-        }
-
-        [TestMethod, Ignore]
-        public void IsRightPrimitiveArray()
-        {
-            initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is int[]);} }");
-        }
-
-        [TestMethod, Ignore]
-        public void IsReftypeArray()
-        {
-            initializeChecker("class Base{ void Main(){ bool a; Base b[]; a = (b is Base[]);} }");
-        }
-
-        [TestMethod, Ignore]
-        public void IsReftypeArrayWrongLeft()
-        {
-            initializeChecker("class Base{ void Main(){ bool a; Base b; a = (b is Base[]);} }");
-        }
-
         [TestMethod]
         public void InexistentMethod()
         {
