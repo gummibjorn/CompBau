@@ -1,0 +1,19 @@
+class Program{
+	void Main(){
+		A a;
+		a = new B();
+
+		B b;
+		b = new B();
+
+		if(a != b){
+			WriteString("what!? never!");
+		}
+	}
+}
+
+class A{
+}
+
+class B : A{
+}

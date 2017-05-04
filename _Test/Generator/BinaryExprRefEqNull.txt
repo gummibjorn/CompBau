@@ -1,0 +1,15 @@
+class Program{
+	void Main(){
+		A a;
+
+		if(a == null){
+			WriteString("what!? never!");
+		}
+	}
+}
+
+class A{
+}
+
+class B : A{
+}

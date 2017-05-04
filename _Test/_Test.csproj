@@ -110,7 +110,11 @@
     <Content Include="Generator\BinaryExpressionOr1.txt" />
     <Content Include="Generator\BigMath.txt" />
     <Content Include="Generator\BinaryExpressionOr2.txt" />
-    <Content Include="Generator\BinaryExprRef.txt" />
+    <Content Include="Generator\BinaryExprRefEqNull.txt" />
+    <Content Include="Generator\BinaryExprRefThis.txt" />
+    <Content Include="Generator\BinaryExprRefNEq.txt" />
+    <Content Include="Generator\BinaryExprRefNEqNull.txt" />
+    <Content Include="Generator\BinaryExprRefEq.txt" />
     <Content Include="Generator\PolymorphismComplex.txt" />
     <Content Include="Generator\Polymorphism.txt" />
     <Content Include="Generator\DynamicDispatch.txt" />

@@ -1,0 +1,18 @@
+class Program{
+	void Main(){
+		A a;
+		a = new B();
+		A a1;
+		a1 = a;
+
+		if(a1 == a){
+			WriteString(" Cookies!");
+		}
+	}
+}
+
+class A{
+}
+
+class B : A{
+}
