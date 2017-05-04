@@ -26,6 +26,11 @@ class Program{
 }
 
 class A{
+	refCompare(A a){
+		if(a == this){
+			WriteString("give!");
+		}
+	}
 }
 
 class B : A{
