@@ -66,6 +66,11 @@ namespace _Test
             initializeInterpreter(makeLexer(code));
         }
 
+        private string writeBool(string expression)
+        {
+            return "if(" + expression + "){ WriteString(\"TRUE\"); } else { WriteString(\"FALSE\"); }";
+        }
+
         public void Run()
         {
             _didRun = true;
@@ -677,6 +682,188 @@ namespace _Test
         {
             runInterpreter(main("Program p; p = null;" +WriteBool("p == null")));
             Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void Playground()
+        {
+            runInterpreter();
+            Run();
+        }
+
+        [TestMethod]
+        public void CallMemberMethodComplex()
+        {
+            runInterpreter();
+            Assert.AreEqual("1!yay", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void CallMemberReturn()
+        {
+            runInterpreter();
+            Run();
+        }
+
+        [TestMethod]
+        public void ArrayCreation()
+        {
+            runInterpreter();
+            Run();
+        }
+
+        [TestMethod]
+        public void BinaryExpressionOr1()
+        {
+            runInterpreter();
+            Assert.AreEqual("True", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void BinaryExpressionOr2()
+        {
+            runInterpreter();
+            Assert.AreEqual("AAFalse", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void BinaryExpressionAnd1()
+        {
+            runInterpreter();
+            Assert.AreEqual("True", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void BinaryExpressionAnd2()
+        {
+            runInterpreter();
+            Assert.AreEqual("False", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void BinaryExpressionAnd3()
+        {
+            runInterpreter();
+            Assert.AreEqual("AFalse", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void BigMath()
+        {
+            runInterpreter();
+            Assert.AreEqual("0-3", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ArrayNullCompareTrue()
+        {
+            runInterpreter(main("int[] a; " + writeBool("a == null")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ArrayNullCompareFalse()
+        {
+            runInterpreter(main("int[] a; a = new int[10]; " + writeBool("a == null")));
+            Assert.AreEqual("FALSE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ArrayAssignNull()
+        {
+            runInterpreter(main("int[] a; a = new int[10]; a = null; " + writeBool("a == null")));
+            Assert.AreEqual("TRUE", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void MemberAccessThisImplicitPrimitive()
+        {
+            runInterpreter(program("int i; void Main(){ i = 5; WriteInt(i); }"));
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void MemberAccessThisPrimitive()
+        {
+            runInterpreter(program("int i; void Main(){ this.i = 5; WriteInt(this.i); }"));
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void DesignatorComplex()
+        {
+            runInterpreter();
+            Assert.AreEqual("Apple" + "OM NOM NOM, TASTY Apple" + "OM NOM NOM, TASTY Apple3", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ObjectCreation()
+        {
+            runInterpreter(main("Program p; p = new Program();"));
+            Run();
+        }
+
+        [TestMethod]
+        public void ClassMemberAccessArray()
+        {
+            runInterpreter();
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ClassMemberAccessMemberArray()
+        {
+            runInterpreter();
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void MemberAccessThisImplicitMethod()
+        {
+            runInterpreter(program("void Foo(){ WriteInt(5); } void Main(){ Foo(); }"));
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void MemberAccessThisMethod()
+        {
+            runInterpreter(program("void Foo(){ WriteInt(5); } void Main(){ this.Foo(); }"));
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void MemberAccessMemberMethod()
+        {
+            runInterpreter("class Program{ void Main(){ Foo f; f = new Foo(); f.Foo(); } } class Foo{ void Foo(){WriteInt(5); } }");
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void MemberAccessMemberArrayMethod()
+        {
+            runInterpreter("class Program{ void Main(){ Foo[] fs; fs = new Foo[10]; fs[0] = new Foo(); fs[0].Foo(); } } class Foo{ void Foo(){WriteInt(5); } }");
+            Assert.AreEqual("5", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void ReturnStatement()
+        {
+            runInterpreter(main("WriteInt(1); return; WriteInt(2);"));
+            Assert.AreEqual("1", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void IsOperator()
+        {
+            runInterpreter();
+            Assert.AreEqual("a is B", _console.Output.ToString());
+        }
+        
+        [TestMethod]
+        public void WhileStatement()
+        {
+            runInterpreter(main("int i; while(i<5){i=i+1; WriteInt(i);};"));
+            Assert.AreEqual("12345", _console.Output.ToString());
         }
 
     }

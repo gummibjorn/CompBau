@@ -159,7 +159,7 @@ namespace _Test
         public void BinaryExpressionOr2()
         {
             initializeGenerator();
-            Run("AFalse");
+            Run("AAFalse");
         }
 
         [TestMethod]
