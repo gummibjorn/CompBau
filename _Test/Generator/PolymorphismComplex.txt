@@ -1,9 +1,11 @@
 class Program{
 	void Main(){
-		Program p;
-		p = new Program();
 		A a;
 		a = new B();
+		A ac;
+		ac = new C();
+		A ad;
+		ad = new D();
 	}
 }
 
@@ -11,4 +13,10 @@ class A{
 }
 
 class B : A{
+}
+
+class C : B{
+}
+
+class D : A{
 }

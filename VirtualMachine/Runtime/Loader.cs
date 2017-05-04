@@ -9,6 +9,7 @@ namespace RappiSharp.VirtualMachine.Runtime
     internal sealed class Loader
     {
         private readonly Metadata _metadata;
+        private int _hierarchyDepth;
         private readonly Dictionary<int, TypeDescriptor> _types = new Dictionary<int, TypeDescriptor>();
         private readonly Dictionary<int, MethodDescriptor> _methods = new Dictionary<int, MethodDescriptor>();
 
@@ -22,6 +23,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             {
                 RegisterTypes();
                 RegisterMethods();
+                FixHierarchyDepth();
                 FixTypes();
                 FixMethods();
                 MainMethod = _methods[_metadata.MainMethod];
@@ -108,27 +110,47 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
-        private ClassDescriptor[] FixBaseTypes(ClassDescriptor classDescriptor, ClassData classData, int level)
+        private void FixHierarchyDepth()
+        {
+            for (int index = 0; index < _metadata.Types.Count; index++)
+            {
+                if (_types[index] is ClassDescriptor)
+                {
+                    FixHierarchyDepth(1, (ClassData)_metadata.Types[index]);
+                }
+            }
+        }
+
+        private void FixHierarchyDepth(int depth, ClassData classData)
         {
             if (classData.BaseType == null)
             {
-                var baseTypes = new ClassDescriptor[level];
-                baseTypes[baseTypes.Length - level] = classDescriptor;
-                return baseTypes;
-            }
-            else
+                _hierarchyDepth = depth > _hierarchyDepth ? depth : _hierarchyDepth;
+            } else
             {
-                var baseTypes = FixBaseTypes(classDescriptor, (ClassData)_metadata.Types[((int)classData.BaseType)], level + 1);
-                classDescriptor.Level = baseTypes.Length - level;
-                baseTypes[classDescriptor.Level] = classDescriptor;
-                return baseTypes;
+                FixHierarchyDepth(++depth, (ClassData)_metadata.Types[((int)classData.BaseType)]);
             }
+        }
+
+        private int FixBaseTypes(ClassDescriptor classDescriptor, ClassData classData)
+        {
+            if (classData.BaseType == null)
+            {
+                classDescriptor.BaseTypes[0] = (ClassDescriptor)_types[_metadata.Types.IndexOf(classData)];
+                return 0;
+            }
+
+            classDescriptor.Level = FixBaseTypes(classDescriptor, (ClassData)_metadata.Types[(int)classData.BaseType])+1;
+
+            classDescriptor.BaseTypes[classDescriptor.Level] = (ClassDescriptor)_types[_metadata.Types.IndexOf(classData)];
+
+            return classDescriptor.Level;
         }
 
         private void FixClassType(ClassDescriptor classDescriptor, ClassData classData)
         {
-            // TODO: Implement support for inheritance later
-            classDescriptor.BaseTypes = FixBaseTypes(classDescriptor, classData, 1);
+            classDescriptor.BaseTypes = new ClassDescriptor[_hierarchyDepth];
+            FixBaseTypes(classDescriptor, classData);
             classDescriptor.FieldTypes = MapTypes(classData.FieldTypes);
             FixMethodParent(classDescriptor, classData);
         }

@@ -569,6 +569,12 @@ namespace _Test
         }
 
         [TestMethod]
+        public void PolymorphismComplex()
+        {
+            runInterpreter();
+        }
+
+        [TestMethod]
         public void NestedArrayAccess()
         {
             runInterpreter();
