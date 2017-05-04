@@ -115,6 +115,8 @@
     <Content Include="Generator\BinaryExprRefNEq.txt" />
     <Content Include="Generator\BinaryExprRefNEqNull.txt" />
     <Content Include="Generator\BinaryExprRefEq.txt" />
+    <Content Include="Generator\ClassCastNull.txt" />
+    <Content Include="Generator\ClassCastInvalid.txt" />
     <Content Include="Generator\PolymorphismComplex.txt" />
     <Content Include="Generator\Polymorphism.txt" />
     <Content Include="Generator\DynamicDispatch.txt" />

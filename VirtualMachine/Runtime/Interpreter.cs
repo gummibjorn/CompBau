@@ -168,6 +168,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(IsInst(Verify<ClassDescriptor>(operand)));
                     break;
                 case OpCode.castclass:
+                    CastClass(Verify<ClassDescriptor>(operand));
                     break;
                 case OpCode.ret:
                     Ret();
@@ -266,6 +267,23 @@ namespace RappiSharp.VirtualMachine.Runtime
             var dynamicMethod = thisReference.Type.VirtualTable[staticMethod.Position];
             var frame = new ActivationFrame(dynamicMethod, thisReference, args, locals);
             _callStack.Push(frame);
+        }
+
+        private void CastClass(ClassDescriptor targetType)
+        {
+            var instance = Stack.Pop();
+
+            if(instance == null)
+            {
+                throw new VMException("Null reference exception");
+            }
+
+            if((instance as ClassObject).Type.BaseTypes[targetType.Level] != targetType)
+            {
+                throw new VMException("Invalid cast");
+            }
+
+            Stack.Push(instance);
         }
 
         private void BinaryOp<T>(Func<int,int,T> action)

@@ -1,0 +1,13 @@
+class Program{
+	void Main(){
+		A a;
+		B b;
+		a = null;
+		b = (B) a;
+	}
+}
+
+class A{}
+
+class B : A{
+}

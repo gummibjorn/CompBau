@@ -610,6 +610,27 @@ namespace _Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(VMException))]
+        public void ClassCastInvalid()
+        {
+            runInterpreter();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(VMException))]
+        public void ClassCastNull()
+        {
+            runInterpreter();
+        }
+
+        [TestMethod]
+        public void ClassCast()
+        {
+            runInterpreter();
+            Assert.AreEqual("b.foo", _console.Output.ToString());
+        }
+
+        [TestMethod]
         public void NestedArrayAccess()
         {
             runInterpreter();
