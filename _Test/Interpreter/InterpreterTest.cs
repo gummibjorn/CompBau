@@ -578,35 +578,35 @@ namespace _Test
         public void BinaryExprRefEq()
         {
             runInterpreter();
-            Assert.AreEqual("", _console.Output.ToString());
+            Assert.AreEqual("Cookies!", _console.Output.ToString());
         }
 
         [TestMethod]
         public void BinaryExprRefNEq()
         {
             runInterpreter();
-            Assert.AreEqual("", _console.Output.ToString());
+            Assert.AreEqual("never!", _console.Output.ToString());
         }
 
         [TestMethod]
         public void BinaryExprRefEqNull()
         {
             runInterpreter();
-            Assert.AreEqual("", _console.Output.ToString());
+            Assert.AreEqual("never!", _console.Output.ToString());
         }
 
         [TestMethod]
         public void BinaryExprRefThis()
         {
             runInterpreter();
-            Assert.AreEqual("", _console.Output.ToString());
+            Assert.AreEqual("give!", _console.Output.ToString());
         }
 
         [TestMethod]
         public void BinaryExprRefNEqNull()
         {
             runInterpreter();
-            Assert.AreEqual("", _console.Output.ToString());
+            Assert.AreEqual("never!", _console.Output.ToString());
         }
 
         [TestMethod]

@@ -7,7 +7,7 @@ class Program{
 		b = new B();
 
 		if(a != b){
-			WriteString("what!? never!");
+			WriteString("never!");
 		}
 	}
 }

@@ -73,6 +73,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(Verify<string>(operand));
                     break;
                 case OpCode.ldnull:
+                    Stack.Push(null);
                     break;
                 case OpCode.br:
                     InstructionPointer += Verify<int>(operand);
@@ -116,10 +117,10 @@ namespace RappiSharp.VirtualMachine.Runtime
                     BinaryOp((a, b) => a >= b);
                     break;
                 case OpCode.ceq:
-                    BinaryOp((a, b) => a == b);
+                    Stack.Push(Compare());
                     break;
                 case OpCode.cne:
-                    BinaryOp((a, b) => a != b);
+                    Stack.Push(!Compare());
                     break;
                 case OpCode.ldloc:
                     Stack.Push(Locals[Verify<int>(operand)]);
@@ -259,6 +260,22 @@ namespace RappiSharp.VirtualMachine.Runtime
             var right = Stack.Pop<int>();
             var left = Stack.Pop<int>();
             Stack.Push(action(left, right));
+        }
+
+        private bool Compare()
+        {
+            var right = Stack.Pop();
+            var left = Stack.Pop();
+            if(right != null)
+            {
+                return right.Equals(left);
+            } else if (left != null)
+            {
+                return left.Equals(right);
+            } else
+            {
+                return true;
+            }
         }
 
         private void Neg()
