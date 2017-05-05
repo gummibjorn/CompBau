@@ -582,5 +582,17 @@ namespace _Test
         {
             initializeChecker("class Program{ void Main(){} int[] Arr(){int[] i; i = new int[5]; return i; } }");
         }
+
+        [TestMethod]
+        public void ReturnPolymorphic()
+        {
+            initializeChecker("class Program{ void Main(){} A Foo(){return new B();} } class A{} class B:A{}");
+        }
+
+        [TestMethod]
+        public void ParametePolymorphic()
+        {
+            initializeChecker("class Program{ void Main(){Foo(new B());} void Foo(A a){} } class A{} class B:A{}");
+        }
     }
 }

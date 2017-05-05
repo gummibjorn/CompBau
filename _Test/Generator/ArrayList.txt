@@ -1,0 +1,134 @@
+class Object {
+	void Print(){
+		WriteString("FAIL");
+	}
+}
+
+class ArrayList {
+	Object[] list;
+	int arrSize;
+	int size;
+	void Init(int initSize){
+		arrSize = initSize;
+		size = 0;
+		list = new Object[arrSize];
+	}
+	
+	void Add(Object o){
+		if (size >= arrSize){
+			Object[] newList;
+			arrSize = 2 * arrSize;
+			newList = new Object[arrSize];
+			int i;
+			i = 0;
+			while(i < size){
+				newList[i] = list[i];
+				i = i + 1;
+			}
+			list = newList;
+		}
+		list[size] = o;
+		size = size + 1;
+	}
+	
+	Object At(int index){
+		return list[index];
+	}
+	
+	Object First(){
+		return list[0];
+	}
+	
+	Object Last(){
+		return list[size-1];
+	}
+	
+	Object Remove(Object o){
+		int i;
+		int j;
+		j = -1;
+		i = 0;
+		while (i < size){
+			if (list[i] == o){
+				j = i;
+			}
+			i = i + 1;
+		}
+		if (j == -1){
+			Object b; // BUG?
+			b = null;
+			return b;
+		}
+		Object ret;
+		ret = list[j];
+		while(j < size-1){
+			list[j] = list[j+1];
+			j = j + 1;
+		}
+		list[j] = null;
+		size = size - 1;
+		return ret;
+	}
+}
+
+class Person : Object{
+	string FirstName;
+	string LastName;
+	void Init( string first, string last ){
+		FirstName = first;
+		LastName = last;
+	}
+	
+	void Print(){
+		WriteString(FirstName);
+		WriteString(" ");
+		WriteString(LastName);
+	}
+}
+
+class Program {
+	void Main(){
+		ArrayList list;
+		list = new ArrayList();
+		list.Init(2);
+		
+		Person p;
+		p = new Person();
+		p.Init("Hans","Meier");
+		list.Add(p);
+		
+		Person p2;
+		p2 = new Person();
+		p2.Init("Peter","Muster");
+		list.Add(p2);
+		
+		Person p3;
+		p3 = new Person();
+		p3.Init("Blub","Zirp");
+		list.Add(p3);
+		
+		Object o;
+		o = list.At(1);
+		o.Print();
+		WriteString("\n");
+		WriteInt(list.size);
+		WriteString("\n");
+		o = list.Remove(p);
+		o.Print();
+		WriteString("\n");
+		WriteInt(list.size);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

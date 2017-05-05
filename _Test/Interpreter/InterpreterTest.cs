@@ -907,6 +907,13 @@ namespace _Test
             runInterpreter(main("int[] a; a = new int[1]; WriteInt(a[0]);"));
             Assert.AreEqual("0", _console.Output.ToString());
         }
+        
+        [TestMethod]
+        public void ArrayList()
+        {
+            runInterpreter();
+            Assert.AreEqual("Peter Muster\n3\nHans Meier\n2", _console.Output.ToString());
+        }
 
     }
 }

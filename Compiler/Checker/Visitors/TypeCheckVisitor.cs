@@ -299,7 +299,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 var paramType = param.Type;
                 var arg = node.Arguments[i];
                 var argType = _symbolTable.FindType(arg);
-                if (paramType != argType)
+                if (!isAssignable(argType,paramType))
                 {
                     Error(arg.Location, $"Cannot assign argument of type {argType} to parameter {param.Identifier} ({paramType})");
                 }
@@ -342,11 +342,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
             }
 
             var returnType = _symbolTable.FindType(node.Expression);
-            var methodReturnType = _method.ReturnType.Identifier;
 
-            if (returnType.Identifier != methodReturnType)
+            if (!isAssignable(returnType, _method.ReturnType))
             {
-                Error(node.Location, $"Method return type {methodReturnType} does not match return expression type {returnType.Identifier}", true);
+                Error(node.Location, $"Method return type {_method.ReturnType.Identifier} does not match return expression type {returnType.Identifier}", true);
             }
         }
 
