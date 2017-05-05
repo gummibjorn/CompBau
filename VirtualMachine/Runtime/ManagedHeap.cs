@@ -24,7 +24,12 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             Type = type;
             Elements = new object[length];
+            for(var i = 0; i< Elements.Length; i++){
+                Elements[i] = Interpreter.DefaultValue(type.ElementType);
+            }
         }
+
+
 
         public ArrayDescriptor Type { get; }
         public object[] Elements { get; }

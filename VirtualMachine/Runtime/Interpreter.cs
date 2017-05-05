@@ -425,7 +425,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             return variables;
         }
 
-        private static object DefaultValue(TypeDescriptor type)
+        internal static object DefaultValue(TypeDescriptor type)
         {
             if (type is InbuiltType)
             {
