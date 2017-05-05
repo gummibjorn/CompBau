@@ -44,7 +44,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     }
                     break;
                 case Operator.Plus:
-                    checkIntegerMaxValue(operand);
+                    CheckIntegerMaxValue(operand);
                     if (type == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
@@ -65,7 +65,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             }
         }
 
-        private void checkIntegerMaxValue(ExpressionNode node)
+        private void CheckIntegerMaxValue(ExpressionNode node)
         {
             if (node is IntegerLiteralNode)
             {
@@ -98,8 +98,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var leftType = _symbolTable.FindType(node.Left);
             var rightType = _symbolTable.FindType(node.Right);
 
-            checkIntegerMaxValue(node.Left);
-            checkIntegerMaxValue(node.Right);
+            CheckIntegerMaxValue(node.Left);
+            CheckIntegerMaxValue(node.Right);
 
             switch (node.Operator)
             {
@@ -140,8 +140,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     break;
                 case Operator.Equals:
                 case Operator.Unequal:
-                    bool isLeftRef = isReferenceType(leftType);
-                    bool isRightRef = isReferenceType(rightType);
+                    bool isLeftRef = IsReferenceType(leftType);
+                    bool isRightRef = IsReferenceType(rightType);
                     bool isLeftNull = leftType == _symbolTable.Compilation.NullType;
                     bool isRightNull = rightType == _symbolTable.Compilation.NullType;
 
@@ -161,7 +161,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     break;
                 case Operator.Is:
                     _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    if (!isReferenceType(leftType))
+                    if (!IsReferenceType(leftType))
                     {
                         Error(node.Location, "Left hand side of 'is' must be a reference type");
                         break;
@@ -189,21 +189,15 @@ namespace RappiSharp.Compiler.Checker.Visitors
             }
         }
 
-        private bool isReferenceType(TypeSymbol type)
+        private bool IsReferenceType(TypeSymbol type)
         {
-            if(type == _symbolTable.Compilation.BoolType
+            return !(type == _symbolTable.Compilation.BoolType
                 || type == _symbolTable.Compilation.CharType
                 || type == _symbolTable.Compilation.StringType
-                || type == _symbolTable.Compilation.IntType)
-            {
-                return false;
-            }else
-            {
-                return true;
-            }
+                || type == _symbolTable.Compilation.IntType);
         }
 
-        private void checkNotLength(DesignatorNode node)
+        private void CheckNotLength(DesignatorNode node)
         {
             if (node is MemberAccessNode)
             {
@@ -232,7 +226,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
         private bool isAssignable(TypeSymbol sub, TypeSymbol baseType)
         {
             if(sub == null) { return false; }
-            if(sub == _symbolTable.Compilation.NullType && isReferenceType(baseType)) { return true; }
+            if(sub == _symbolTable.Compilation.NullType && IsReferenceType(baseType)) { return true; }
 
             if(sub is ArrayTypeSymbol && baseType is ArrayTypeSymbol)
             {
@@ -269,8 +263,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
             base.Visit(node);
             var leftType = _symbolTable.FindType(node.Left);
             var rightType = _symbolTable.FindType(node.Right);
-            checkIntegerMaxValue(node.Right);
-            checkNotLength(node.Left);
+            CheckIntegerMaxValue(node.Right);
+            CheckNotLength(node.Left);
             if (!isAssignable(rightType, leftType))
             {
                 Error(node.Location, $"Cannot assign '{rightType?.ToString()}' to '{leftType?.ToString()}'");
@@ -281,8 +275,6 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             base.Visit(node);
             var methodSymbol = (MethodSymbol)_symbolTable.GetTarget(node.Designator);
-            //var methodDefinition = _symbolTable.GetDeclarationNode<MethodNode>(methodSymbol);
-            //var returnType = _symbolTable.FindType(methodDefinition.ReturnType); 
             if(methodSymbol == null)
             {
                 Error(node.Location, $"Undeclared method '{node.Designator}'", true);
