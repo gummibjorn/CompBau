@@ -43,18 +43,18 @@
 				left[i] = arr[i];
 				i = i + 1;
 			}
-
+			
 			int[] right;
 			right = new int[arr.length - middle];
 			i = middle;
-			while(i < right.length){
+			while(i < arr.length){
 				right[i - middle] = arr[i];
 				i = i + 1;
 			}
-
+			
 			left = mergeSort(left);
 			right = mergeSort(right);
-
+			
 			return merge(left,right);
 		}
 		else{
@@ -89,12 +89,12 @@
 			indexResult = indexResult + 1;
 		}
 
-		while(indexLeft < left.length){
+		while(indexRight < right.length){
 			newArr[indexResult] = right[indexRight];
 			indexRight = indexRight + 1;
 			indexResult = indexResult + 1;
 		}
-
+		
 		return newArr;
 	}
 }
