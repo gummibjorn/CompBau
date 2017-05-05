@@ -92,7 +92,7 @@ namespace _Test
             }
         }
 
-        class TestConsole : IConsole
+        class TestConsole : IConsole, IDisposable
         {
 
             private Queue<int> _input = new Queue<int>();
@@ -139,6 +139,10 @@ namespace _Test
                 _input.Enqueue('\n');
             }
 
+            public void Dispose()
+            {
+                _output.Dispose();
+            }
         }
 
         private string program(string content)

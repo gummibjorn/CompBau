@@ -77,10 +77,10 @@ namespace RappiSharp.Compiler.Checker.General {
             {
               return _typeFixup[node];
 
-            } catch(KeyNotFoundException e)
+            } catch(KeyNotFoundException)
             {
                 Diagnosis.ReportError(node.Location, "Type not found for " + node.ToString());
-                throw e;
+                throw;
             }
     }
   }

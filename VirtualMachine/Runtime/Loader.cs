@@ -33,7 +33,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
                 Console.WriteLine(e);
                 //throw new InvalidILException($"Invalid IL format");
-                throw e;
+                throw;
             }
         }
 

@@ -16,12 +16,12 @@ namespace RappiSharp.VirtualMachine.Runtime
     public class SystemConsole : IConsole
     {
 
-        void IConsole.Write(object o)
+        public void Write(object o)
         {
             Console.Write(o);
         }
 
-        int IConsole.Read()
+        public int Read()
         {
             return Console.Read();
         }
