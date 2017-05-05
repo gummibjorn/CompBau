@@ -564,7 +564,7 @@ namespace _Test
         public void DynamicDispatch()
         {
             runInterpreter();
-            Assert.AreEqual("LulB", _console.Output.ToString());
+            Assert.AreEqual("LulHahaROFL", _console.Output.ToString());
         }
 
         [TestMethod]

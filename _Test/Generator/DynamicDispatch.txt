@@ -1,19 +1,40 @@
 class Program{
 	void Main(){
 		A a;
-		a = new B();
+
+		a = new A();
+		a.WriteLul();
+
+		a = new A1();
+		a.WriteLul();
+
+		a = new A2();
 		a.WriteLul();
 	}
 }
 
 class A{
+	string message;
 	void WriteLul(){
-		WriteString("LulA");
+		message = "Lul";
+		WriteString(message);
 	}
 }
 
-class B : A{
+class A1 : A{
+	int pad;
+	int morePad;
 	void WriteLul(){
-		WriteString("LulB");
+		string otherMessage;
+		otherMessage = "Haha";
+		WriteString(otherMessage);
+	}
+}
+
+class A2 : A{
+	string message; //shadow
+	void WriteLul(){
+		message = "ROFL";
+		WriteString(message);
 	}
 }

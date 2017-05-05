@@ -255,7 +255,6 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void CallVirt(MethodDescriptor staticMethod)
         {
-            var locals = InitializedVariables(staticMethod.LocalTypes);
             var args = new object[staticMethod.ParameterTypes.Length];
             for(var i = staticMethod.ParameterTypes.Length -1; i >= 0; i--)
             {
@@ -265,6 +264,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
             var thisReference = Stack.Pop<ClassObject>();
             var dynamicMethod = thisReference.Type.VirtualTable[staticMethod.Position];
+            var locals = InitializedVariables(dynamicMethod.LocalTypes);
             var frame = new ActivationFrame(dynamicMethod, thisReference, args, locals);
             _callStack.Push(frame);
         }
