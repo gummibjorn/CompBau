@@ -865,6 +865,20 @@ namespace _Test
             runInterpreter(main("int i; while(i<5){i=i+1; WriteInt(i);};"));
             Assert.AreEqual("12345", _console.Output.ToString());
         }
+        
+        [TestMethod]
+        public void MergeSort()
+        {
+            runInterpreter();
+            Assert.AreEqual("0,1,2,3,4,5,6,7,8,9", _console.Output.ToString());
+        }
+        
+        [TestMethod]
+        public void QuickSort()
+        {
+            runInterpreter();
+            Assert.AreEqual("0,1,2,3,4,5,6,7,8,9", _console.Output.ToString());
+        }
 
     }
 }

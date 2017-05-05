@@ -117,6 +117,7 @@
     <Content Include="Generator\BinaryExprRefEq.txt" />
     <Content Include="Generator\ClassCastNull.txt" />
     <Content Include="Generator\ClassCastInvalid.txt" />
+    <Content Include="Generator\MergeSort.txt" />
     <Content Include="Generator\PolymorphismComplex.txt" />
     <Content Include="Generator\Polymorphism.txt" />
     <Content Include="Generator\DynamicDispatch.txt" />
@@ -133,6 +134,7 @@
     <Content Include="Generator\CallMemberArg.txt" />
     <Content Include="Generator\DesignatorComplex.txt" />
     <Content Include="Generator\Playground.txt" />
+    <Content Include="Generator\QuickSort.txt" />
     <Content Include="Lexer\CombinedAssignment.txt" />
     <Content Include="Lexer\CombinedEverything.txt" />
     <Content Include="Lexer\CombinedHelloWorld.txt" />

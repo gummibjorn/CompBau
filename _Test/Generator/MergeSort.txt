@@ -1,0 +1,100 @@
+﻿class MergeSort {
+	void Main(){
+		int[] x;
+		x = new int[10];
+		x[0] = 7;
+		x[1] = 1;
+		x[2] = 0;
+		x[3] = 9;
+		x[4] = 2;
+		x[5] = 3;
+		x[6] = 6;
+		x[7] = 8;
+		x[8] = 5;
+		x[9] = 4;
+		//PrintArray(x);
+		//WriteChar('\n');
+		x = mergeSort(x);
+		PrintArray(x);
+	}
+
+	void PrintArray(int[] arr){
+		int i;
+		i = 0;
+		while(i < arr.length - 1){
+			WriteInt(arr[i]);
+			WriteChar(',');
+			i = i + 1;
+		}
+		if(arr.length > 0){
+			WriteInt(arr[arr.length-1]);
+		}
+	}
+
+	int[] mergeSort(int[] arr){
+		if(arr.length > 1){
+			int middle;
+			middle = arr.length / 2;
+			int[] left;
+			left = new int[middle];
+			int i;
+			i = 0;
+			while(i < left.length){
+				left[i] = arr[i];
+				i = i + 1;
+			}
+
+			int[] right;
+			right = new int[arr.length - middle];
+			i = middle;
+			while(i < right.length){
+				right[i - middle] = arr[i];
+				i = i + 1;
+			}
+
+			left = mergeSort(left);
+			right = mergeSort(right);
+
+			return merge(left,right);
+		}
+		else{
+			return arr;
+		}
+	}
+
+	int[] merge(int[] left, int[] right){
+		int[] newArr;
+		newArr = new int[left.length + right.length];
+		int indexLeft;
+		indexLeft = 0;
+		int indexRight;
+		indexRight = 0;
+		int indexResult;
+		indexResult = 0;
+
+		while(indexLeft < left.length && indexRight < right.length){
+			if(left[indexLeft] < right[indexRight]){
+				newArr[indexResult] = left[indexLeft];
+				indexLeft = indexLeft + 1;
+			} else{
+				newArr[indexResult] = right[indexRight];
+				indexRight = indexRight + 1;
+			}
+			indexResult = indexResult + 1;
+		}
+
+		while(indexLeft < left.length){
+			newArr[indexResult] = left[indexLeft];
+			indexLeft = indexLeft + 1;
+			indexResult = indexResult + 1;
+		}
+
+		while(indexLeft < left.length){
+			newArr[indexResult] = right[indexRight];
+			indexRight = indexRight + 1;
+			indexResult = indexResult + 1;
+		}
+
+		return newArr;
+	}
+}
