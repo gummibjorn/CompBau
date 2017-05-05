@@ -1,0 +1,72 @@
+﻿    class Word
+    {
+        void print()
+        {
+            WriteString("");
+        }
+    }
+
+    class HelloWord : Word
+    {
+        void print()
+        {
+            WriteString("Hello");
+        }
+    }
+
+    class ThouWord : Word
+    {
+        void print()
+        {
+            WriteString("thou");
+        }
+    }
+
+    class BeautifulWord : Word
+    {
+        void print()
+        {
+            WriteString("beautiful");
+        }
+    }
+
+    class WorldWord : Word
+    {
+        void print()
+        {
+            WriteString("World");
+        }
+    }
+
+    class SeperatorWord : Word
+    {
+        void print()
+        {
+            WriteString(" ");
+        }
+    }
+
+
+    class Greeter
+    {
+
+        void Main()
+        {
+            Word[] words;
+            words = new Word[7];
+            words[0] = new HelloWord();
+            words[1] = new SeperatorWord();
+            words[2] = new ThouWord();
+            words[3] = new SeperatorWord();
+            words[4] = new BeautifulWord();
+            words[5] = new SeperatorWord();
+            words[6] = new WorldWord();
+            int index;
+            index = 0;
+            while (index < words.length)
+            {
+                words[index].print();
+                index = index + 1;
+            }
+        }
+    }

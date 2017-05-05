@@ -104,6 +104,9 @@
     <Content Include="Checker\ArrayCreation.txt" />
     <Content Include="Checker\MethodReturnStatementInvalid.txt" />
     <Content Include="Checker\MethodReturnStatement.txt" />
+    <Content Include="Generator\Greeter.txt" />
+    <Content Include="Generator\AVL.txt" />
+    <Content Include="Generator\Dijkstra.txt" />
     <Content Include="Generator\BinaryExpressionAnd1.txt" />
     <Content Include="Generator\BinaryExpressionAnd3.txt" />
     <Content Include="Generator\BinaryExpressionAnd2.txt" />

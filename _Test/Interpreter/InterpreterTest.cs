@@ -526,6 +526,27 @@ namespace _Test
         }
 
         [TestMethod]
+        public void Dijkstra()
+        {
+            runInterpreter();
+            Assert.AreEqual("0 0\n1 4\n2 12\n3 19\n4 21\n5 11\n6 9\n7 8\n8 14\n", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void AVL()
+        {
+            runInterpreter();
+            Assert.AreEqual("30 20 10 25 40 50 ", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void Greeter()
+        {
+            runInterpreter();
+            Assert.AreEqual("Hello thou beautiful World", _console.Output.ToString());
+        }
+
+        [TestMethod]
         public void ObjectNew()
         {
             runInterpreter(main("Program p; p = new Program();"));
