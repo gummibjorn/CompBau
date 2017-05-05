@@ -1,0 +1,189 @@
+﻿   class MaxFlow
+    {
+        bool bfs(int[][] rGraph, int s, int t, int[] parent)
+        {
+
+            bool[] visited;
+            visited = new bool[6];
+            int i;
+            i = 0;
+            while (i < 6)
+            {
+                visited[i] = false;
+                i = i + 1;
+            }
+
+            int[] queue;
+            queue = new int[1000000];
+            int getIndex;
+            int putIndex;
+            getIndex = 0;
+            putIndex = 0;
+            queue[putIndex] = s;
+            putIndex = putIndex + 1;
+            visited[s] = true;
+            parent[s] = -1;
+
+            while (getIndex != putIndex)
+            {
+                int u;
+                u = queue[getIndex];
+                getIndex = getIndex + 1;
+                int v;
+                v = 0;
+                while(v < 6)
+                {
+                    if ( u < 6 && v < 6 && visited[v] == false && rGraph[u][v] > 0)
+                    {
+                        queue[putIndex] = v;
+                        putIndex = putIndex + 1;
+                        parent[v] = u;
+                        visited[v] = true;
+                    }
+                    v = v + 1;
+                }
+            }
+
+            return visited[t] == true;
+        }
+
+        int fordFulkerson(int[][] graph, int s, int t)
+        {
+
+            int[][] rGraph;
+            rGraph = new int[6][];
+            int i;
+            i = 0;
+            while(i < 6)
+            {
+                rGraph[i] = new int[6];
+                i = i + 1;
+            }
+            int u;
+            u = 0;
+            while (u < 6)
+            {
+                int b;
+                b = 0;
+                while (u < 6 && b < 6)
+                {
+                    rGraph[u][b] = graph[u][b];
+
+                    b = b + 1;
+                }
+
+                u = u + 1;
+            }
+ 
+
+        int[] parent;
+        parent = new int[6];
+
+        int maxflow;
+        maxflow = 0;   
+
+        while (bfs(rGraph, s, t, parent))
+        {
+            int pathflow;
+            pathflow = 2147483647;
+            int v;
+            v = t;
+            int z;
+            while (v < 6 && v != s)
+            {
+                z = parent[v];
+                if(z < 6) {
+                    if (pathflow < rGraph[z][v])
+                    {
+                        pathflow = pathflow;
+                    }
+                    else
+                    {
+                        pathflow = rGraph[z][v];
+                    }
+                }
+                v = parent[v];
+            }
+            v = t;
+            while (v < 6 && v != s)
+            {
+                z = parent[v];
+                if(z < 6 && v < 6){
+                    rGraph[z][v] = rGraph[z][v] - pathflow;
+                    rGraph[v][z] = rGraph[v][z] + pathflow;
+                }
+                v = parent[v];
+            }
+
+            maxflow = maxflow + pathflow;
+        }
+ 
+        return maxflow;
+    }
+ 
+}
+
+class Printer
+{
+    void Main()
+    {
+        int[][] graph;
+        graph = new int[6][];
+        int c;
+        c = 0;
+        while (c < 6)
+        {
+            graph[c] = new int[6];
+            c = c + 1;
+        }
+
+        graph[0][0] = 0;
+        graph[0][1] = 16;
+        graph[0][2] = 13;
+        graph[0][3] = 0;
+        graph[0][4] = 0;
+        graph[0][5] = 0;
+
+
+        graph[1][0] = 0;
+        graph[1][1] = 0;
+        graph[1][2] = 10;
+        graph[1][3] = 12;
+        graph[1][4] = 0;
+        graph[1][5] = 0;
+
+
+        graph[2][0] = 0;
+        graph[2][1] = 4;
+        graph[2][2] = 0;
+        graph[2][3] = 0;
+        graph[2][4] = 14;
+        graph[2][5] = 0;
+
+        graph[3][0] = 0;
+        graph[3][1] = 0;
+        graph[3][2] = 9;
+        graph[3][3] = 0;
+        graph[3][4] = 0;
+        graph[3][5] = 20;
+
+
+        graph[4][0] = 0;
+        graph[4][1] = 0;
+        graph[4][2] = 0;
+        graph[4][3] = 7;
+        graph[4][4] = 0;
+        graph[4][5] = 4;
+            graph[5][0] = 0;
+            graph[5][1] = 0;
+            graph[5][2] = 0;
+            graph[5][3] = 0;
+            graph[5][4] = 0;
+            graph[5][5] = 0;
+
+
+            MaxFlow m;
+            m = new MaxFlow();
+            WriteInt(m.fordFulkerson(graph, 0, 5));
+        }
+    }

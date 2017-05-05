@@ -904,6 +904,13 @@ namespace _Test
             runInterpreter();
             Assert.AreEqual("0,1,2,3,4,5,6,7,8,9", _console.Output.ToString());
         }
+
+        [TestMethod]
+        public void MaxFlow()
+        {
+            runInterpreter();
+            Assert.AreEqual("23", _console.Output.ToString());
+        }
         
         [TestMethod]
         public void DefaultInitIntArr()

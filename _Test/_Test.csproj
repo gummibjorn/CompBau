@@ -104,6 +104,7 @@
     <Content Include="Checker\ArrayCreation.txt" />
     <Content Include="Checker\MethodReturnStatementInvalid.txt" />
     <Content Include="Checker\MethodReturnStatement.txt" />
+    <Content Include="Generator\MaxFlow.txt" />
     <Content Include="Generator\Greeter.txt" />
     <Content Include="Generator\AVL.txt" />
     <Content Include="Generator\Dijkstra.txt" />
