@@ -17,8 +17,8 @@ namespace RappiSharp.VirtualMachine.Runtime
         IntPtr _limit;
         private readonly int ALIGNMENT = 8;
 
-        IntPtr _descIndex = (IntPtr)0;
-        Dictionary<TypeDescriptor, IntPtr> _descToPtr = new Dictionary<TypeDescriptor, IntPtr>();
+        int _typeDescriptorIndex = 0;
+        Dictionary<TypeDescriptor, int> _descToPtr = new Dictionary<TypeDescriptor, int>();
 
         public RawHeap(int nofBytes)
         {
@@ -39,8 +39,8 @@ namespace RappiSharp.VirtualMachine.Runtime
             IntPtr address = _freePtr;
             _freePtr += size;
             Marshal.WriteInt64(_heap, 0, size);
-            IntPtr typeTag = MapToId(type);
-            Marshal.WriteInt64(_heap, 8, (int)typeTag);
+            int typeTag = MapToId(type);
+            Marshal.WriteInt64(_heap, 8, typeTag);
             Marshal.WriteInt64(_heap, 16, length);
             address += 24;
             for(var i  = 0; i < length; i++)
@@ -61,8 +61,8 @@ namespace RappiSharp.VirtualMachine.Runtime
             IntPtr address = _freePtr;
             _freePtr += size;
             Marshal.WriteInt64(_heap, (int)address, size);
-            IntPtr typeTag = MapToId(type);
-            Marshal.WriteInt64(_heap, (int)address+8, (int)typeTag);
+            int typeTag = MapToId(type);
+            Marshal.WriteInt64(_heap, (int)address+8, typeTag);
             address += 24;
             Initialize(address, type);
             return address;
@@ -70,7 +70,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public TypeDescriptor GetType(IntPtr ptr)
         {
-            return MapToDescriptor((IntPtr)Marshal.ReadInt32(ptr, -16));
+            return MapToDescriptor(Marshal.ReadInt32(ptr, -16));
         }
 
         public int GetArrayLength(IntPtr ptr)
@@ -80,7 +80,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public void StoreElement(IntPtr array, int index, long element)
         {
-            Marshal.WriteInt64(array, index * ALIGNMENT, (long)element);
+            Marshal.WriteInt64(array, index * ALIGNMENT, element);
         }
 
         public long LoadElement(IntPtr array, int index)
@@ -88,21 +88,21 @@ namespace RappiSharp.VirtualMachine.Runtime
             return Marshal.ReadInt64(array, index * ALIGNMENT);
         }
 
-        private IntPtr MapToId(TypeDescriptor type)
+        private int MapToId(TypeDescriptor type)
         {
             if (_descToPtr.ContainsKey(type))
             {
                 return _descToPtr[type];
             } else
             {
-                var index = _descIndex;
-                _descIndex += 1;
+                var index = _typeDescriptorIndex;
+                _typeDescriptorIndex += 1;
                 _descToPtr[type] = index;
                 return index;
             }
         }
 
-        private TypeDescriptor MapToDescriptor(IntPtr id)
+        private TypeDescriptor MapToDescriptor(int id)
         {
             foreach(var entry in _descToPtr)
             {
