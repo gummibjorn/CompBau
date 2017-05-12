@@ -72,7 +72,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(Verify<int>(operand));
                     break;
                 case OpCode.ldc_s:
-                    Stack.Push(Verify<string>(operand));
+                    Ldc_s(Verify<string>(operand));
                     break;
                 case OpCode.ldnull:
                     Stack.Push(IntPtr.Zero);
@@ -176,6 +176,12 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Ret();
                     break;
             }
+        }
+
+        private void Ldc_s(string s)
+        {
+            var ptr = _heap.Allocate(s);
+            Stack.Push(ptr);
         }
 
         private bool IsInst(ClassDescriptor op)

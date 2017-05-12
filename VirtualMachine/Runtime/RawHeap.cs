@@ -20,6 +20,8 @@ namespace RappiSharp.VirtualMachine.Runtime
         int _typeDescriptorIndex = 0;
         Dictionary<TypeDescriptor, int> _descToPtr = new Dictionary<TypeDescriptor, int>();
 
+        List<string> _unmanagedStrings = new List<string>();
+
         public RawHeap(int nofBytes)
         {
             _heap = Marshal.AllocHGlobal(nofBytes);
@@ -27,15 +29,29 @@ namespace RappiSharp.VirtualMachine.Runtime
             _limit = _heap + nofBytes;
         }
 
+        private void CheckHeapSize(int elementSize)
+        {
+            if(((int)_freePtr + elementSize) > (int)_limit)
+            {
+                throw new VMException("Out of Mana");
+            }
+        }
+
+        public int Allocate(string s)
+        {
+            _unmanagedStrings.Add(s);
+
+            return _unmanagedStrings.LastIndexOf(s);
+        }
+
         public IntPtr Allocate(ArrayDescriptor type, int length)
         {
             var elementSize = ALIGNMENT; //TODO
             int size = 24 + elementSize * length;
             //int size = 24 + Math.Round(size, ALIGNMENT);
-            if(((int)_freePtr + size) > (int)_limit)
-            {
-                throw new VMException("Out of Mana");
-            }
+            
+            CheckHeapSize(size);
+
             IntPtr address = _freePtr;
             _freePtr += size;
             Marshal.WriteInt64(_heap, 0, size);
@@ -54,10 +70,9 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             //int size = 24 + Math.Round(type.TotalFieldSize, ALIGNMENT);
             int size = 0;
-            if(((int)_freePtr + size) > (int)_limit)
-            {
-                throw new VMException("Out of Mana");
-            }
+
+            CheckHeapSize(size);
+            
             IntPtr address = _freePtr;
             _freePtr += size;
             Marshal.WriteInt64(_heap, (int)address, size);
