@@ -106,22 +106,28 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private long ObjectToBytes(object value)
         {
-            long bytes;
-            if(value is IntPtr)
+            if (value is IntPtr)
             {
-                bytes = (long)(IntPtr)value;
-            } else if (value is int)
-            {
-                bytes = (int)value; //whooooo
-
-            } else if(value is string)
-            {
-                bytes = Allocate((string)value);
-            } else 
-            {
-                bytes = (long)value;
+                return (long)(IntPtr)value;
             }
-            return bytes;
+            else if (value is int)
+            {
+                return (int)value; //whooooo
+
+            }
+            else if (value is string)
+            {
+                return Allocate((string)value);
+            }
+            else if (value is char)
+            {
+                return (char)value;
+            }
+            else if (value is bool)
+            {
+                return (bool)value ? 1 : 0;
+            }
+            throw new VMException($"Cannot convert {value} to bytes");
         }
 
         private object BytesToObject(long element, TypeDescriptor type)
@@ -135,9 +141,14 @@ namespace RappiSharp.VirtualMachine.Runtime
             } else if (type == InbuiltType.Int)
             {
                 return ((int)element);
+            }else if (type == InbuiltType.Char)
+            {
+                return ((char)element);
+            }else if (type == InbuiltType.Bool)
+            {
+                return element==1;
             }
             throw new VMException($"Cannot load type {type}");
-
         }
 
         private int MapToId(TypeDescriptor type)
