@@ -17,7 +17,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             _method = method;
         }
 
-        private void Error(Location location, string msg, bool fatal=false)
+        private void Error(Location location, string msg, bool fatal = false)
         {
             Diagnosis.ReportError(location, msg);
             if (fatal)
@@ -38,7 +38,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     if (type == _symbolTable.Compilation.BoolType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    } else
+                    }
+                    else
                     {
                         Error(node.Location, $"Invalid type {type.ToString()} for unary '!'", true);
                     }
@@ -48,7 +49,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     if (type == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
-                    } else
+                    }
+                    else
                     {
                         Error(node.Location, $"Invalid type {type.ToString()} for unary {optr.ToString()}");
                     }
@@ -57,7 +59,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     if (type == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
-                    } else
+                    }
+                    else
                     {
                         Error(node.Location, $"Invalid type {type.ToString()} for unary {optr.ToString()}");
                     }
@@ -108,7 +111,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     if (leftType == _symbolTable.Compilation.BoolType && rightType == _symbolTable.Compilation.BoolType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    } else
+                    }
+                    else
                     {
                         Error(node.Location, "comparing apples and oranges gives you scurvies", true);
                     }
@@ -121,7 +125,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     if (leftType == _symbolTable.Compilation.IntType && rightType == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.IntType);
-                    } else
+                    }
+                    else
                     {
                         Error(node.Location, $"Wrong type in binary expression '{leftType?.ToString()}' '{node.Operator}' '{rightType?.ToString()}'", true);
                     }
@@ -133,9 +138,10 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     if (leftType == _symbolTable.Compilation.IntType && rightType == _symbolTable.Compilation.IntType)
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    } else
+                    }
+                    else
                     {
-                        Error(node.Location,$"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
+                        Error(node.Location, $"Wrong type in binary expression {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
                     }
                     break;
                 case Operator.Equals:
@@ -146,7 +152,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     bool isRightNull = rightType == _symbolTable.Compilation.NullType;
 
                     //FIXME these exceptions don't have to be fatal - we can fix the type even if errors occur
-                    if(!isLeftRef && isRightNull || !isRightRef && isLeftNull)
+                    if (!isLeftRef && isRightNull || !isRightRef && isLeftNull)
                     {
                         Error(node.Location, $"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
                     }
@@ -154,7 +160,8 @@ namespace RappiSharp.Compiler.Checker.Visitors
                     if (isAssignable(leftType, rightType) || isAssignable(rightType, leftType))
                     {
                         _symbolTable.FixType(node, _symbolTable.Compilation.BoolType);
-                    } else
+                    }
+                    else
                     {
                         Error(node.Location, $"Wrong type in comparison {leftType.ToString()} {node.Operator} {rightType.ToString()}", true);
                     }
@@ -166,22 +173,24 @@ namespace RappiSharp.Compiler.Checker.Visitors
                         Error(node.Location, "Left hand side of 'is' must be a reference type");
                         break;
                     }
-                    if(node.Right is BasicDesignatorNode)
+                    if (node.Right is BasicDesignatorNode)
                     {
                         var identifier = ((BasicDesignatorNode)node.Right).Identifier;
                         var type = _symbolTable.Compilation.Classes.Find(c => c.Identifier == identifier);
-                        if(type == null)
+                        if (type == null)
                         {
                             Error(node.Right.Location, $"Undeclared class '{identifier}'");
-                        } else
+                        }
+                        else
                         {
-                            if(!isAssignable(type, leftType) && !isAssignable(leftType, type))
+                            if (!isAssignable(type, leftType) && !isAssignable(leftType, type))
                             {
                                 Error(node.Location, $"Left hand side of 'is' can never be of type '{leftType.Identifier}'");
                             }
                             //OK
                         }
-                    } else
+                    }
+                    else
                     {
                         Error(node.Left.Location, "Left hand side of 'is' must be a class name");
                     }
@@ -202,9 +211,9 @@ namespace RappiSharp.Compiler.Checker.Visitors
             if (node is MemberAccessNode)
             {
                 var memberAccessNode = (MemberAccessNode)node;
-                if(memberAccessNode.Identifier == "length")
+                if (memberAccessNode.Identifier == "length")
                 {
-                    if(_symbolTable.FindType(memberAccessNode.Designator) is ArrayTypeSymbol)
+                    if (_symbolTable.FindType(memberAccessNode.Designator) is ArrayTypeSymbol)
                     {
                         Error(node.Location, "Length must not be on the left side of an assignment");
                     }
@@ -216,7 +225,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             var sourceType = _symbolTable.FindType(node.Designator);
             var targetType = _symbolTable.FindType(node.Type) as ClassSymbol;
-            if(targetType == null)
+            if (targetType == null)
             {
                 Error(node.Location, $"cannot cast to '{node.Type.Identifier}' as it is not a class", true);
             }
@@ -225,19 +234,19 @@ namespace RappiSharp.Compiler.Checker.Visitors
 
         private bool isAssignable(TypeSymbol sub, TypeSymbol baseType)
         {
-            if(sub == null) { return false; }
-            if(sub == _symbolTable.Compilation.NullType && IsReferenceType(baseType)) { return true; }
+            if (sub == null) { return false; }
+            if (sub == _symbolTable.Compilation.NullType && IsReferenceType(baseType)) { return true; }
 
-            if(sub is ArrayTypeSymbol && baseType is ArrayTypeSymbol)
+            if (sub is ArrayTypeSymbol && baseType is ArrayTypeSymbol)
             {
                 return isAssignable(((ArrayTypeSymbol)sub).ElementType, ((ArrayTypeSymbol)baseType).ElementType);
             }
 
-            if(sub is ClassSymbol && baseType is ClassSymbol)
+            if (sub is ClassSymbol && baseType is ClassSymbol)
             {
                 var subClass = (ClassSymbol)sub;
                 var baseClass = (ClassSymbol)baseType;
-                if(subClass == baseClass)
+                if (subClass == baseClass)
                 {
                     return true;
                 }
@@ -252,7 +261,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
             base.Visit(node);
             var expressionType = _symbolTable.FindType(node.Expression);
 
-            if(expressionType != _symbolTable.Compilation.IntType)
+            if (expressionType != _symbolTable.Compilation.IntType)
             {
                 Error(node.Location, $"Expression in element access must be of type int");
             }
@@ -275,7 +284,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             base.Visit(node);
             var methodSymbol = (MethodSymbol)_symbolTable.GetTarget(node.Designator);
-            if(methodSymbol == null)
+            if (methodSymbol == null)
             {
                 Error(node.Location, $"Undeclared method '{node.Designator}'", true);
             }
@@ -291,7 +300,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
                 var paramType = param.Type;
                 var arg = node.Arguments[i];
                 var argType = _symbolTable.FindType(arg);
-                if (!isAssignable(argType,paramType))
+                if (!isAssignable(argType, paramType))
                 {
                     Error(arg.Location, $"Cannot assign argument of type {argType} to parameter {param.Identifier} ({paramType})");
                 }
@@ -314,20 +323,21 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             base.Visit(node);
 
-            if(node.Expression == null)
+            if (node.Expression == null)
             {
                 if (_method.ReturnType != null)
                 {
                     Error(node.Location, $"Method return type {_method.ReturnType.Identifier} does not match return expression type null", true);
-                }else
+                }
+                else
                 {
                     return;
                 }
             }
 
-            if(_method.ReturnType == null)
+            if (_method.ReturnType == null)
             {
-                if(node.Expression != null)
+                if (node.Expression != null)
                 {
                     Error(node.Location, $"Method return type void does not match return expression type {node.Expression}", true);
                 }
@@ -344,7 +354,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
         private void checkBoolCondition(ExpressionNode condition)
         {
             var type = _symbolTable.FindType(condition);
-            if(type != _symbolTable.Compilation.BoolType)
+            if (type != _symbolTable.Compilation.BoolType)
             {
                 Error(condition.Location, $"Condition must be of type bool");
             }
@@ -366,7 +376,7 @@ namespace RappiSharp.Compiler.Checker.Visitors
         {
             base.Visit(node);
             var type = _symbolTable.FindType(node.Type);
-            if(type == null)
+            if (type == null)
             {
                 Error(node.Location, $"Undeclared type '{node.Type.Identifier}'", true);
             }
@@ -379,12 +389,12 @@ namespace RappiSharp.Compiler.Checker.Visitors
             var arrayType = _symbolTable.FindType(new ArrayTypeNode(node.Location, node.ElementType));
             var expressionType = _symbolTable.FindType(node.Expression);
 
-            if(expressionType != _symbolTable.Compilation.IntType)
+            if (expressionType != _symbolTable.Compilation.IntType)
             {
                 Error(node.Location, "Invalid expression type in array creation");
 
             }
-            
+
             _symbolTable.FixType(node, arrayType);
 
         }

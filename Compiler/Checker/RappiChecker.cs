@@ -3,6 +3,9 @@ using RappiSharp.Compiler.Checker.Phases;
 using RappiSharp.Compiler.Parser.Tree;
 using RappiSharp.Compiler.Checker.Visitors;
 using System.Linq;
+using RappiSharp.Compiler.Checker.Symbols;
+using System;
+using System.Collections.Generic;
 
 namespace RappiSharp.Compiler.Checker
 {
@@ -21,6 +24,7 @@ namespace RappiSharp.Compiler.Checker
                 TypeResolution.Run(SymbolTable);
                 FixSyntaxTree();
                 CheckSingleMain();
+                CheckInvalidOverrides();
             } catch (CheckerException)
             {
                 Diagnosis.ReportError(new Location(1, 1), "Checker terminated with errors");
@@ -69,6 +73,63 @@ namespace RappiSharp.Compiler.Checker
                 {
                     Diagnosis.ReportError(location, "Main method must be void");
                 }
+            }
+        }
+
+        private void CheckInvalidOverrides()
+        {
+            foreach(var classSymbol in SymbolTable.Compilation.Classes)
+            {
+                CheckInvalidOverrides(classSymbol);
+            }
+
+        }
+
+        private void CheckInvalidOverrides(ClassSymbol classSymbol)
+        {
+            if(classSymbol.BaseClass != null)
+            {
+                var subMethods = new Dictionary<String, MethodSymbol>();
+                foreach(var method in classSymbol.Methods)
+                {
+                    subMethods[method.Identifier] = method;
+                }
+
+                var baseMethods = new Dictionary<String, MethodSymbol>();
+                foreach(var method in ((ClassSymbol)classSymbol.BaseClass).Methods)
+                {
+                    baseMethods[method.Identifier] = method;
+                }
+
+                foreach(var name in baseMethods.Keys)
+                {
+                    if (subMethods.ContainsKey(name))
+                    {
+                        var subMethod = subMethods[name];
+                        var baseMethod = baseMethods[name];
+
+                        if(subMethod.Parameters.Count != baseMethod.Parameters.Count)
+                        {
+                            Diagnosis.ReportError(new Location(-1,-1), $"Parameter count of {classSymbol.Identifier}.{name} does not match base class");
+                        }
+                        if(subMethod.ReturnType != baseMethod.ReturnType)
+                        {
+                            Diagnosis.ReportError(new Location(-1,-1), $"Return type of {classSymbol.Identifier}.{name} does not match base class");
+                        }
+                        for(var i = 0; i < subMethod.Parameters.Count; i++)
+                        {
+                            if(subMethod.Parameters[i].Type != baseMethod.Parameters[i].Type)
+                            {
+                                Diagnosis.ReportError(new Location(-1,-1), $"Parameter {i} type of {classSymbol.Identifier}.{name} does not match base class");
+                            }
+                        }
+                    }
+
+                }
+
+                CheckInvalidOverrides(classSymbol.BaseClass as ClassSymbol);
+
+
             }
         }
     }
