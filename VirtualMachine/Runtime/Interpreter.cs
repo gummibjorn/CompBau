@@ -185,14 +185,13 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private bool IsInst(ClassDescriptor op)
         {
-            var instance = Stack.Pop();
-            if(instance == null)
+            var ptr = Stack.Pop<IntPtr>();
+            if(ptr == IntPtr.Zero)
             {
                 return false;
             }
-            var obj = (ClassObject) instance;
-            return obj.Type.BaseTypes[op.Level] == op;
-
+            var type = (ClassDescriptor)_heap.GetType(ptr);
+            return type.BaseTypes[op.Level] == op;
         }
 
         private void StFld(int fieldIndex)
