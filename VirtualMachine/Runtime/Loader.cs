@@ -151,24 +151,35 @@ namespace RappiSharp.VirtualMachine.Runtime
             return classDescriptor.Level;
         }
 
-        private TypeDescriptor[] FixFieldTypes(ClassData classData)
+        private int[] MapOffsets(TypeDescriptor[] fieldTypes)
+        {
+            int[] fieldOffsets = new int[fieldTypes.Length];
+            for(var i=0; i<fieldTypes.Length; i++)
+            {
+                fieldOffsets[i] = 8 * i; //FIXME: retrive correct size of type
+            }
+            return fieldOffsets;
+        }
+
+        private void FixFieldTypes(ClassData classData, ClassDescriptor classDescriptor)
         {
             if (classData.BaseType == null)
             {
-                return MapTypes(classData.FieldTypes);
+                classDescriptor.FieldTypes = MapTypes(classData.FieldTypes);
+                return;
             }
 
-            var fieldTypes = FixFieldTypes((ClassData)_metadata.Types[(int)classData.BaseType]);
+            FixFieldTypes((ClassData)_metadata.Types[(int)classData.BaseType], classDescriptor);
 
-            return fieldTypes.Concat(MapTypes(classData.FieldTypes)).ToArray();
-
+            classDescriptor.FieldTypes = classDescriptor.FieldTypes.Concat(MapTypes(classData.FieldTypes)).ToArray();
         }
 
         private void FixClassType(ClassDescriptor classDescriptor, ClassData classData)
         {
             classDescriptor.BaseTypes = new ClassDescriptor[_hierarchyDepth];
             FixBaseTypes(classDescriptor, classData);
-            classDescriptor.FieldTypes = FixFieldTypes(classData);
+            FixFieldTypes(classData, classDescriptor);
+            classDescriptor.FieldOffsets = MapOffsets(classDescriptor.FieldTypes);
             MapVirtualTable(classDescriptor, classData);
             FixMethodParent(classDescriptor, classData);
         }

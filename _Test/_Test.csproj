@@ -104,10 +104,7 @@
     <Content Include="Checker\ArrayCreation.txt" />
     <Content Include="Checker\MethodReturnStatementInvalid.txt" />
     <Content Include="Checker\MethodReturnStatement.txt" />
-<<<<<<< HEAD
     <Content Include="Generator\PolymorphismFields.txt" />
-=======
->>>>>>> rawHeap
     <Content Include="Generator\StringArray.txt" />
     <Content Include="Generator\MaxFlow.txt" />
     <Content Include="Generator\Greeter.txt" />

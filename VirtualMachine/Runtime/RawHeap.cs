@@ -114,7 +114,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         public object LoadField(IntPtr instance, int index)
         {
             ClassDescriptor type = (ClassDescriptor)GetType(instance);
-            return BytesToObject(Marshal.ReadInt64(instance, type.FieldOffsets[index]), type);
+            return BytesToObject(Marshal.ReadInt64(instance, type.FieldOffsets[index]), type.FieldTypes[index]);
         }
 
         private long ObjectToBytes(object value)

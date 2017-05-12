@@ -180,6 +180,10 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private object Ldlen(IntPtr ptr)
         {
+            if(ptr == IntPtr.Zero)
+            {
+                throw new VMException("Array reference is null");
+            }
             return _heap.GetArrayLength(ptr);
         }
 
@@ -206,6 +210,10 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void LdFld(int fieldIndex)
         {
             var instance = Stack.Pop<IntPtr>();
+            if(instance == IntPtr.Zero)
+            {
+                throw new VMException("Reference is null");
+            }
             Stack.Push(_heap.LoadField(instance, fieldIndex));
         }
 
@@ -249,7 +257,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
-        private void checkEvaluationStackEmpty()
+        private void CheckEvaluationStackEmpty()
         {
             if(Stack.Count != 0)
             {
@@ -266,8 +274,14 @@ namespace RappiSharp.VirtualMachine.Runtime
                 args[i] = Verify(Stack.Pop(), type);
 
             }
-            var thisReference = Stack.Pop<ClassObject>();
-            var dynamicMethod = thisReference.Type.VirtualTable[staticMethod.Position];
+            var thisReference = Stack.Pop<IntPtr>();
+
+            if(thisReference == IntPtr.Zero)
+            {
+                throw new VMException("Reference is null");
+            }
+
+            var dynamicMethod = ((ClassDescriptor)_heap.GetType(thisReference)).VirtualTable[staticMethod.Position];
             var locals = InitializedVariables(dynamicMethod.LocalTypes);
             var frame = new ActivationFrame(dynamicMethod, thisReference, args, locals);
             _callStack.Push(frame);
@@ -275,14 +289,19 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void CastClass(ClassDescriptor targetType)
         {
-            var instance = Stack.Pop();
+            var ptr = Stack.Pop<IntPtr>();
 
-            if(instance != null && (instance as ClassObject).Type.BaseTypes[targetType.Level] != targetType)
+            if(ptr != IntPtr.Zero)
             {
-                throw new VMException("Invalid cast");
+                var type = (ClassDescriptor)_heap.GetType(ptr);
+
+                if(ptr != IntPtr.Zero && type.BaseTypes[targetType.Level] != targetType)
+                {
+                    throw new VMException("Invalid cast");
+                }
             }
 
-            Stack.Push(instance);
+            Stack.Push(ptr);
         }
 
         private void BinaryOp<T>(Func<int,int,T> action)
@@ -324,14 +343,14 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var value = Stack.Pop();
             var localType = ActiveFrame.Method.ParameterTypes[index];
-            Arguments[index] = Verify(value, localType);
+            Arguments[index] = value;
         }
 
         private void Stloc(int index)
         {
             var value = Stack.Pop();
             var localType = ActiveFrame.Method.LocalTypes[index];
-            Locals[index] = Verify(value, localType);
+            Locals[index] = value;
         }
 
         private object Verify(object value, TypeDescriptor type)
@@ -455,7 +474,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
             else
             {
-                return null;
+                return IntPtr.Zero;
             }
         }
 
