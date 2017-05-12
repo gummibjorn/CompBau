@@ -54,14 +54,14 @@ namespace RappiSharp.VirtualMachine.Runtime
 
             IntPtr address = _freePtr;
             _freePtr += size;
-            Marshal.WriteInt64(_heap, 0, size);
+            Marshal.WriteInt64(address, 0, size);
             int typeTag = MapToId(type);
-            Marshal.WriteInt64(_heap, 8, typeTag);
-            Marshal.WriteInt64(_heap, 16, length);
+            Marshal.WriteInt64(address, 8, typeTag);
+            Marshal.WriteInt64(address, 16, length);
             address += 24;
             for(var i  = 0; i < length; i++)
             {
-                Marshal.WriteInt64(_heap, i * ALIGNMENT, 0); //TODO make a default value
+                Marshal.WriteInt64(address, i * ALIGNMENT, 0); //TODO make a default value
             }
             return address;
         }
@@ -90,7 +90,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public int GetArrayLength(IntPtr ptr)
         {
-            return Marshal.ReadInt32(_heap, (int)ptr - 8);
+            return Marshal.ReadInt32(ptr - 8);
         }
 
         public void StoreElement(IntPtr array, int index, long element)
@@ -129,6 +129,45 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void Initialize(IntPtr address, ClassDescriptor type)
         {
             throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            var current = _heap;
+            var builder = new StringBuilder();
+            while((int)current <= (int)_limit) {
+                byte[] bytes = new byte[8];
+                builder.Append(current.ToString("x8"));
+                builder.Append(" ");
+                for(var i = 0; i < ALIGNMENT; i++)
+                {
+                    bytes[i] = Marshal.ReadByte(current + i);
+                }
+                current = current + 8;
+
+                for(var i = 0; i < bytes.Length; i++)
+                {
+                    if(i%4 == 0)
+                    {
+                        builder.Append(" ");
+                    }
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+
+                /*
+                for(var i = 0; i < bytes.Length; i++)
+                {
+                    if(i%4 == 0)
+                    {
+                        builder.Append(" ");
+                    }
+                    builder.Append((char)bytes[i]);
+                }
+                */
+
+                builder.AppendLine();
+            }
+            return builder.ToString();
         }
     }
 }

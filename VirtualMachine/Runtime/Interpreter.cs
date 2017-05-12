@@ -10,7 +10,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         private readonly Loader _loader;
         private readonly CallStack _callStack;
         private IConsole _console;
-        private RawHeap _heap;
+        public RawHeap _heap;
 
         public Interpreter(Metadata metadata) : this(metadata, new SystemConsole()) { }
 
@@ -19,7 +19,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             _console = console;
             _loader = new Loader(metadata);
             _callStack = new CallStack();
-            _heap = new RawHeap(64000);
+            _heap = new RawHeap(2048);
         }
 
         public void Run()
@@ -146,7 +146,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     NewArr(Verify<ArrayDescriptor>(operand));
                     break;
                 case OpCode.ldlen:
-                    Stack.Push(Stack.Pop<ArrayObject>().Elements.Length);
+                    Stack.Push(Ldlen(Stack.Pop<IntPtr>()));
                     break;
                 case OpCode.ldelem:
                     Ldelem();
@@ -182,6 +182,11 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var ptr = _heap.Allocate(s);
             Stack.Push(ptr);
+        }
+
+        private object Ldlen(IntPtr ptr)
+        {
+            return _heap.GetArrayLength(ptr);
         }
 
         private bool IsInst(ClassDescriptor op)

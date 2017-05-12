@@ -90,6 +90,7 @@ namespace _Test
             {
                 Assert.Fail("Test didn't run!");
             }
+            Console.Write(_interpreter._heap.ToString());
         }
 
         class TestConsole : IConsole, IDisposable
