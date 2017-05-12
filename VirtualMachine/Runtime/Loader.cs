@@ -3,6 +3,7 @@ using RappiSharp.VirtualMachine.Descriptors;
 using RappiSharp.VirtualMachine.Error;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RappiSharp.VirtualMachine.Runtime
 {
@@ -150,11 +151,25 @@ namespace RappiSharp.VirtualMachine.Runtime
             return classDescriptor.Level;
         }
 
+        private TypeDescriptor[] FixFieldTypes(ClassData classData)
+        {
+            if (classData.BaseType == null)
+            {
+                return MapTypes(classData.FieldTypes);
+            }
+
+            var fieldTypes = FixFieldTypes((ClassData)_metadata.Types[(int)classData.BaseType]);
+
+            fieldTypes.Concat(MapTypes(classData.FieldTypes));
+
+            return fieldTypes;
+        }
+
         private void FixClassType(ClassDescriptor classDescriptor, ClassData classData)
         {
             classDescriptor.BaseTypes = new ClassDescriptor[_hierarchyDepth];
             FixBaseTypes(classDescriptor, classData);
-            classDescriptor.FieldTypes = MapTypes(classData.FieldTypes);
+            classDescriptor.FieldTypes = FixFieldTypes(classData);
             MapVirtualTable(classDescriptor, classData);
             FixMethodParent(classDescriptor, classData);
         }
