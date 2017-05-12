@@ -66,18 +66,18 @@ namespace RappiSharp.VirtualMachine.Runtime
             return address;
         }
 
-        IntPtr Allocate(ClassDescriptor type)
+        public IntPtr Allocate(ClassDescriptor type)
         {
-            //int size = 24 + Math.Round(type.TotalFieldSize, ALIGNMENT);
-            int size = 0;
+            int size = 24 + type.TotalFieldSize; //might have to round this to alignment
+            //int size = 0;
 
             CheckHeapSize(size);
             
             IntPtr address = _freePtr;
             _freePtr += size;
-            Marshal.WriteInt64(_heap, (int)address, size);
+            Marshal.WriteInt64(address, 0, size);
             int typeTag = MapToId(type);
-            Marshal.WriteInt64(_heap, (int)address+8, typeTag);
+            Marshal.WriteInt64(address, 8, typeTag);
             address += 24;
             Initialize(address, type);
             return address;
@@ -102,6 +102,19 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var bytes = Marshal.ReadInt64(array, index * ALIGNMENT);
             return BytesToObject(bytes, type);
+        }
+
+        public void StoreField(IntPtr instance, int index, object value)
+        {
+            ClassDescriptor type = (ClassDescriptor)GetType(instance);
+            var bytes = ObjectToBytes(value);
+            Marshal.WriteInt64(instance, type.FieldOffsets[index], bytes);
+        }
+
+        public object LoadField(IntPtr instance, int index)
+        {
+            ClassDescriptor type = (ClassDescriptor)GetType(instance);
+            return BytesToObject(Marshal.ReadInt64(instance, type.FieldOffsets[index]), type);
         }
 
         private long ObjectToBytes(object value)
@@ -176,7 +189,11 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void Initialize(IntPtr address, ClassDescriptor type)
         {
-            throw new NotImplementedException();
+            for(var i = 0; i < type.FieldTypes.Length; i++) 
+            {
+                var f = type.FieldTypes[i];
+                Marshal.WriteInt64(address, type.FieldOffsets[i], ObjectToBytes(Interpreter.DefaultValue(type)));
+            }
         }
 
         public override string ToString()

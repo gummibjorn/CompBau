@@ -41,9 +41,9 @@ namespace RappiSharp.VirtualMachine.Runtime
             _callStack.Push(new ActivationFrame(mainMethod, mainObject, new object[0], locals));
         }
 
-        private object NewObject(ClassDescriptor descriptor)
+        private IntPtr NewObject(ClassDescriptor descriptor)
         {
-            return new ClassObject(descriptor);
+            return _heap.Allocate(descriptor);
         }
 
         private void Interpret()
@@ -198,15 +198,16 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void StFld(int fieldIndex)
         {
             var value = Stack.Pop();
-            var instance = Stack.Pop<ClassObject>();
-            Verify(value, instance.Type.FieldTypes[fieldIndex]);
-            instance.Fields[fieldIndex] = value;
+            var instance = Stack.Pop<IntPtr>();
+            //Verify(value, instance.Type.FieldTypes[fieldIndex]);
+            //instance.Fields[fieldIndex] = value;
+            _heap.StoreField(instance, fieldIndex, value);
         }
 
         private void LdFld(int fieldIndex)
         {
-            var instance = Stack.Pop<ClassObject>();
-            Stack.Push(instance.Fields[fieldIndex]);
+            var instance = Stack.Pop<IntPtr>();
+            Stack.Push(_heap.LoadField(instance, fieldIndex));
         }
 
         private void Ldelem()
