@@ -160,9 +160,8 @@ namespace RappiSharp.VirtualMachine.Runtime
 
             var fieldTypes = FixFieldTypes((ClassData)_metadata.Types[(int)classData.BaseType]);
 
-            fieldTypes.Concat(MapTypes(classData.FieldTypes));
+            return fieldTypes.Concat(MapTypes(classData.FieldTypes)).ToArray();
 
-            return fieldTypes;
         }
 
         private void FixClassType(ClassDescriptor classDescriptor, ClassData classData)

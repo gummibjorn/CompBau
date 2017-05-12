@@ -329,6 +329,13 @@ namespace _Test
             initializeGenerator();
             Run("a is B");
         }
+
+        [TestMethod]
+        public void PolymorphismFields()
+        {
+            initializeGenerator();
+            Run("1942");
+        }
         
         [TestMethod]
         public void WhileStatement()

@@ -228,7 +228,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
                 {
                     var classScope = (ClassSymbol)target.Scope;
                     //_assembler.Emit(OpCode.ldthis);
-                    _assembler.Emit(OpCode.ldfld, classScope.Fields.IndexOf(target as FieldSymbol));
+                    _assembler.Emit(OpCode.ldfld, classScope.AllFields.IndexOf(target as FieldSymbol));
                 } else 
                 {
                     //FIXME why does throwing an exception here break so many tests? it shouldn't go into this branch!
@@ -302,18 +302,18 @@ namespace RappiSharp.Compiler.Generator.Emit {
             } else
             {
                 var ct = (ClassSymbol)type;
-                var field = ct.Fields.Find(f => f.Identifier == node.Identifier);
+                var field = ct.AllFields.FindLast(f => f.Identifier == node.Identifier);
 
                 if(_designator_level > 0)
                 {
-                    _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
+                    _assembler.Emit(OpCode.ldfld, ct.AllFields.IndexOf(field));
                 }else
                 {
                     if(_expression_level > 0)
                     {
-                        if(ct.Fields.IndexOf(field) != -1) //else its a method call
+                        if(ct.AllFields.IndexOf(field) != -1) //else its a method call
                         {
-                            _assembler.Emit(OpCode.ldfld, ct.Fields.IndexOf(field));
+                            _assembler.Emit(OpCode.ldfld, ct.AllFields.IndexOf(field));
                         }
                     }else
                     {
@@ -353,7 +353,7 @@ namespace RappiSharp.Compiler.Generator.Emit {
                         _assembler.Emit(OpCode.ldthis);
                     }
                     Expression(() => node.Right.Accept(this));
-                    var index = ((ClassSymbol)target.Scope).Fields.IndexOf(target as FieldSymbol);
+                    var index = ((ClassSymbol)target.Scope).AllFields.IndexOf(target as FieldSymbol);
                     _assembler.Emit(OpCode.stfld, index);
                 } else
                 {
