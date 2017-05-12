@@ -114,6 +114,9 @@ namespace RappiSharp.VirtualMachine.Runtime
             {
                 bytes = (int)value; //whooooo
 
+            } else if(value is string)
+            {
+                bytes = Allocate((string)value);
             } else 
             {
                 bytes = (long)value;
@@ -129,7 +132,6 @@ namespace RappiSharp.VirtualMachine.Runtime
             } else if (type == InbuiltType.Int)
             {
                 return ((int)element);
-
             }
             throw new VMException($"Cannot load type {type}");
 

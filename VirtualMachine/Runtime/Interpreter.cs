@@ -72,7 +72,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(Verify<int>(operand));
                     break;
                 case OpCode.ldc_s:
-                    Ldc_s(Verify<string>(operand));
+                    Stack.Push(Verify<string>(operand));
                     break;
                 case OpCode.ldnull:
                     Stack.Push(IntPtr.Zero);
@@ -176,12 +176,6 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Ret();
                     break;
             }
-        }
-
-        private void Ldc_s(string s)
-        {
-            var ptr = _heap.Allocate(s);
-            Stack.Push(ptr);
         }
 
         private object Ldlen(IntPtr ptr)
