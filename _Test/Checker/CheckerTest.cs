@@ -599,14 +599,14 @@ namespace _Test
         public void InvalidOverrideReturn()
         {
             initializeChecker("class A{ void Main(){} void Foo(){} } class B:A{ int Foo(){return 1;}}");
-            AssertDiagnosisContains("Gurken");
+            AssertDiagnosisContains("Return type of B.Foo does not match base class");
         }
 
         [TestMethod]
         public void InvalidOverrideParam()
         {
             initializeChecker("class A{ void Main(){} void Foo(int i){} } class B:A{ void Foo(string s){} }");
-            AssertDiagnosisContains("Gurken");
+            AssertDiagnosisContains("Parameter 0 type of B.Foo does not match");
         }
     }
 }

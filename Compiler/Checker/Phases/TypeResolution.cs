@@ -3,6 +3,7 @@ using RappiSharp.Compiler.Checker.General;
 using RappiSharp.Compiler.Checker.Symbols;
 using RappiSharp.Compiler.Parser.Tree;
 using System.Collections.Generic;
+using RappiSharp.Compiler.Checker.Visitors;
 
 namespace RappiSharp.Compiler.Checker.Phases
 {
@@ -56,7 +57,7 @@ namespace RappiSharp.Compiler.Checker.Phases
                 else
                 {
                     Diagnosis.ReportError(classNode.Location, "Cyclic inheritance is not allowed");
-                    return;
+                    throw new CheckerException("Cyclic inheritance detected");
                 }
 
 
