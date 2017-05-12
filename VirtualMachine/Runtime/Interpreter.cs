@@ -220,18 +220,8 @@ namespace RappiSharp.VirtualMachine.Runtime
             var index = Stack.Pop<int>();
             var ptr = Stack.Pop<IntPtr>();
             var type = (ArrayDescriptor)_heap.GetType(ptr);
-            var element = _heap.LoadElement(ptr, index);
-            if(type.ElementType is ArrayDescriptor || type.ElementType is ClassDescriptor)
-            {
-                Stack.Push((IntPtr)element);
-            } else if (type.ElementType == InbuiltType.Int)
-            {
-                Stack.Push((int)element);
-
-            } else 
-            {
-                Stack.Push(element);
-            }
+            var element = _heap.LoadElement(ptr, index, type.ElementType);
+            Stack.Push(element);
         }
 
         private void Stelem()
@@ -241,19 +231,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             var ptr = Stack.Pop<IntPtr>();
             var type = (ArrayDescriptor)_heap.GetType(ptr);
             Verify(value, type.ElementType);
-            long bytes;
-            if(value is IntPtr)
-            {
-                bytes = (long)(IntPtr)value;
-            } else if (value is int)
-            {
-                bytes = (long)(int)value; //whooooo
-
-            } else 
-            {
-                bytes = (long)value;
-            }
-            _heap.StoreElement(ptr, index, bytes);
+            _heap.StoreElement(ptr, index, value, type.ElementType);
         }
 
         private void NewArr(ArrayDescriptor arrayDescriptor)

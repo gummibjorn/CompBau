@@ -93,14 +93,46 @@ namespace RappiSharp.VirtualMachine.Runtime
             return Marshal.ReadInt32(ptr - 8);
         }
 
-        public void StoreElement(IntPtr array, int index, long element)
+        public void StoreElement(IntPtr array, int index, object value, TypeDescriptor type)
         {
-            Marshal.WriteInt64(array, index * ALIGNMENT, element);
+            Marshal.WriteInt64(array, index * ALIGNMENT, ObjectToBytes(value));
         }
 
-        public long LoadElement(IntPtr array, int index)
+        public object LoadElement(IntPtr array, int index, TypeDescriptor type)
         {
-            return Marshal.ReadInt64(array, index * ALIGNMENT);
+            var bytes = Marshal.ReadInt64(array, index * ALIGNMENT);
+            return BytesToObject(bytes, type);
+        }
+
+        private long ObjectToBytes(object value)
+        {
+            long bytes;
+            if(value is IntPtr)
+            {
+                bytes = (long)(IntPtr)value;
+            } else if (value is int)
+            {
+                bytes = (int)value; //whooooo
+
+            } else 
+            {
+                bytes = (long)value;
+            }
+            return bytes;
+        }
+
+        private object BytesToObject(long element, TypeDescriptor type)
+        {
+            if(type is ArrayDescriptor || type is ClassDescriptor)
+            {
+                return ((IntPtr)element);
+            } else if (type == InbuiltType.Int)
+            {
+                return ((int)element);
+
+            }
+            throw new VMException($"Cannot load type {type}");
+
         }
 
         private int MapToId(TypeDescriptor type)
