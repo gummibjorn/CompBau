@@ -1,0 +1,41 @@
+class Program{
+	void Main(){
+		B a;
+		a = new B();
+		a.InitA();
+		a.InitB();
+		a.PrintA();
+		a.PrintB();
+	}
+}
+
+class A{
+	int a;
+	int b;
+
+	void InitA(){
+		a = 19;
+		b = 12;
+	}
+
+	void PrintA(){
+		WriteInt(a);
+	}
+
+	void PrintB(){
+		WriteInt(b);
+	}
+}
+
+class B : A{
+	int b;
+
+	void InitB(){
+		b = 42;
+	}
+
+	void PrintB(){
+		WriteInt(b);
+	}
+	
+}

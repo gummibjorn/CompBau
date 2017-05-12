@@ -925,6 +925,13 @@ namespace _Test
             runInterpreter();
             Assert.AreEqual("Peter Muster\n3\nHans Meier\n2", _console.Output.ToString());
         }
-
+        
+        [TestMethod]
+        public void PolymorphismFields()
+        {
+            runInterpreter();
+            Assert.AreEqual("1942", _console.Output.ToString());
+        }
+        
     }
 }

@@ -590,9 +590,23 @@ namespace _Test
         }
 
         [TestMethod]
-        public void ParametePolymorphic()
+        public void ParameterPolymorphic()
         {
             initializeChecker("class Program{ void Main(){Foo(new B());} void Foo(A a){} } class A{} class B:A{}");
+        }
+
+        [TestMethod]
+        public void InvalidOverrideReturn()
+        {
+            initializeChecker("class A{ void Main(){} void Foo(){} } class B:A{ int Foo(){return 1;}}");
+            AssertDiagnosisContains("Gurken");
+        }
+
+        [TestMethod]
+        public void InvalidOverrideParam()
+        {
+            initializeChecker("class A{ void Main(){} void Foo(int i){} } class B:A{ void Foo(string s){} }");
+            AssertDiagnosisContains("Gurken");
         }
     }
 }
