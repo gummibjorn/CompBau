@@ -28,6 +28,9 @@ namespace RappiSharp.VirtualMachine.Runtime {
 
     public T Pop<T>() {
       var value = Pop();
+      if (value == null) {
+            throw new InvalidILException($"null deref!");
+      }
       if (!(value is T)) {
             throw new InvalidILException($"Expected {typeof(T)} instead of {value?.GetType()} ({value})");
       }

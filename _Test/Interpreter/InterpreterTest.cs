@@ -933,5 +933,31 @@ namespace _Test
             Assert.AreEqual("1942", _console.Output.ToString());
         }
         
+        [TestMethod]
+        public void NullDerefObject()
+        {
+            try
+            {
+                runInterpreter(main("Program p; p.Main();"));
+                Assert.Fail("Exception expected");
+            } catch (VMException e)
+            {
+                Assert.IsTrue(e.Message.Contains("null"));
+            }
+        }
+
+        [TestMethod]
+        public void NullDerefArray()
+        {
+            try
+            {
+                runInterpreter(main("int[] arr; WriteInt(arr.length);"));
+                Assert.Fail("Exception expected");
+            } catch (VMException e)
+            {
+                Assert.IsTrue(e.Message.Contains("null"));
+            }
+        }
+        
     }
 }
