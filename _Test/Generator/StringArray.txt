@@ -1,0 +1,8 @@
+﻿class Program{
+	void Main(){
+		string[] a;
+		a = new string[2];
+		a[1] = "asdf";
+		WriteString(a[1]);
+	}
+}

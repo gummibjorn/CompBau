@@ -129,6 +129,9 @@ namespace RappiSharp.VirtualMachine.Runtime
             if(type is ArrayDescriptor || type is ClassDescriptor)
             {
                 return ((IntPtr)element);
+            } else if(type == InbuiltType.String)
+            {
+                return _unmanagedStrings.ElementAt((int)element);
             } else if (type == InbuiltType.Int)
             {
                 return ((int)element);
