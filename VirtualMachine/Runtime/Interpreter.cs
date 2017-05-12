@@ -10,6 +10,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         private readonly Loader _loader;
         private readonly CallStack _callStack;
         private IConsole _console;
+        public RawHeap _heap;
 
         public Interpreter(Metadata metadata) : this(metadata, new SystemConsole()) { }
 
@@ -18,6 +19,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             _console = console;
             _loader = new Loader(metadata);
             _callStack = new CallStack();
+            _heap = new RawHeap(2048);
         }
 
         public void Run()
@@ -39,9 +41,9 @@ namespace RappiSharp.VirtualMachine.Runtime
             _callStack.Push(new ActivationFrame(mainMethod, mainObject, new object[0], locals));
         }
 
-        private object NewObject(ClassDescriptor descriptor)
+        private IntPtr NewObject(ClassDescriptor descriptor)
         {
-            return new ClassObject(descriptor);
+            return _heap.Allocate(descriptor);
         }
 
         private void Interpret()
@@ -73,7 +75,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(Verify<string>(operand));
                     break;
                 case OpCode.ldnull:
-                    Stack.Push(null);
+                    Stack.Push(IntPtr.Zero);
                     break;
                 case OpCode.br:
                     InstructionPointer += Verify<int>(operand);
@@ -144,7 +146,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     NewArr(Verify<ArrayDescriptor>(operand));
                     break;
                 case OpCode.ldlen:
-                    Stack.Push(Stack.Pop<ArrayObject>().Elements.Length);
+                    Stack.Push(Ldlen(Stack.Pop<IntPtr>()));
                     break;
                 case OpCode.ldelem:
                     Ldelem();
@@ -176,71 +178,73 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
+        private object Ldlen(IntPtr ptr)
+        {
+            return _heap.GetArrayLength(ptr);
+        }
+
         private bool IsInst(ClassDescriptor op)
         {
-            var instance = Stack.Pop();
-            if(instance == null)
+            var ptr = Stack.Pop<IntPtr>();
+            if(ptr == IntPtr.Zero)
             {
                 return false;
             }
-            var obj = (ClassObject) instance;
-            return obj.Type.BaseTypes[op.Level] == op;
-
+            var type = (ClassDescriptor)_heap.GetType(ptr);
+            return type.BaseTypes[op.Level] == op;
         }
 
         private void StFld(int fieldIndex)
         {
             var value = Stack.Pop();
-            var instance = Stack.Pop<ClassObject>();
-            Verify(value, instance.Type.FieldTypes[fieldIndex]);
-            instance.Fields[fieldIndex] = value;
+            var instance = Stack.Pop<IntPtr>();
+            //Verify(value, instance.Type.FieldTypes[fieldIndex]);
+            //instance.Fields[fieldIndex] = value;
+            _heap.StoreField(instance, fieldIndex, value);
         }
 
         private void LdFld(int fieldIndex)
         {
-            var instance = Stack.Pop<ClassObject>();
-            Stack.Push(instance.Fields[fieldIndex]);
+            var instance = Stack.Pop<IntPtr>();
+            Stack.Push(_heap.LoadField(instance, fieldIndex));
         }
 
         private void Ldelem()
         {
             var index = Stack.Pop<int>();
-            var array = Stack.Pop<ArrayObject>();
-            if(array.Elements.Length <= index || 0 > index)
-            {
-                throw new VMException("index out of array range");
-            }
-            Stack.Push(array.Elements[index]);
+            var ptr = Stack.Pop<IntPtr>();
+            var type = (ArrayDescriptor)_heap.GetType(ptr);
+            var element = _heap.LoadElement(ptr, index, type.ElementType);
+            Stack.Push(element);
         }
 
         private void Stelem()
         {
             var value = Stack.Pop();
             var index = Stack.Pop<int>();
-            var array = Stack.Pop<ArrayObject>();
-            Verify(value, array.Type.ElementType);
-            array.Elements[index] = value;
+            var ptr = Stack.Pop<IntPtr>();
+            var type = (ArrayDescriptor)_heap.GetType(ptr);
+            Verify(value, type.ElementType);
+            _heap.StoreElement(ptr, index, value, type.ElementType);
         }
 
         private void NewArr(ArrayDescriptor arrayDescriptor)
         {
             var length = Stack.Pop<int>();
-            Stack.Push(new ArrayObject(arrayDescriptor, length));
+            var ptr = _heap.Allocate(arrayDescriptor, length);
+            Stack.Push(ptr);
         }
 
         private void Ret()
         {
             var type = ActiveFrame.Method.ReturnType;
-
             if(type != null)
             {
                 var value = Verify(Stack.Pop(), type);
-                checkEvaluationStackEmpty();
                 _callStack.Pop();
                 Stack.Push(value);
             } else
             {
-                checkEvaluationStackEmpty();
                 _callStack.Pop();
             }
         }
@@ -344,6 +348,8 @@ namespace RappiSharp.VirtualMachine.Runtime
             }else if(type == InbuiltType.Char)
             {
                 return Verify<char>(value);
+            }else if(value is IntPtr) {
+                return value; //TODO TYPE CHECK
             }else if(type is ArrayDescriptor) {
                 if (value == null) return null;
                 if(value is ArrayObject)

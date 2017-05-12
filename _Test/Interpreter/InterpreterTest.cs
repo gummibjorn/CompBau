@@ -90,6 +90,7 @@ namespace _Test
             {
                 Assert.Fail("Test didn't run!");
             }
+            Console.Write(_interpreter._heap.ToString());
         }
 
         class TestConsole : IConsole, IDisposable
@@ -917,6 +918,13 @@ namespace _Test
         {
             runInterpreter(main("int[] a; a = new int[1]; WriteInt(a[0]);"));
             Assert.AreEqual("0", _console.Output.ToString());
+        }
+
+        [TestMethod]
+        public void StringArray()
+        {
+            runInterpreter();
+            Assert.AreEqual("asdf", _console.Output.ToString());
         }
         
         [TestMethod]
