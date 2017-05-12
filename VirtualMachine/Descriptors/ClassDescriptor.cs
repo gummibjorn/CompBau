@@ -17,5 +17,8 @@
         }
 
         public int Level { get; set; }
+
+        public int[] FieldOffsets { get; }
+        public int TotalFieldSize { get; }
     }
 }
