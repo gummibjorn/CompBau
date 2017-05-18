@@ -182,12 +182,17 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
-        private object Ldlen(IntPtr ptr)
+        private void NullReferenceCheck(IntPtr ptr)
         {
             if(ptr == IntPtr.Zero)
             {
-                throw new VMException("Array reference is null");
+                throw new VMException("Reference is null");
             }
+        }
+
+        private object Ldlen(IntPtr ptr)
+        {
+            NullReferenceCheck(ptr);
             return _heap.GetArrayLength(ptr);
         }
 
@@ -206,18 +211,16 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var value = Stack.Pop();
             var instance = Stack.Pop<IntPtr>();
-            //Verify(value, instance.Type.FieldTypes[fieldIndex]);
-            //instance.Fields[fieldIndex] = value;
+            NullReferenceCheck(instance);
+            var instanceType = (ClassDescriptor)_heap.GetType(instance);
+            Verify(value, instanceType.FieldTypes[fieldIndex]);
             _heap.StoreField(instance, fieldIndex, value);
         }
 
         private void LdFld(int fieldIndex)
         {
             var instance = Stack.Pop<IntPtr>();
-            if(instance == IntPtr.Zero)
-            {
-                throw new VMException("Reference is null");
-            }
+            NullReferenceCheck(instance);
             Stack.Push(_heap.LoadField(instance, fieldIndex));
         }
 
@@ -225,6 +228,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var index = Stack.Pop<int>();
             var ptr = Stack.Pop<IntPtr>();
+            NullReferenceCheck(ptr);
             var type = (ArrayDescriptor)_heap.GetType(ptr);
             var element = _heap.LoadElement(ptr, index, type.ElementType);
             Stack.Push(element);
@@ -235,6 +239,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             var value = Stack.Pop();
             var index = Stack.Pop<int>();
             var ptr = Stack.Pop<IntPtr>();
+            NullReferenceCheck(ptr);
             var type = (ArrayDescriptor)_heap.GetType(ptr);
             Verify(value, type.ElementType);
             _heap.StoreElement(ptr, index, value, type.ElementType);
@@ -280,11 +285,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
             var thisReference = Stack.Pop<IntPtr>();
 
-            if(thisReference == IntPtr.Zero)
-            {
-                throw new VMException("Reference is null");
-            }
-
+            NullReferenceCheck(thisReference);
             var dynamicMethod = ((ClassDescriptor)_heap.GetType(thisReference)).VirtualTable[staticMethod.Position];
             var locals = InitializedVariables(dynamicMethod.LocalTypes);
             var frame = new ActivationFrame(dynamicMethod, thisReference, args, locals);
@@ -354,6 +355,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var value = Stack.Pop();
             var localType = ActiveFrame.Method.LocalTypes[index];
+            Verify(value, localType);
             Locals[index] = value;
         }
 
@@ -371,28 +373,32 @@ namespace RappiSharp.VirtualMachine.Runtime
             }else if(type == InbuiltType.Char)
             {
                 return Verify<char>(value);
-            }else if(value is IntPtr) {
-                return value; //TODO TYPE CHECK
-            }else if(type is ArrayDescriptor) {
-                if (value == null) return null;
-                if(value is ArrayObject)
+            }else {
+                try
                 {
-                    if((value as ArrayObject).Type.ElementType == (type as ArrayDescriptor).ElementType)
+                    if((IntPtr)value != IntPtr.Zero)
                     {
-                        return value;
+                        var valueType = _heap.GetType((IntPtr)value);
+                        
+                        if(valueType is ClassDescriptor)
+                        {
+                            if(type != ((ClassDescriptor)valueType).BaseTypes[((ClassDescriptor)type).Level])
+                            {
+                                throw new InvalidILException($"Expected {type} instead of {valueType}");
+                            }
+                        }else if(valueType is ArrayDescriptor)
+                        {
+                            if(valueType != type)
+                            {
+                                throw new InvalidILException($"Expected {type} instead of {valueType}");
+                            }
+                        }
                     }
-                }
-                throw new InvalidILException($"Expected {(type as ArrayDescriptor).ElementType}[]");
-            } else {
-                if (value == null) return null;
-                if(value is ClassObject)
+                } catch (Exception e)
                 {
-                    if((value as ClassObject).Type.BaseTypes[(type as ClassDescriptor).Level] == type)
-                    {
-                        return value;
-                    }
+                        throw new InvalidILException("Invalid type");
                 }
-                throw new InvalidILException($"Expected {type}");
+                return value; 
             }
         }
 

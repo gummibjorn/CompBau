@@ -158,6 +158,11 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public object LoadElement(IntPtr array, int index, TypeDescriptor type)
         {
+            var length = GetArrayLength(array);
+            if (index >= length)
+            {
+                throw new VMException("Invalid array index");
+            }
             var bytes = Marshal.ReadInt64(array, index * ALIGNMENT);
             return BytesToObject(bytes, type);
         }
@@ -175,6 +180,14 @@ namespace RappiSharp.VirtualMachine.Runtime
             return BytesToObject(Marshal.ReadInt64(instance, type.FieldOffsets[index]), type.FieldTypes[index]);
         }
 
+        private void TypeCheck(TypeDescriptor valueType, TypeDescriptor targetType)
+        {
+            if(valueType != targetType)
+            {
+                throw new VMException("Invalid type");
+            }
+        }
+
         private long ObjectToBytes(object value)
         {
             if (value is IntPtr)
@@ -183,8 +196,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
             else if (value is int)
             {
-                return (int)value;
-
+                return (int)value; 
             }
             else if (value is string)
             {
