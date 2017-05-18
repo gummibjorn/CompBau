@@ -14,6 +14,8 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         IntPtr _heap;
         private readonly int ALIGNMENT = 8;
+        private readonly int MARK_BIT = 1 << 63;
+
         private List<FreeEntry> _freeList = new List<FreeEntry>();
 
         int _typeDescriptorIndex = 0;
@@ -98,6 +100,62 @@ namespace RappiSharp.VirtualMachine.Runtime
         }
 
         private void RunGarbageCollection()
+        {
+            Mark();
+            Sweep();
+        }
+
+        private void Mark()
+        {
+            foreach(var root in GetRootSet())
+            {
+                Traverse(root);
+            }
+        }
+
+        private void Traverse(IntPtr current)
+        {
+            if (current != IntPtr.Zero && !IsMarked(current))
+            {
+                SetMark(current);
+                foreach (var next in GetPointers(current))
+                {
+                    Traverse(next);
+                }
+            }        }
+
+        private IEnumerable<IntPtr> GetPointers(IntPtr current)
+        {
+            var type = GetType(current);       
+            if(type is ArrayDescriptor && IsReferenceType(((ArrayDescriptor)type).ElementType))
+            {
+                return GetArrayPointers(current);
+            }else if(type is ClassDescriptor)
+            {
+
+            }
+        }
+
+        private IEnumerable<IntPtr> GetArrayPointers(IntPtr current)
+        {
+            for(int i=0; i < GetArrayLength(current); i++)
+            {
+                yield return (IntPtr)Marshal.ReadInt64(current, i * ALIGNMENT);
+            }
+        }
+
+        private void SetMark(IntPtr current)
+        {
+            var bytes = Marshal.ReadInt64(current) & MARK_BIT;
+            Marshal.WriteInt64(current, bytes);
+        }
+
+        private bool IsMarked(IntPtr current)
+        {
+            return (Marshal.ReadInt64(current) & MARK_BIT) == MARK_BIT; 
+        }
+
+        private void Sweep()
         {
             throw new NotImplementedException();
         }
