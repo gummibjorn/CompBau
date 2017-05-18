@@ -545,6 +545,12 @@ namespace _Test
         }
 
         [TestMethod]
+        public void GarbageCollectionTrigger()
+        {
+            runInterpreter();
+        }
+
+        [TestMethod]
         public void Greeter()
         {
             runInterpreter();

@@ -48,7 +48,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     }
                 }
                 var parameterTypes = frame.Method.ParameterTypes;
-                for (int i = 0; i < localTypes.Length; i++)
+                for (int i = 0; i < parameterTypes.Length; i++)
                 {
                     var value = frame.Arguments[i];
                     if (!IntPtr.Zero.Equals(value) && IsReferenceType(parameterTypes[i]))
@@ -134,7 +134,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             {
                 return GetClassFieldPointers(current, (ClassDescriptor)type);
             }
-            throw new VMException("IntPtr type not known");
+            return Enumerable.Empty<IntPtr>();
         }
 
         private IEnumerable<IntPtr> GetClassFieldPointers(IntPtr current, ClassDescriptor type)
