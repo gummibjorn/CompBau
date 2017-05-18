@@ -14,7 +14,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         IntPtr _heap;
         private readonly int ALIGNMENT = 8;
-        private readonly int MARK_BIT = 1 << 63;
+        private readonly int MARK_BIT = 1 << 31;
 
         private FreeList _freeList = new FreeList();
 
@@ -144,7 +144,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             {
                 if (IsReferenceType(type.FieldTypes[i]))
                 {
-                    yield return (IntPtr)Marshal.ReadInt64(current, i * type.FieldOffsets[i]);
+                    yield return (IntPtr)Marshal.ReadInt64(current, type.FieldOffsets[i]);
                 }
             }
         }
@@ -159,34 +159,38 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void SetMark(IntPtr current)
         {
-            var bytes = Marshal.ReadInt64(current) & MARK_BIT;
-            Marshal.WriteInt64(current, bytes);
+            var bytes = Marshal.ReadInt32(current) | MARK_BIT;
+            Marshal.WriteInt32(current, bytes);
         }
 
         private void RemoveMark(IntPtr current)
         {
-            var bytes = Marshal.ReadInt64(current) & ~MARK_BIT;
-            Marshal.WriteInt64(current, bytes);
+            var bytes = Marshal.ReadInt32(current) & ~MARK_BIT;
+            Marshal.WriteInt32(current, bytes);
         }
 
         private bool IsMarked(IntPtr current)
         {
-            return (Marshal.ReadInt64(current) & MARK_BIT) == MARK_BIT; 
+            return (Marshal.ReadInt32(current) & MARK_BIT) == MARK_BIT; 
         }
 
         private long ReadSize(IntPtr current)
         {
-            return Marshal.ReadInt64(current) & ~MARK_BIT;
+            return Marshal.ReadInt32(current+4) & ~MARK_BIT;
         }
 
         private void WriteSize(IntPtr current, long size)
         {
-            Marshal.WriteInt64(current, size);
+            Marshal.WriteInt32(current, (int)size);
         }
 
         private void Sweep(IntPtr block)
         {
             var size = ReadSize(block);
+            if(size == 0)
+            {
+                throw new VMException("GOT A SIZE OF 0");
+            }
             var next = block + (int)size;
 
             if (!IsMarked(block))
@@ -234,7 +238,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             //int size = 24 + Math.Round(size, ALIGNMENT);
 
             IntPtr address = AllocateBytes(size);
-            Marshal.WriteInt64(address, 0, size);
+            WriteSize(address, size);
             int typeTag = MapToId(type);
             Marshal.WriteInt64(address, 8, typeTag);
             Marshal.WriteInt64(address, 16, length);
@@ -251,7 +255,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             int size = 24 + type.TotalFieldSize; //might have to round this to alignment
 
             IntPtr address = AllocateBytes(size);
-            Marshal.WriteInt64(address, 0, size);
+            WriteSize(address, size);
             int typeTag = MapToId(type);
             Marshal.WriteInt64(address, 8, typeTag);
             address += 24;
@@ -388,7 +392,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var current = _heap;
             var builder = new StringBuilder();
-            while((int)current <= (int)_limit) {
+            while((long)current <= (long)_limit) {
                 byte[] bytes = new byte[8];
                 builder.Append(current.ToString("x8"));
                 builder.Append(" ");
