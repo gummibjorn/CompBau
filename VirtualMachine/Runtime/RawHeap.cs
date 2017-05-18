@@ -163,6 +163,12 @@ namespace RappiSharp.VirtualMachine.Runtime
             Marshal.WriteInt64(current, bytes);
         }
 
+        private void RemoveMark(IntPtr current)
+        {
+            var bytes = Marshal.ReadInt64(current) & ~MARK_BIT;
+            Marshal.WriteInt64(current, bytes);
+        }
+
         private bool IsMarked(IntPtr current)
         {
             return (Marshal.ReadInt64(current) & MARK_BIT) == MARK_BIT; 
@@ -190,7 +196,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
             if((long)next < (long)_limit)
             {
-                Sweep(block + (int)size);
+                Sweep(next);
             } else
             {
                 _freeList.Merge();
@@ -198,7 +204,19 @@ namespace RappiSharp.VirtualMachine.Runtime
                 {
                     WriteSize(f.Position, f.Size);
                 }
-                //TODO remove marks
+                RemoveMarks(_heap);
+            }
+        }
+
+        private void RemoveMarks(IntPtr block)
+        {
+            var size = ReadSize(block);
+            var next = block + (int)size;
+
+            RemoveMark(block);
+            if ((long)next < (long)_limit)
+            {
+                RemoveMarks(next);
             }
         }
 
