@@ -174,12 +174,18 @@ namespace RappiSharp.VirtualMachine.Runtime
             classDescriptor.FieldTypes = classDescriptor.FieldTypes.Concat(MapTypes(classData.FieldTypes)).ToArray();
         }
 
+        private void FixTotalFieldSize(ClassDescriptor classDescriptor)
+        {
+            classDescriptor.TotalFieldSize = classDescriptor.FieldTypes.Length * 8; //FIXME: retrive correct size of type
+        }
+
         private void FixClassType(ClassDescriptor classDescriptor, ClassData classData)
         {
             classDescriptor.BaseTypes = new ClassDescriptor[_hierarchyDepth];
             FixBaseTypes(classDescriptor, classData);
             FixFieldTypes(classData, classDescriptor);
             classDescriptor.FieldOffsets = MapOffsets(classDescriptor.FieldTypes);
+            FixTotalFieldSize(classDescriptor);
             MapVirtualTable(classDescriptor, classData);
             FixMethodParent(classDescriptor, classData);
         }

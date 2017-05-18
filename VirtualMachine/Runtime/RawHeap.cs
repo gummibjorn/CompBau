@@ -192,7 +192,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             for(var i = 0; i < type.FieldTypes.Length; i++) 
             {
                 var f = type.FieldTypes[i];
-                Marshal.WriteInt64(address, type.FieldOffsets[i], ObjectToBytes(Interpreter.DefaultValue(type)));
+                Marshal.WriteInt64(address, type.FieldOffsets[i], ObjectToBytes(Interpreter.DefaultValue(f)));
             }
         }
 
