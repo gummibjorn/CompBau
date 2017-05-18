@@ -13,28 +13,93 @@ namespace RappiSharp.VirtualMachine.Runtime
     {
 
         IntPtr _heap;
-        IntPtr _freePtr;
-        IntPtr _limit;
         private readonly int ALIGNMENT = 8;
+        private List<FreeEntry> _freeList = new List<FreeEntry>();
 
         int _typeDescriptorIndex = 0;
         Dictionary<TypeDescriptor, int> _descToPtr = new Dictionary<TypeDescriptor, int>();
 
         List<string> _unmanagedStrings = new List<string>();
+        private CallStack _callStack;
+        private IntPtr _limit;
 
-        public RawHeap(int nofBytes)
+        public RawHeap(int nofBytes, CallStack callStack)
         {
             _heap = Marshal.AllocHGlobal(nofBytes);
-            _freePtr = _heap; //???
             _limit = _heap + nofBytes;
+            _freeList.Add(new FreeEntry(_heap, nofBytes));
+            _callStack = callStack;
         }
 
-        private void CheckHeapSize(int elementSize)
+
+        IEnumerable<IntPtr> GetRootSet()
         {
-            if(((int)_freePtr + elementSize) > (int)_limit)
+            foreach (var frame in _callStack)
+            {
+                var localTypes = frame.Method.LocalTypes;
+                for (int i = 0; i < localTypes.Length; i++)
+                {
+                    var value = frame.Locals[i];
+                    if (!IntPtr.Zero.Equals(value) && IsReferenceType(localTypes[i]))
+                    {
+                        yield return (IntPtr)value;
+                    }
+                }
+                var parameterTypes = frame.Method.ParameterTypes;
+                for (int i = 0; i < localTypes.Length; i++)
+                {
+                    var value = frame.Arguments[i];
+                    if (!IntPtr.Zero.Equals(value) && IsReferenceType(parameterTypes[i]))
+                    {
+                        yield return (IntPtr)value;
+                    }
+                }
+                // scan parameters
+                yield return (IntPtr)frame.ThisReference;
+            }
+        }
+
+        private bool IsReferenceType(TypeDescriptor typeDescriptor)
+        {
+            return typeDescriptor is ArrayDescriptor || typeDescriptor is ClassDescriptor;
+        }
+
+        private IntPtr AllocateBytes(int elementSize, bool first = true)
+        {
+            foreach(var free in _freeList)
+            {
+                if(free.Size >= elementSize)
+                {
+                    return TakeFromFreeList(free, elementSize);
+                }
+            }
+            if (first)
+            {
+                RunGarbageCollection();
+                return AllocateBytes(elementSize, false);
+            } else
             {
                 throw new VMException("Out of Mana");
             }
+        }
+
+        private IntPtr TakeFromFreeList(FreeEntry free, int elementSize)
+        {
+            var position = free.Position;
+            if(free.Size == elementSize)
+            {
+                _freeList.Remove(free);
+            } else
+            {
+                free.Position = position + elementSize;
+                free.Size -= elementSize;
+            }
+            return position;
+        }
+
+        private void RunGarbageCollection()
+        {
+            throw new NotImplementedException();
         }
 
         public int Allocate(string s)
@@ -49,11 +114,8 @@ namespace RappiSharp.VirtualMachine.Runtime
             var elementSize = ALIGNMENT; //TODO
             int size = 24 + elementSize * length;
             //int size = 24 + Math.Round(size, ALIGNMENT);
-            
-            CheckHeapSize(size);
 
-            IntPtr address = _freePtr;
-            _freePtr += size;
+            IntPtr address = AllocateBytes(size);
             Marshal.WriteInt64(address, 0, size);
             int typeTag = MapToId(type);
             Marshal.WriteInt64(address, 8, typeTag);
@@ -69,12 +131,8 @@ namespace RappiSharp.VirtualMachine.Runtime
         public IntPtr Allocate(ClassDescriptor type)
         {
             int size = 24 + type.TotalFieldSize; //might have to round this to alignment
-            //int size = 0;
 
-            CheckHeapSize(size);
-            
-            IntPtr address = _freePtr;
-            _freePtr += size;
+            IntPtr address = AllocateBytes(size);
             Marshal.WriteInt64(address, 0, size);
             int typeTag = MapToId(type);
             Marshal.WriteInt64(address, 8, typeTag);
@@ -125,7 +183,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
             else if (value is int)
             {
-                return (int)value; //whooooo
+                return (int)value;
 
             }
             else if (value is string)
@@ -233,6 +291,44 @@ namespace RappiSharp.VirtualMachine.Runtime
                 builder.AppendLine();
             }
             return builder.ToString();
+        }
+    }
+
+    class FreeEntry
+    {
+        IntPtr _position;
+        int _size;
+
+        public FreeEntry(IntPtr position, int size)
+        {
+            _size = size;
+            _position = position;
+        }
+        
+        public IntPtr Position
+        {
+            get
+            {
+                return _position;
+            }
+
+            set
+            {
+                _position = value;
+            }
+        }
+
+        public int Size
+        {
+            get
+            {
+                return _size;
+            }
+
+            set
+            {
+                _size = value;
+            }
         }
     }
 }

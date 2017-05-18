@@ -12,6 +12,10 @@ namespace RappiSharp.VirtualMachine.Runtime
         private IConsole _console;
         public RawHeap _heap;
 
+        private const int KB = 1024;
+        private const int MB = 1024 * KB;
+        private const int GB = 1024 * MB;
+
         public Interpreter(Metadata metadata) : this(metadata, new SystemConsole()) { }
 
         public Interpreter(Metadata metadata, IConsole console)
@@ -19,7 +23,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             _console = console;
             _loader = new Loader(metadata);
             _callStack = new CallStack();
-            _heap = new RawHeap(2048);
+            _heap = new RawHeap(2 * KB, _callStack);
         }
 
         public void Run()
