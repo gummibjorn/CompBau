@@ -129,14 +129,26 @@ namespace RappiSharp.VirtualMachine.Runtime
             var type = GetType(current);       
             if(type is ArrayDescriptor && IsReferenceType(((ArrayDescriptor)type).ElementType))
             {
-                return GetArrayPointers(current);
+                return GetArrayElemPointers(current);
             }else if(type is ClassDescriptor)
             {
+                return GetClassFieldPointers(current, (ClassDescriptor)type);
+            }
+            throw new VMException("IntPtr type not known");
+        }
 
+        private IEnumerable<IntPtr> GetClassFieldPointers(IntPtr current, ClassDescriptor type)
+        {
+            for(int i=0; i<type.FieldTypes.Length; i++)
+            {
+                if (IsReferenceType(type.FieldTypes[i]))
+                {
+                    yield return (IntPtr)Marshal.ReadInt64(current, i * type.FieldOffsets[i]);
+                }
             }
         }
 
-        private IEnumerable<IntPtr> GetArrayPointers(IntPtr current)
+        private IEnumerable<IntPtr> GetArrayElemPointers(IntPtr current)
         {
             for(int i=0; i < GetArrayLength(current); i++)
             {
