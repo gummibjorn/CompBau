@@ -19,7 +19,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 currentGroup.Add(this[i]);
                 groups.Add(currentGroup);
 
-                while (i != this.Count() && currentGroup.Last().DirectlyPrecedes(this[i+1])){
+                while (i+1 < this.Count() && currentGroup.Last().DirectlyPrecedes(this[i+1])){
                     currentGroup.Add(this[i+1]);
                     i += 1;
                 }
@@ -57,7 +57,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public bool DirectlyPrecedes(FreeEntry next)
         {
-            return (_position + (int)_size).Equals(next);
+            return (_position + (int)_size).Equals(next.Position);
         }
         
         public IntPtr Position

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace _Test
 {
     [TestClass]
-    class FreeListTest
+    public class FreeListTest
     {
 
         [TestMethod]
@@ -22,13 +22,13 @@ namespace _Test
 
             list.Merge();
 
+            Assert.AreEqual(2, list.Count());
+
             Assert.AreEqual((IntPtr)0, list[0].Position);
             Assert.AreEqual(16, list[0].Size);
 
             Assert.AreEqual((IntPtr)400, list[1].Position);
             Assert.AreEqual(8, list[1].Size);
-
-            Assert.AreEqual(2, list.Count());
         }
     }
 }
