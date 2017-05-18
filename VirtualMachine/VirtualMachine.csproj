@@ -53,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\ActivationFrame.cs" />
     <Compile Include="Runtime\CallStack.cs" />
+    <Compile Include="Runtime\FreeList.cs" />
     <Compile Include="Runtime\ManagedHeap.cs" />
     <Compile Include="Runtime\RawHeap.cs" />
     <Compile Include="Runtime\SystemConsole.cs" />

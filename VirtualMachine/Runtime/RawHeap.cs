@@ -16,7 +16,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         private readonly int ALIGNMENT = 8;
         private readonly int MARK_BIT = 1 << 63;
 
-        private List<FreeEntry> _freeList = new List<FreeEntry>();
+        private FreeList _freeList = new FreeList();
 
         int _typeDescriptorIndex = 0;
         Dictionary<TypeDescriptor, int> _descToPtr = new Dictionary<TypeDescriptor, int>();
@@ -102,7 +102,7 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void RunGarbageCollection()
         {
             Mark();
-            Sweep();
+            Sweep(_heap);
         }
 
         private void Mark()
@@ -167,9 +167,38 @@ namespace RappiSharp.VirtualMachine.Runtime
             return (Marshal.ReadInt64(current) & MARK_BIT) == MARK_BIT; 
         }
 
-        private void Sweep()
+        private long ReadSize(IntPtr current)
         {
-            throw new NotImplementedException();
+            return Marshal.ReadInt64(current) & ~MARK_BIT;
+        }
+
+        private void WriteSize(IntPtr current, long size)
+        {
+            Marshal.WriteInt64(current, size);
+        }
+
+        private void Sweep(IntPtr block)
+        {
+            var size = ReadSize(block);
+            var next = block + (int)size;
+
+            if (!IsMarked(block))
+            {
+                _freeList.Add(new FreeEntry(block, size));
+            }
+
+            if((long)next < (long)_limit)
+            {
+                Sweep(block + (int)size);
+            } else
+            {
+                _freeList.Merge();
+                foreach(var f in _freeList)
+                {
+                    WriteSize(f.Position, f.Size);
+                }
+                //TODO remove marks
+            }
         }
 
         public int Allocate(string s)
@@ -373,44 +402,6 @@ namespace RappiSharp.VirtualMachine.Runtime
                 builder.AppendLine();
             }
             return builder.ToString();
-        }
-    }
-
-    class FreeEntry
-    {
-        IntPtr _position;
-        int _size;
-
-        public FreeEntry(IntPtr position, int size)
-        {
-            _size = size;
-            _position = position;
-        }
-        
-        public IntPtr Position
-        {
-            get
-            {
-                return _position;
-            }
-
-            set
-            {
-                _position = value;
-            }
-        }
-
-        public int Size
-        {
-            get
-            {
-                return _size;
-            }
-
-            set
-            {
-                _size = value;
-            }
         }
     }
 }
