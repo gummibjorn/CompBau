@@ -122,7 +122,8 @@ namespace RappiSharp.VirtualMachine.Runtime
                 {
                     Traverse(next);
                 }
-            }        }
+            }
+        }
 
         private IEnumerable<IntPtr> GetPointers(IntPtr current)
         {
