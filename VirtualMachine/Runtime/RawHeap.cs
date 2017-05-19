@@ -87,6 +87,13 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private IntPtr TakeFromFreeList(FreeEntry free, int elementSize)
         {
+            foreach(var elem in _freeList)
+            {
+                Console.WriteLine("pos: " + elem.Position + " size: " + elem.Size );
+            }
+
+            Console.WriteLine("---------------------------");
+
             var position = free.Position;
             if(free.Size == elementSize)
             {
@@ -102,7 +109,9 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void RunGarbageCollection()
         {
             Mark();
+            Console.WriteLine("Mark DONE");
             Sweep(_heap);
+            Console.WriteLine("Sweep DONE");
         }
 
         private void Mark()
