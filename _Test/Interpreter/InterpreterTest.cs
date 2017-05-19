@@ -547,6 +547,12 @@ namespace _Test
         }
 
         [TestMethod]
+        public void GarbageCollectionFragmented()
+        {
+            runInterpreter();
+        }
+
+        [TestMethod]
         public void GarbageCollectionTrigger()
         {
             runInterpreter();

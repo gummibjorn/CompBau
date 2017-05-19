@@ -1,0 +1,26 @@
+﻿class Program{
+
+	void refill(Slurp[] arr){
+		int i;
+		Slurp temp;
+		while(i<40){
+			temp = new Slurp();
+			arr[i] = new Slurp();
+			i=i+1;
+		}
+	}
+
+	void Main(){
+		Slurp[] arr;
+		arr = new Slurp[40];
+
+		int i;
+		while(i<10000){
+			refill(arr);	
+			i=i+1;
+		}
+	}
+}
+
+class Slurp{
+}

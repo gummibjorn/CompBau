@@ -105,6 +105,7 @@
     <Content Include="Checker\ArrayCreation.txt" />
     <Content Include="Checker\MethodReturnStatementInvalid.txt" />
     <Content Include="Checker\MethodReturnStatement.txt" />
+    <Content Include="Generator\GarbageCollectionFragmented.txt" />
     <Content Include="Generator\GarbageCollectionTrigger.txt" />
     <Content Include="Generator\PolymorphismFields.txt" />
     <Content Include="Generator\StringArray.txt" />
