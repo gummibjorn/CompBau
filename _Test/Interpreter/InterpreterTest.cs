@@ -25,6 +25,7 @@ namespace _Test
         private Interpreter _interpreter;
         private TestConsole _console;
         private bool _didRun;
+        private int _heapSize;
 
         private void initializeInterpreter(RappiLexer lexer)
         {
@@ -34,7 +35,7 @@ namespace _Test
                 Assert.Fail("Error while generating code: " + Diagnosis.Messages);
             }
             _console = new TestConsole();
-            _interpreter = new Interpreter(generator.Metadata, _console);
+            _interpreter = new Interpreter(generator.Metadata, _console, _heapSize);
         }
 
         private void runInterpreter()
@@ -52,7 +53,7 @@ namespace _Test
         private void runInterpreter(Metadata _metadata)
         {
             _console = new TestConsole();
-            _interpreter = new Interpreter(_metadata, _console);
+            _interpreter = new Interpreter(_metadata, _console, _heapSize);
             Run();
         }
 
@@ -80,6 +81,7 @@ namespace _Test
         [TestInitialize]
         public void Before()
         {
+            _heapSize = 2 * 1024;
             _didRun = false;
         }
 
@@ -912,9 +914,10 @@ namespace _Test
             Assert.AreEqual("0,1,2,3,4,5,6,7,8,9", _console.Output.ToString());
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void MaxFlow()
         {
+            _heapSize = 25 * 1024 * 1024;
             runInterpreter();
             Assert.AreEqual("23", _console.Output.ToString());
         }

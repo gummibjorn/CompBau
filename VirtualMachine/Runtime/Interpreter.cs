@@ -18,12 +18,12 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public Interpreter(Metadata metadata) : this(metadata, new SystemConsole()) { }
 
-        public Interpreter(Metadata metadata, IConsole console)
+        public Interpreter(Metadata metadata, IConsole console, int heapSize = 2 * KB)
         {
             _console = console;
             _loader = new Loader(metadata);
             _callStack = new CallStack();
-            _heap = new RawHeap(2 * KB, _callStack);
+            _heap = new RawHeap(heapSize, _callStack);
         }
 
         public void Run()
