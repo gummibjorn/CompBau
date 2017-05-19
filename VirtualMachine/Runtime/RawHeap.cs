@@ -72,7 +72,12 @@ namespace RappiSharp.VirtualMachine.Runtime
             {
                 if(free.Size >= elementSize)
                 {
-                    return TakeFromFreeList(free, elementSize);
+                    var ptr = TakeFromFreeList(free, elementSize);
+                    for(var i = 0; i < elementSize; i += 8)
+                    {
+                        Marshal.WriteInt64(ptr, i, 0x1234567811223344);
+                    }
+                    return ptr;
                 }
             }
             if (first)
@@ -108,6 +113,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void RunGarbageCollection()
         {
+            RemoveMarks(_heap);
             Mark();
             Console.WriteLine("Mark DONE");
             Sweep(_heap);
@@ -122,12 +128,12 @@ namespace RappiSharp.VirtualMachine.Runtime
             }
         }
 
-        private void Traverse(IntPtr current)
+        private void Traverse(IntPtr instance)
         {
-            if (current != IntPtr.Zero && !IsMarked(current))
+            if (instance != IntPtr.Zero && !IsMarked(instance-24))
             {
-                SetMark(current);
-                foreach (var next in GetPointers(current))
+                SetMark(instance-24);
+                foreach (var next in GetPointers(instance))
                 {
                     Traverse(next);
                 }
@@ -168,6 +174,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void SetMark(IntPtr current)
         {
+            Console.WriteLine("Mark SET");
             var bytes = Marshal.ReadInt32(current) | MARK_BIT;
             Marshal.WriteInt32(current, bytes);
         }
@@ -185,12 +192,12 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private long ReadSize(IntPtr current)
         {
-            return Marshal.ReadInt32(current+4) & ~MARK_BIT;
+            return Marshal.ReadInt32(current, 4) & ~MARK_BIT;
         }
 
         private void WriteSize(IntPtr current, long size)
         {
-            Marshal.WriteInt32(current, (int)size);
+            Marshal.WriteInt32(current, 4, (int)size);
         }
 
         private void Sweep(IntPtr block)
@@ -403,22 +410,29 @@ namespace RappiSharp.VirtualMachine.Runtime
             var builder = new StringBuilder();
             while((long)current <= (long)_limit) {
                 byte[] bytes = new byte[8];
-                builder.Append(current.ToString("x8"));
+                long bytes64;
+                bytes64 = Marshal.ReadInt64(current);
+                //builder.Append(current.ToString("x8"));
+                builder.Append(current.ToString());
                 builder.Append(" ");
                 for(var i = 0; i < ALIGNMENT; i++)
                 {
-                    bytes[i] = Marshal.ReadByte(current + i);
+                    bytes[7-i] = Marshal.ReadByte(current + i);
                 }
                 current = current + 8;
 
                 for(var i = 0; i < bytes.Length; i++)
                 {
+                    builder.Append("  ");
                     if(i%4 == 0)
                     {
-                        builder.Append(" ");
+                        builder.Append("  ");
                     }
                     builder.Append(bytes[i].ToString("x2"));
                 }
+
+                builder.Append(" -> ");
+                builder.Append(bytes64);
 
                 /*
                 for(var i = 0; i < bytes.Length; i++)
