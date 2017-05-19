@@ -59,7 +59,21 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             return (_position + (int)_size).Equals(next.Position);
         }
-        
+
+        public override int GetHashCode()
+        {
+            return _position.GetHashCode() + _size.GetHashCode();
+        }
+
+        public override bool Equals(Object obj)
+        {
+            FreeEntry freeEntry = obj as FreeEntry;
+            if (freeEntry == null)
+                return false;
+            else
+                return _position == freeEntry._position && _size == freeEntry._size;
+        }
+
         public IntPtr Position
         {
             get

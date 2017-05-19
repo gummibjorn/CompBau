@@ -108,12 +108,12 @@ namespace RappiSharp.VirtualMachine.Runtime
                 free.Position = position + elementSize;
                 free.Size -= elementSize;
             }
+            WriteSize(free.Position, free.Size);
             return position;
         }
 
         private void RunGarbageCollection()
         {
-            RemoveMarks(_heap);
             Mark();
             Console.WriteLine("Mark DONE");
             Sweep(_heap);
@@ -192,7 +192,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private long ReadSize(IntPtr current)
         {
-            return Marshal.ReadInt32(current, 4) & ~MARK_BIT;
+            return Marshal.ReadInt32(current, 4);
         }
 
         private void WriteSize(IntPtr current, long size)
@@ -211,7 +211,14 @@ namespace RappiSharp.VirtualMachine.Runtime
 
             if (!IsMarked(block))
             {
-                _freeList.Add(new FreeEntry(block, size));
+                var entry = new FreeEntry(block, size);
+                if (!_freeList.Contains(entry))
+                {
+                    _freeList.Add(entry);
+                }
+            }else
+            {
+                RemoveMark(block);
             }
 
             if((long)next < (long)_limit)
@@ -224,7 +231,6 @@ namespace RappiSharp.VirtualMachine.Runtime
                 {
                     WriteSize(f.Position, f.Size);
                 }
-                RemoveMarks(_heap);
             }
         }
 
