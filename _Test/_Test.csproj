@@ -63,6 +63,8 @@
     <Compile Include="Generator\ILIterator.cs" />
     <Compile Include="Interpreter\InterpreterTest.cs" />
     <Compile Include="Interpreter\MetadataBuilder.cs" />
+    <Compile Include="Interpreter\ProcessLauncher.cs" />
+    <Compile Include="Interpreter\TobiTest.cs" />
     <Compile Include="Lexer\LexerTest.cs" />
     <Compile Include="AbstractTest.cs" />
     <Compile Include="Parser\ParserTreeTest.cs" />
@@ -105,11 +107,8 @@
     <Content Include="Checker\ArrayCreation.txt" />
     <Content Include="Checker\MethodReturnStatementInvalid.txt" />
     <Content Include="Checker\MethodReturnStatement.txt" />
-
     <Content Include="Generator\GarbageCollectionFragmented.txt" />
-
     <Content Include="Generator\GCCyclicReferences.txt" />
-
     <Content Include="Generator\GarbageCollectionTrigger.txt" />
     <Content Include="Generator\PolymorphismFields.txt" />
     <Content Include="Generator\StringArray.txt" />

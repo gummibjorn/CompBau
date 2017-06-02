@@ -94,10 +94,10 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             foreach(var elem in _freeList)
             {
-                Console.WriteLine("pos: " + elem.Position + " size: " + elem.Size );
+                //Console.WriteLine("pos: " + elem.Position + " size: " + elem.Size );
             }
 
-            Console.WriteLine("---------------------------");
+            //Console.WriteLine("---------------------------");
 
             var position = free.Position;
             if(free.Size == elementSize)
@@ -115,9 +115,9 @@ namespace RappiSharp.VirtualMachine.Runtime
         private void RunGarbageCollection()
         {
             Mark();
-            Console.WriteLine("Mark DONE");
+            //Console.WriteLine("Mark DONE");
             Sweep(_heap);
-            Console.WriteLine("Sweep DONE");
+            //Console.WriteLine("Sweep DONE");
         }
 
         private void Mark()
@@ -174,7 +174,7 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void SetMark(IntPtr current)
         {
-            Console.WriteLine("Mark SET");
+            //Console.WriteLine("Mark SET");
             var bytes = Marshal.ReadInt32(current) | MARK_BIT;
             Marshal.WriteInt32(current, bytes);
         }
