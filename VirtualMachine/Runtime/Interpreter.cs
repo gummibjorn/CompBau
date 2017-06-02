@@ -404,7 +404,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                             }
                         }
                     }
-                } catch (Exception e)
+                } catch (Exception)
                 {
                         throw new InvalidILException("Invalid type");
                 }
