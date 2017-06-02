@@ -35,6 +35,9 @@ namespace RappiSharp.VirtualMachine.Runtime
             _limit = _heap + nofBytes;
             _freeList.Add(new FreeEntry(_heap, nofBytes));
             _callStack = callStack;
+
+            //add default string
+            _unmanagedStrings.Add(string.Empty);
         }
 
 
@@ -252,9 +255,10 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public int Allocate(string s)
         {
+            //TODO: this is memory leaky, but proper runtime system would allocate string as char arrays in the heap anyway
             _unmanagedStrings.Add(s);
 
-            return _unmanagedStrings.LastIndexOf(s);
+            return _unmanagedStrings.IndexOf(s);
         }
 
         public IntPtr Allocate(ArrayDescriptor type, int length)
@@ -360,6 +364,11 @@ namespace RappiSharp.VirtualMachine.Runtime
             throw new VMException($"Cannot convert {value} to bytes");
         }
 
+        public string LoadString(int index)
+        {
+            return _unmanagedStrings.ElementAt(index);
+        }
+
         private object BytesToObject(long element, TypeDescriptor type)
         {
             if(type is ArrayDescriptor || type is ClassDescriptor)
@@ -367,7 +376,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 return ((IntPtr)element);
             } else if(type == InbuiltType.String)
             {
-                return _unmanagedStrings.ElementAt((int)element);
+                return (int)element;
             } else if (type == InbuiltType.Int)
             {
                 return ((int)element);

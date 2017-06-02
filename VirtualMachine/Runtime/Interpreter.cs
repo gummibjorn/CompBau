@@ -76,7 +76,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                     Stack.Push(Verify<int>(operand));
                     break;
                 case OpCode.ldc_s:
-                    Stack.Push(Verify<string>(operand));
+                    Stack.Push(_heap.Allocate(Verify<string>(operand)));
                     break;
                 case OpCode.ldnull:
                     Stack.Push(IntPtr.Zero);
@@ -320,6 +320,16 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
             var right = Stack.Pop();
             var left = Stack.Pop();
+            if(right is string)
+            {
+                right = _heap.Allocate((string)right);
+            }
+
+            if(left is string)
+            {
+                left = _heap.Allocate((string)left);
+            }
+
             if(right != null)
             {
                 return right.Equals(left);
@@ -369,7 +379,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 return Verify<int>(value);
             }else if(type == InbuiltType.String)
             {
-                return Verify<string>(value);
+                return Verify<int>(value);
             }else if(type == InbuiltType.Char)
             {
                 return Verify<char>(value);
@@ -406,8 +416,8 @@ namespace RappiSharp.VirtualMachine.Runtime
         {
                 if(operand == MethodDescriptor.WriteString)
                 {
-                    var arg = Stack.Pop<string>();
-                    _console.Write(arg);
+                    var arg = Stack.Pop<int>();
+                    _console.Write(_heap.LoadString(arg));
                 }
 
                 if(operand == MethodDescriptor.WriteChar)
@@ -425,7 +435,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 if(operand == MethodDescriptor.ReadString)
                 {
                     string input = _console.ReadLine();
-                    Stack.Push(input);
+                    Stack.Push(_heap.Allocate(input));
                 }
 
                 if(operand == MethodDescriptor.ReadChar)
@@ -442,8 +452,8 @@ namespace RappiSharp.VirtualMachine.Runtime
 
                 if(operand == MethodDescriptor.Halt)
                 {
-                    var arg = Stack.Pop<string>();
-                    _console.Write(arg);
+                    var arg = Stack.Pop<int>();
+                    _console.Write(_heap.LoadString(arg));
                     Environment.Exit(1);
                 }
         }
@@ -478,7 +488,8 @@ namespace RappiSharp.VirtualMachine.Runtime
                 }
                 if (type == InbuiltType.String)
                 {
-                    return string.Empty;
+                    //index on default string
+                    return 0;
                 }
                 throw new InvalidILException("Invalid inbuilt type");
             }
