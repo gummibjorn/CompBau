@@ -168,7 +168,7 @@ class P{ void Main(){
             Assert.AreEqual("1", output);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         [ExpectedException(typeof(VMException))]
         public void TestHalt()
         {
@@ -755,7 +755,7 @@ class P{ void Main(){
             Assert.AreEqual("1", output);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         [ExpectedException(typeof(VMException))]
         public void Halt()
         {
@@ -2369,7 +2369,7 @@ class Program {
         }
 
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void NullAccess()
         {
             var code = @"
@@ -2472,7 +2472,7 @@ class Program {
             Assert.IsFalse(Diagnosis.HasErrors);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void NullAccessArrayLen()
         {
             var code = @"
