@@ -27,6 +27,10 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public RawHeap(int nofBytes, CallStack callStack)
         {
+            if(IntPtr.Size != ALIGNMENT)
+            {
+                throw new VMException("Platform not supported, please run with 64bit");
+            }
             _heap = Marshal.AllocHGlobal(nofBytes);
             _limit = _heap + nofBytes;
             _freeList.Add(new FreeEntry(_heap, nofBytes));
@@ -73,7 +77,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 if(free.Size >= elementSize)
                 {
                     var ptr = TakeFromFreeList(free, elementSize);
-                    for(var i = 0; i < elementSize; i += 8)
+                    for(var i = 0; i < elementSize; i += ALIGNMENT)
                     {
                         Marshal.WriteInt64(ptr, i, 0x1234567811223344);
                     }
@@ -130,9 +134,9 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         private void Traverse(IntPtr instance)
         {
-            if (instance != IntPtr.Zero && !IsMarked(instance-24))
+            if (instance != IntPtr.Zero && !IsMarked(instance-3*ALIGNMENT))
             {
-                SetMark(instance-24);
+                SetMark(instance-3*ALIGNMENT);
                 foreach (var next in GetPointers(instance))
                 {
                     Traverse(next);
@@ -255,44 +259,43 @@ namespace RappiSharp.VirtualMachine.Runtime
 
         public IntPtr Allocate(ArrayDescriptor type, int length)
         {
-            var elementSize = ALIGNMENT; //TODO
-            int size = 24 + elementSize * length;
-            //int size = 24 + Math.Round(size, ALIGNMENT);
+            var elementSize = ALIGNMENT;
+            int size = 3*ALIGNMENT + elementSize * length;
 
             IntPtr address = AllocateBytes(size);
             WriteSize(address, size);
             int typeTag = MapToId(type);
-            Marshal.WriteInt64(address, 8, typeTag);
-            Marshal.WriteInt64(address, 16, length);
-            address += 24;
+            Marshal.WriteInt64(address, ALIGNMENT, typeTag);
+            Marshal.WriteInt64(address, 2*ALIGNMENT, length);
+            address += 3*ALIGNMENT;
             for(var i  = 0; i < length; i++)
             {
-                Marshal.WriteInt64(address, i * ALIGNMENT, 0); //TODO make a default value
+                Marshal.WriteInt64(address, i * ALIGNMENT, 0);
             }
             return address;
         }
 
         public IntPtr Allocate(ClassDescriptor type)
         {
-            int size = 24 + type.TotalFieldSize; //might have to round this to alignment
+            int size = 3*ALIGNMENT + type.TotalFieldSize; //might have to round this to alignment
 
             IntPtr address = AllocateBytes(size);
             WriteSize(address, size);
             int typeTag = MapToId(type);
-            Marshal.WriteInt64(address, 8, typeTag);
-            address += 24;
+            Marshal.WriteInt64(address, ALIGNMENT, typeTag);
+            address += 3*ALIGNMENT;
             Initialize(address, type);
             return address;
         }
 
         public TypeDescriptor GetType(IntPtr ptr)
         {
-            return MapToDescriptor(Marshal.ReadInt32(ptr, -16));
+            return MapToDescriptor(Marshal.ReadInt32(ptr, -2*ALIGNMENT));
         }
 
         public int GetArrayLength(IntPtr ptr)
         {
-            return Marshal.ReadInt32(ptr - 8);
+            return Marshal.ReadInt32(ptr - ALIGNMENT);
         }
 
         public void StoreElement(IntPtr array, int index, object value, TypeDescriptor type)
@@ -415,7 +418,7 @@ namespace RappiSharp.VirtualMachine.Runtime
             var current = _heap;
             var builder = new StringBuilder();
             while((long)current <= (long)_limit) {
-                byte[] bytes = new byte[8];
+                byte[] bytes = new byte[ALIGNMENT];
                 long bytes64;
                 bytes64 = Marshal.ReadInt64(current);
                 //builder.Append(current.ToString("x8"));
@@ -425,7 +428,7 @@ namespace RappiSharp.VirtualMachine.Runtime
                 {
                     bytes[7-i] = Marshal.ReadByte(current + i);
                 }
-                current = current + 8;
+                current = current + ALIGNMENT;
 
                 for(var i = 0; i < bytes.Length; i++)
                 {
@@ -439,17 +442,6 @@ namespace RappiSharp.VirtualMachine.Runtime
 
                 builder.Append(" -> ");
                 builder.Append(bytes64);
-
-                /*
-                for(var i = 0; i < bytes.Length; i++)
-                {
-                    if(i%4 == 0)
-                    {
-                        builder.Append(" ");
-                    }
-                    builder.Append((char)bytes[i]);
-                }
-                */
 
                 builder.AppendLine();
             }
